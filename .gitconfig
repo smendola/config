@@ -40,6 +40,7 @@
 	branches = !sh -c $HOME/bin/git-branches
 	what = !sh -c $HOME/bin/git-what
 	workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
+	permission-reset = "!git diff -p | grep -E \"^(diff|old mode|new mode)\" | sed -e \"s/^old/NEW/;s/^new/old/;s/^NEW/new/\" | git apply"
 
 [core]
 	autocrlf = false
@@ -85,3 +86,5 @@ fetch = master
 url = git@bitbucket.org:smendola/ng-jenkins.git
 fetch = master
 
+[gui]
+	recentrepo = C:/Users/smendola/Home/ng
