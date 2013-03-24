@@ -75,7 +75,7 @@ fetch = master
 
 
 [remote "dots"]
-url = git@bitbucket.org:smendola/dots.git
+url = git@bitbucket.org:smendola/dots2.git
 fetch = master
 
 [remote "bin"]

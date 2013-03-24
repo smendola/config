@@ -241,7 +241,8 @@ mci()
     mvn install "$@"
 }
 
-if [[ -d /c/msysgit ]]
+#if [[ -d /c/msysgit ]]
+if false
 then
 	# cygwin git is not usable, it's busted.
 	# msysgit comes with all its own unix programs like ls etc.
@@ -358,3 +359,5 @@ push-ui()
     fi
     )
 }
+
+alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
