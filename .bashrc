@@ -74,6 +74,10 @@ else
   prat 1 7 34 47
 fi
 
+if [ -f /etc/bash_completion ]
+then
+    complete -o default -o nospace -F _git config
+fi
 
 export KANDO=kando@engvmkando:studywork-ng.git
 export WORKSPACE=$(mix ~/ng)
