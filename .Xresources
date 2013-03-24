@@ -1,0 +1,28 @@
+!XTerm*font: -*-bitstream vera sans mono-medium-r-normal-*
+!XTerm*reverseVideo:true
+
+
+Rxvt*cursorColor: yellow
+Rxvt*foreground: whitesmoke
+Rxvt*background: #000040
+Rxvt*scrollBar_right: true
+Rxvt*color12:#0044FF
+Rxvt*loginShell: true
+Rxvt*keysym.0xFF50:\001
+Rxvt*keysym.0xFF57:\005
+Rxvt*saveLines: 1000
+Rxvt*font: consolas-18
+
+rxvt*cursorColor: yellow
+rxvt*foreground: whitesmoke
+rxvt*background: #000040
+rxvt*scrollBar_right: true
+rxvt*color12:#0044FF
+rxvt*loginShell: true
+rxvt*keysym.0xFF50:\001
+rxvt*keysym.0xFF57:\005
+!rxvt*menu: /root/.rxvt.menu
+rxvt*saveLines: 1000
+!rxvt*font: -*-courier new-medium-r-*-*-*-180-*-*-*-*-*-*
+rxvt*font: consolas-18
+rxvt*swapButtons:true

@@ -1,0 +1,10 @@
+BoldAsFont=no
+Transparency=low
+CursorType=block
+FontHeight=9
+BackspaceSendsBS=yes
+ClicksPlaceCursor=yes
+RightClickAction=paste
+CursorColour=255,255,0
+BellSound=yes
+BellFlash=yes
