@@ -1,0 +1,87 @@
+;;;;;;;;; Generic settings not specific to me ;;;;;;;;
+
+[color]
+	ui = true
+[color]
+	branch = auto
+	diff = auto
+	status = auto
+[color "branch"]
+	current = green bold
+	; local = yellow 
+	; remote = green
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+[color "status"]
+	; added = green
+	changed = yellow
+	; untracked = red
+
+[alias]
+	co = checkout
+	ci = commit
+	dt = difftool
+	dty = difftool -y
+	
+	; see: http://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git/4991675#4991675
+	oldest-ancestor = !bash -c 'diff -u <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
+	branchdiff = !sh -c \"git diff `git oldest-ancestor`..\"
+	branchdt = !sh -c \"git dt `git oldest-ancestor`..\"
+	branchdty = !sh -c \"git dty `git oldest-ancestor`..\"
+	branchlog = !sh -c \"git log `git oldest-ancestor`..\"
+	
+	; MINGW Git requires this ugliness;
+	; cygwin git would allow:
+	; workon = workon
+	; yes, it would.
+	branches = !sh -c $HOME/bin/git-branches
+	what = !sh -c $HOME/bin/git-what
+	workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
+
+[core]
+	autocrlf = false
+
+[remote "kando"]
+url = kando@engvmkando:studywork-ng.git
+fetch = master
+
+[difftool "diffmerge"]
+	cmd = diffmerge \"$REMOTE\" \"$LOCAL\"
+[mergetool "diffmerge"]
+	cmd = diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = true
+
+
+[difftool "winmerge"]
+	cmd = git-winmerge-wrapper.sh \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
+[mergetool "winmerge"]
+	cmd = git-winmerge-wrapper.sh \"$REMOTE\" \"$LOCAL\" \"$BASE\" \"$MERGED\"
+	trustExitCode = false
+
+[diff]
+	tool = winmerge
+[merge]
+	tool = diffmerge
+
+
+;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
+[user]
+	email = smendola@jwei-z400.phtcorp.com
+	name = Salvatore Mendola
+
+
+[remote "dots"]
+url = git@bitbucket.org:smendola/dots.git
+fetch = master
+
+[remote "bin"]
+url = git@bitbucket.org:smendola/bin.git
+fetch = master
+
+[remote "jenkins"]
+url = git@bitbucket.org:smendola/ng-jenkins.git
+fetch = master
+
