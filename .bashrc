@@ -31,7 +31,7 @@ histchars='!;'
 ### Adjust these values to your own environment; in particular:
 ###  - CATALINA_HOME (where you installed tomcat)
 ###  - CATALINA_BASE (probably ingore this)
-###  - CATALINA_HOME
+###  - JAVA_HOME
 ###  - PHANTOMJS_BIN (where you installed PhantomJS)
 ###  - WORKSPACE (where you git-clone'd studywork-ng)
 ### Recommend installing all dev tools/sdk's in a single place, e.g.
@@ -49,7 +49,7 @@ export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
-export LESSOPEN="| source-highlight -f esc -i %s"
+LESSOPEN='| source-highlight --failsafe -f esc -i %s'
 export LESS=' -R '
 
 export TOOLS_DIR=/c/tools

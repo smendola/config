@@ -26,3 +26,7 @@ rxvt*saveLines: 1000
 !rxvt*font: -*-courier new-medium-r-*-*-*-180-*-*-*-*-*-*
 rxvt*font: consolas-18
 rxvt*swapButtons:true
+
+console*cursorColor: red
+console*background: pink
+console*foreground: black

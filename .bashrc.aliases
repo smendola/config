@@ -339,4 +339,4 @@ push-ui()
     )
 }
 
-alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+alias dots='\git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
