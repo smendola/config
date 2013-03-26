@@ -1,6 +1,7 @@
 ###############################################################
 ### ALIASES AND FUNCTIONS FOR INTERACTIVE USE
 ###############################################################
+
 prat()
 { 
     if [[ $TERM == emacs ]]; then
@@ -73,21 +74,6 @@ alias pp='echo $PATH | tr : \\12'
     eval "$@" | 1,000
 }
 
-
-kbn () {
-    local ps=`ps -af | grep $1`
-    echo $ps
-    echo ""
-    local cmd=`echo $ps | gawk '{print $2}' | xargs echo kill`
-    echo -n $cmd "(y/n): "
-    local ans
-    read ans
-    if [ "$ans" == "y" ]
-    then
-        eval $cmd
-    fi  
-}
-
 ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
@@ -126,12 +112,6 @@ tp () {
 }
 
 histchars='!;'
-
-#PROMPT_COMMAND="newest=\$(newest); $PROMPT_COMMAND"
-#function newest {
-#    /bin/ls -t $* | head -1
-#}
-
 
 deref ()
 {
@@ -186,7 +166,7 @@ jgrep ()
     local where="$2";
     test -z "$where" && where=.;
     if [ -d "$where" ]; then
-        /bin/find "$where" -name '*.jar' -exec sh -c "jar tf \$(cygpath -d {} ) | grep -q $what" \; -print;
+        /bin/find "$where" -name '*.jar' -exec sh -c "jar tf \$(dos {} ) | grep -q $what" \; -print;
     elif [ -e "$where" ]; then
         jar tf "$where" | grep "$what";
     else
@@ -212,7 +192,7 @@ mix() {
     cygpath -ma "$1"
 }
 
-alias jmeter='(cd /c/tools/jmeter/bin; nohup ./jmeter.sh &)'
+alias jmeter='(cd $TOOLS_DIR/jmeter/bin; nohup ./jmeter.sh &)'
 
 
 cygsetup() {
@@ -241,9 +221,14 @@ mci()
     mvn install "$@"
 }
 
-#if [[ -d /c/msysgit ]]
-if false
+
+if [[ $(uname) == MINGW* ]] 
 then
+	echo -n '';# nothing to do
+elif [[ -d /c/msysgit ]]
+then
+	echo 'Using MSYS git'
+
 	# cygwin git is not usable, it's busted.
 	# msysgit comes with all its own unix programs like ls etc.
 	# so it cannot be added to PATH normally.
@@ -259,15 +244,18 @@ then
 	{
 		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
 	}
+elif [[ -f /usr/bin/git.exe ]]
+then
+	echo 'Using cygwin git'
 else
-	echo '*** using cygwin git ***'
+    echo '*** No git found! ***'
 fi
 
 
 skyssh()
 {
     [[ $1 ]] || (echo "Specify port number" && return)
-    local port=${1#*:}
+    local port=${1##*:}
     ssh -l dev \
         -Y \
         -p $port \
@@ -292,15 +280,6 @@ curbranch_bracketed()
     then
         echo " [$cb]"
     fi
-}
-
-synchdots()
-{
-    for d in ~/dots ~/bin
-    do
-        cd $d && git pull && git ci -m bla -a && git push
-    done
-    cp ~/dots/gitconfig ~/.gitconfig
 }
 
 fixtty()
