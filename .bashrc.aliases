@@ -9,12 +9,13 @@ prat()
     fi;
 
     PRAT=$*;
-    local attr_list;
+    local attr_list='0';
+    local attr_list2='0;31;47;7'
     local shlvl;
     local title;
     local prompt;
     local remote;
-    attr_list='0';
+
     for attr in $*;
     do
         attr_list="$attr_list;$attr";
@@ -28,7 +29,7 @@ prat()
         remote=" [REMOTE]"
     fi
 
-    prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[41m\]\$(__git_ps1 ' [%s] ')$shlvl$remote\[\033[0m\]\n\$ ";
+    prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[${attr_list2}m\]\$(curbranch_bracketed)$shlvl$remote\[\033[0m\] \n\$ ";
     PS1=$prompt
 }
 
@@ -269,17 +270,19 @@ curbranch()
 {
     if git branch > /dev/null 2>&1 
     then
-	echo $(git branch | grep '^[*]' | cut -c 3-)
+	    echo $(git branch | grep '^[*]' | cut -c 3-)
     fi
 }
 
 curbranch_bracketed()
 {
-    local cb=$(curbranch)
-    if [[ $cb ]]
-    then
-        echo " [$cb]"
-    fi
+    __git_ps1 ' (%s) '
+    
+    #local cb=$(curbranch)    
+    #if [[ $cb ]]
+    #then
+    #    echo " [$cb]"
+    #fi
 }
 
 fixtty()
@@ -292,10 +295,9 @@ jenkins()
     (title "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
 }
 
-type __git_ps1 > /dev/null 2>&1 || __git_ps1()
-{
-    curbranch_bracketed
-}
+#type __git_ps1 > /dev/null 2>&1 || 
+#    [[ -f /etc/bash_completion.d/git ]] && . /etc/bash_completion.d/git ||
+#    echo 'FAILSAFE __git_ps1' && . $HOME/.git_ps1.sh
 
 type stty > /dev/null 2>&1 || stty()
 {
@@ -339,4 +341,4 @@ push-ui()
     )
 }
 
-alias dots='\git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
