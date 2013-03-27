@@ -6,5 +6,5 @@ BackspaceSendsBS=yes
 ClicksPlaceCursor=yes
 RightClickAction=paste
 CursorColour=255,255,0
-BellSound=yes
+BellSound=no
 BellFlash=yes
