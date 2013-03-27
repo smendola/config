@@ -28,7 +28,7 @@ prat()
         remote=" [REMOTE]"
     fi
 
-    prompt="\n\[\033[${attr_list}m\] \h: \w\[\033[41m\]\$(__git_ps1 ' [%s]')$shlvl$remote \[\033[0m\]\n\$ ";
+    prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[41m\]\$(__git_ps1 ' [%s] ')$shlvl$remote\[\033[0m\]\n\$ ";
     PS1=$prompt
 }
 
