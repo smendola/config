@@ -10,7 +10,8 @@ prat()
 
     PRAT=$*;
     local attr_list='0';
-    local attr_list2='0;31;47;7'
+#    local attr_list2='0;31;47;7'
+    local attr_list2='41'
     local shlvl;
     local title;
     local prompt;
