@@ -9,6 +9,7 @@
 # If running in MSYS/MINGW, use some replacements for cyg programs
 [[ $(uname) = MINGW* ]] && PATH=~/bin/msys:$PATH
 
+
 ###############################################################
 ### SHELL SETTINGS
 ###############################################################
@@ -87,6 +88,19 @@ elif [[ $TERM == cygwin ]]; then
   prat 1 46
 else
   prat 1 7 34 47
+fi
+
+###############################################################
+### GIT FEATURES
+### Normally, these are only loaded with --login shells, but
+### I want them even if simple "exec bash"
+###############################################################
+type __git_ps1 > /dev/null 2>&1 || if [[ -f /etc/bash_completion.d/git ]] 
+then
+    . /etc/bash_completion.d/git
+elif [[ -f /etc/git-prompt.sh ]] 
+then
+    . /etc/git-prompt.sh
 fi
 
 if [ -f /etc/bash_completion ]

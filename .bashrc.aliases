@@ -295,10 +295,6 @@ jenkins()
     (title "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
 }
 
-#type __git_ps1 > /dev/null 2>&1 || 
-#    [[ -f /etc/bash_completion.d/git ]] && . /etc/bash_completion.d/git ||
-#    echo 'FAILSAFE __git_ps1' && . $HOME/.git_ps1.sh
-
 type stty > /dev/null 2>&1 || stty()
 {
 	echo -n
