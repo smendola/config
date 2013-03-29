@@ -55,7 +55,7 @@ export LESS=' -R '
 
 export TOOLS_DIR=/c/tools
 
-export JENKINS_HOME=~/jenkins
+export JENKINS_HOME=$(mix ~/jenkins)
 
 ###############################################################
 ### PATH CONSTRUCTION
