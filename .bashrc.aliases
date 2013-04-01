@@ -227,6 +227,9 @@ mci()
 if [[ $(uname) == MINGW* ]] 
 then
 	echo -n '';# nothing to do
+elif [[ -f /usr/bin/git.exe ]]
+then
+	echo 'Using cygwin git'
 elif [[ -d /c/msysgit ]]
 then
 	echo 'Using MSYS git'
@@ -246,9 +249,6 @@ then
 	{
 		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
 	}
-elif [[ -f /usr/bin/git.exe ]]
-then
-	echo 'Using cygwin git'
 else
     echo '*** No git found! ***'
 fi
