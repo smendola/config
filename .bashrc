@@ -50,10 +50,12 @@ export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
-LESSOPEN='| source-highlight --failsafe -f esc -i %s'
+export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
 export LESS=' -R '
 
 export TOOLS_DIR=/c/tools
+
+export JENKINS_HOME=$(mix ~/jenkins)
 
 ###############################################################
 ### PATH CONSTRUCTION
