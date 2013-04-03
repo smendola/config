@@ -1,0 +1,15 @@
+#!/bin/sh
+declare -a args
+for arg
+do
+    # convert -option to /option
+    if [[ $arg = -* ]]
+    then
+        arg="/${arg#-}"
+    elif [[ $arg = /* ]]
+    then
+        arg="$(cygpath -m "$arg")"
+    fi
+	args[${#args[*]}]=$arg
+done
+exec WinMergeU "${args[@]}"

@@ -1,0 +1,106 @@
+#!/bin/bash
+
+usage()
+{
+    echo "Usage: ${0##*/} WORK_ITEM [COMMENT]"
+    echo "       WORK_ITEM must be DE*, US*, TA*, or EXP-*"
+    echo "       COMMENT is only applicable when creating a new branch"
+    echo ""
+    echo "If you have already worked on this WORK_ITEM (meaning the branch already exists),"
+    echo "this command simply checks out that branch."
+    echo "If the branch does not already exist, then executing this command"
+    echo "results in creating branch WORK_ITEM, and branch-point tag BP-WORK_ITEM"
+    echo "with given comment on the tag."
+    echo "Branch-point tag is useful for listing/diffing everything done on branch."
+    exit -1
+}
+
+[[ $# = 1 || $# = 2 ]] || usage
+
+# little hack here: allow giving BP- tag name instead of branch name
+branch_name=${1#BP-}
+comment=$2
+tag="BP-${branch_name}"
+
+# MINGW does not support =~
+#if [[ ! $branch_name =~ (DE|US|TA)[0-9]* && $branch_name != ${USERNAME}-* ]]
+if [[ ! $(echo $branch_name | egrep '(DE|US|TA)[0-9]*') && $branch_name != ${USERNAME}-* ]]
+then
+  echo "Invalid WORK_ITEM $branch_name; must be DE*, US*, TA*, or ${USERNAME}-*"
+  exit 1
+fi
+
+current_branch=$(git branch | sed -n 's/[*] //p')
+
+if [[ ! $current_branch ]]
+then
+   echo "Could not determine current branch; perhaps $(pwd) is not in a git workspace"
+   exit 1
+fi
+
+
+if [[ $(git branch --list "$branch_name") || $(git branch --list -a "*/$branch_name") ]]
+then
+    # Branch already exists; just switch to it
+    git co "${branch_name}"
+else
+    # New branch to be created; and new tag; both with comment associated with them
+    
+    if [[ ! $comment ]]
+    then
+        echo ""
+        echo "COMMENT is required when creating a new work branch"
+        echo ""
+        usage
+    fi
+    
+    if [[ $current_branch != master ]]
+    then
+        echo ""
+        echo "You are not currently on branch ${current_branch}, NOT master."
+        echo "Do you want to create the work branch off of this branch?"
+        echo "If not, please check out master first, then run ${0##*/}"
+        echo ""
+
+        subBranch=X
+        while [[ -n $subBranch && $subBranch != [yYnN]* ]]
+        do
+            echo -n "Enter Y to proceed branching off of ${current_branch}, N to abort (Y/N) [N]: "
+            read subBranch
+        done
+        if [[ $subBranch != [yY]* ]]
+        then
+            echo "Canceled."
+            exit
+        fi
+        echo ""
+    fi
+    
+
+    echo ""
+    echo "It's a good idea to do a pull before starting work on a new branch."
+    echo "Besides the obvious reasons, diffing against the $tag tag will show"
+    echo "un-interesting diffs if you merge from $current_branch later."
+    echo "Do you want to pull from $current_branch right now?"
+    echo ""
+    
+    pull=X
+    while [[ -n $pull && $pull != [yYnN]* ]]
+    do
+        echo -n "Enter Y to pull right now, N otherwise (Y/N) [Y]: "
+        read pull
+    done
+    
+    if [[ $pull != [nN]* ]]
+    then
+        git pull origin "$current_branch"
+    fi
+    
+    # The actual work
+    git branch "${branch_name}"
+    git tag -m "$comment" -a "${tag}"
+    git co "${branch_name}"
+fi
+
+# Finally, show where we landed
+git what

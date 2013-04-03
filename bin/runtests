@@ -1,0 +1,8 @@
+#!/bin/sh
+trap "exit -1" ERR
+cd $WORKSPACE/test/robotframework/src/main/suite
+mkdir -p _Executable
+[[ -f $WORKSPACE/test/robotframework/target/*.jar ]] && 
+	cp $WORKSPACE/test/robotframework/target/*.jar _Executable || 
+	echo NO JARS!
+cygstart cmd /K pybot "$@" .

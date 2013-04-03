@@ -1,0 +1,16 @@
+/*
+!/.gitignore
+!/.bashrc
+!/.bashrc.aliases
+!/.bash_profile
+!/.ssh
+!/.vimrc
+!/.minttyrc
+!/.ffmpeg
+!/.emacs
+!/.emacs.d
+!/.ssh
+/.ssh/known_hosts
+!/bin
+!/bin.personal
+

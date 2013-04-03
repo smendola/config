@@ -1,0 +1,65 @@
+#!/bin/sh
+trap "echo Aborting.; exit -1" ERR
+
+CONFIG_FILE=~/ng-install.ini
+
+while getopts brdc: OPTNAME
+do
+    case $OPTNAME in
+    \?) # Option not recognized
+        exit 1;;
+     d) set -x
+        PS4='+${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]}: '
+        ;;
+     b) BUILD=all;;
+     c) CONFIG_FILE=$OPTARG;;
+     r) RUN=1;;
+     *) MVNOPT="$MVNOPT -$OPTNAME" ;;
+    esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [[ ! -f $CONFIG_FILE ]]
+then
+  echo "Config file $CONFIG_FILE does not exist"
+  echo "If the name is different, use ${0##*/} -c CONFIG_FILE"
+  exit 1
+fi
+
+# Build all/some/none of the projects
+cd $WORKSPACE
+case "${BUILD}" in
+    all) mvn -DskipTests -q $MVNOPT install;;
+    ui)  mvn -DskipTests -q $MVNOPT install -pl sw-ng-ui;;
+esac
+
+echo "*** Copying artifacts from \$WORKSPACE/install into \$WORKSPACE/tools/sw-ng-installer/setup/artifacts ***"
+# Set up installer
+#   copy the artifacts into the installer
+ARTIFACTS_DIR=${WORKSPACE}/tools/sw-ng-installer/setup/artifacts
+mkdir -p ${ARTIFACTS_DIR}
+
+find "${WORKSPACE}/install" -name \*.zip -print -exec cp {} ${ARTIFACTS_DIR} \;
+find services tools/log-server-adapter sw-ng-ui \
+    -name \*.war -print -exec cp {} ${ARTIFACTS_DIR} \;
+echo "Done."
+
+echo "*** Generating buildinfo.txt ***"
+#   generate a buildinfo.txt file
+cd $WORKSPACE/tools/sw-ng-installer/setup
+echo development/SNAPSHOT > $WORKSPACE/tools/sw-ng-installer/setup/buildinfo.txt
+echo "Done."
+
+echo "*** Invoking installer, giving it config file $CONFIG_FILE ***"
+
+# Run installer
+cd $WORKSPACE/tools/sw-ng-installer/setup
+./setup.sh "${CONFIG_FILE}"
+
+if [[ $RUN ]]
+then
+  echo "*** Starting tomcat in the foreground ***"
+  # Run tomcat
+  catalina.sh jpda run
+fi
+
