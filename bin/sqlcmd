@@ -1,0 +1,8 @@
+#!/bin/sh
+if [[ $SQLCMD_NOOP ]]
+then
+   echo "*** SQLCMD is NO-OP!!!! ***"
+   exit 0
+fi
+
+/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn/SQLCMD.EXE "$@"

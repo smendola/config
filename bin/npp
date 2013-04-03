@@ -1,0 +1,11 @@
+#!/bin/sh
+declare -a args
+for arg
+do
+     args[${#args[*]}]=$(cygpath -ma "$arg")
+done
+
+case "${0##*/}" in
+    npp) cygstart notepad++ "${args[@]}";;
+    sublime) cygstart sublime_text "${args[@]}";;
+esac
