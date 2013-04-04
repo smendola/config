@@ -11,5 +11,6 @@
 !.emacs.d
 !/.ssh
 /.ssh/known_hosts
-!bin
-!bin.personal
+!/bin
+!/bin.personal
+!/ng-install.ini
