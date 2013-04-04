@@ -1,0 +1,4 @@
+#!/bin/sh
+# best attempt... good luck...
+"$@"
+exit
