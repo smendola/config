@@ -69,7 +69,7 @@ echo ""
 # Your email address can be constructed, but your full name can't, so prompt for that.
 echo -n "Enter your full name; this will go in .gitconfig: "
 read FULL_NAME
-echo -n "Enter your email address: [${USERNAME}@phtcorp.com]:"
+echo -n "Enter your email address: [${USERNAME}@phtcorp.com]: "
 read EMAIL
 
 sed --in-place \
