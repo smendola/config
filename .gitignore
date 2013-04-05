@@ -13,4 +13,5 @@
 /.ssh/known_hosts
 !/bin
 !/bin.personal
-
+!/ng-install.ini
+!/setup-cygwin.sh
