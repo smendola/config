@@ -1,3 +1,8 @@
+;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
+[user]
+	email = smendola@jwei-z400.phtcorp.com
+	name = Salvatore Mendola
+
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
 [color]
@@ -45,10 +50,6 @@
 [core]
 	autocrlf = false
 
-[remote "kando"]
-url = kando@engvmkando:studywork-ng.git
-fetch = master
-
 [difftool "diffmerge"]
 	cmd = diffmerge \"$REMOTE\" \"$LOCAL\"
 [mergetool "diffmerge"]
@@ -67,24 +68,17 @@ fetch = master
 [merge]
 	tool = diffmerge
 
+[remote "ng"]
+	url = kando@engvmkando:studywork-ng.git
+	fetch = master
 
-;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
-[user]
-	email = smendola@jwei-z400.phtcorp.com
-	name = Salvatore Mendola
+[remote "config"]
+	url = https://smendola@bitbucket.org/smendola/config.git
+	fetch = master
+
+[remote "ng-jenkins"]
+	url = git@bitbucket.org:smendola/ng-jenkins.git
+	fetch = master
 
 
-[remote "dots"]
-url = git@bitbucket.org:smendola/dots2.git
-fetch = master
 
-[remote "bin"]
-url = git@bitbucket.org:smendola/bin.git
-fetch = master
-
-[remote "jenkins"]
-url = git@bitbucket.org:smendola/ng-jenkins.git
-fetch = master
-
-[gui]
-	recentrepo = C:/Users/smendola/Home/ng
