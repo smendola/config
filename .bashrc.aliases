@@ -338,4 +338,6 @@ push-ui()
     )
 }
 
+alias cls='echo -n -e "\033c"'
+
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'

@@ -8,3 +8,4 @@ RightClickAction=paste
 CursorColour=255,255,0
 BellSound=no
 BellFlash=yes
+ScrollbackLines=100000
