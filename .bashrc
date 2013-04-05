@@ -39,7 +39,7 @@ histchars='!;'
 ### C:\tools, and point TOOLS_DIR to that dir. Put JRE there, as
 ### well (e.g. $TOOLS_DIR/jre6)
 ###############################################################
-export JAVA_HOME=$(mix /c/tools/jdk6)
+export JAVA_HOME=$(mix "/c/tools/jdk6")
 export CATALINA_HOME=/c/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
@@ -62,7 +62,7 @@ export JENKINS_HOME=$(mix ~/jenkins)
 ###############################################################
 
 PATH=~/bin:$PATH
-PATH=$(unx $JAVA_HOME)/bin:$PATH
+PATH=$(unx "$JAVA_HOME/bin"):$PATH
 
 
 # Add all /c/tools/springsource/*/bin and  /c/tools/*/bin to PATH
