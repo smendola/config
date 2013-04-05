@@ -3,6 +3,10 @@
 	email = smendola@jwei-z400.phtcorp.com
 	name = Salvatore Mendola
 
+[remote "config-sal"]
+	url = git clone git@bitbucket.org:smendola/config-sal.git
+	fetch = master
+
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
 [color]
