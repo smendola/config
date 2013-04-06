@@ -14,7 +14,7 @@
 ### SHELL SETTINGS
 ###############################################################
 shopt -s nullglob ; # prevents cd wrong* from causing cd ~
-shopt -s progcomp ; # having trouble with that feature
+shopt -u progcomp ; # having trouble with that feature
 shopt -s globstar 2> /dev/null;  # foo/**/bar matches bar at any subdir depth; not supported in MINGW
 
 unset HISTFILE
