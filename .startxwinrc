@@ -1,4 +1,4 @@
 SHLVL=0
-rxvt -name "console"
+#rxvt -name "console"
 # When above process exits, kill XWin
-pkill -9 XWin
+#pkill -9 XWin
