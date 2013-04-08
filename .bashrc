@@ -20,6 +20,8 @@ shopt -s globstar 2> /dev/null;  # foo/**/bar matches bar at any subdir depth; n
 unset HISTFILE
 histchars='!;'
 
+GLOBIGNORE=.:..
+
 ###############################################################
 ### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
 ###############################################################
