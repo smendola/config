@@ -338,4 +338,18 @@ push-ui()
     )
 }
 
+clear-m2()
+{
+    if [[ $# ]]
+    then
+        for pkg in "$@"
+        do
+            command rm -rf ~/.m2/repository/$pkg
+        done
+    else
+        command rm -rf ~/.m2/repository/
+    fi
+}
+
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+
