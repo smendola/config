@@ -353,3 +353,5 @@ clear-m2()
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
+alias ride='(pythonw -c "from robotide import main; main()"&)'
+alias pybot='pybot.bat -l DEBUG'
