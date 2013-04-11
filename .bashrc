@@ -82,6 +82,10 @@ do
     fi
 done
 
+
+# Remove various Windows crap from PATH
+PATH=$(pp | egrep -iv '/c/Program|/c/Windows|/AppData/' | tr '\012' :)
+
 ###############################################################
 ### Stuff...
 ###############################################################
