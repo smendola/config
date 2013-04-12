@@ -38,6 +38,8 @@ prat()
 # colorize ls output, if supported
 /bin/ls /dev/null --color > /dev/null 2>&1 && alias ls='/bin/ls --color=auto'
 
+# Clears the scrollback buffer, not just the current screen
+alias cls='echo -e "\ec\e[3J"'
 
 bd () {
     cd "$OLDPWD"
@@ -358,8 +360,8 @@ alias ride='(pythonw -c "from robotide import main; main()"&)'
 pybot()
 {
     pybot.bat \
-        -C on \
         -L DEBUG \
+        --suitestatlevel 3 \
         --tagdoc "Bug:There is an open Defect on this scenario" \
         --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
         --tagstatexclude "TC*" \
