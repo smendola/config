@@ -51,7 +51,7 @@ export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
-export LESS=' -R '
+export LESS='-R -x4'
 
 export TOOLS_DIR=/c/tools
 
