@@ -11,6 +11,8 @@
 # MODIFICATION LOG (most recent first)
 # DATE      WHO DESCRIPTION
 # ========= === =============================================================
+# 09-Apr-13 SM  Fix a quoting problem; rgrep '*.xml' would do rgrep pom.xml
+#               despite quotes. Also, skip .git/
 # 05-Aug-09 KRH Modified to run on AIX.
 # 20-Sep-05 KRH Minor update to run under bash.
 # 10-Oct-01 KRH Quote the found filename to protect against weird file names.
@@ -151,9 +153,9 @@ elif [[ $# -eq 1 ]]
 then
     OR=""
     # Allow for multiple filename patterns, reformat for "find".
-    for ELEMENT in $( echo "$1" | sed 's/|/ /g;' )
+    for ELEMENT in "$( echo "$1" | sed 's/|/ /g;' )"
     do
-        FILESPEC="${FILESPEC}${OR}-name \"$ELEMENT\""
+        FILESPEC="${FILESPEC}${OR}-name '$ELEMENT'"
         OR=" -o "
     done
     # Or condition applies only to filespec, isolate it
@@ -163,7 +165,7 @@ fi
 # ===========================================================================
 # PROCESSING
 
-eval find . -type f $FILESPEC -print | while read FILE
+eval find . -name .git -prune -o -type f $FILESPEC -print | while read FILE
 do
     case $MODE in
     not)    # Check for failure, then display the file

@@ -38,6 +38,8 @@ prat()
 # colorize ls output, if supported
 /bin/ls /dev/null --color > /dev/null 2>&1 && alias ls='/bin/ls --color=auto'
 
+# Clears the scrollback buffer, not just the current screen
+alias cls='echo -e "\ec\e[3J"'
 
 bd () {
     cd "$OLDPWD"
@@ -338,4 +340,33 @@ push-ui()
     )
 }
 
+clear-m2()
+{
+    if [[ $# ]]
+    then
+        for pkg in "$@"
+        do
+            command rm -rf ~/.m2/repository/$pkg
+        done
+    else
+        command rm -rf ~/.m2/repository/
+    fi
+}
+
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+
+alias ride='(pythonw -c "from robotide import main; main()"&)'
+
+pybot()
+{
+    pybot.bat \
+        -L DEBUG \
+        --suitestatlevel 3 \
+        --tagdoc "Bug:There is an open Defect on this scenario" \
+        --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
+        --tagstatexclude "TC*" \
+        --tagstatlink "DE*:https://rally1.rallydev.com/#/3985632862d/search?keywords=DE%1:Rally" \
+        --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
+        --tagstatlink "TC*:https://rally1.rallydev.com/#/3985632862d/search?keywords=TC%1:Rally" \
+        "$@"
+}
