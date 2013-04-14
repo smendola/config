@@ -259,16 +259,14 @@ function skyssh() {
     services-useast.skytap.com
 }
 
-curbranch()
-{
+function curbranch() {
     if git branch > /dev/null 2>&1 
     then
 	    echo $(git branch | grep '^[*]' | cut -c 3-)
     fi
 }
 
-curbranch_bracketed()
-{
+function curbranch_bracketed() {
     __git_ps1 ' (%s) '
     
     #local cb=$(curbranch)    
@@ -278,8 +276,7 @@ curbranch_bracketed()
     #fi
 }
 
-fixtty()
-{
+function fixtty() {
     stty sane erase ^H
 }
 
