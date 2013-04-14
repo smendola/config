@@ -115,8 +115,6 @@ tp () {
   TITLE_PREFIX="$@"
 }
 
-histchars='!;'
-
 deref ()
 {
     if [ -L $1 ]

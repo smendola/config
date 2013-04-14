@@ -16,7 +16,7 @@ alias rm='rm -i'
 alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
 alias whiches='type -Pa'
 
-PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
+#PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
 
 function upto ()
 {
@@ -65,8 +65,6 @@ function wt () {
 function tp () {
   TITLE_PREFIX="$@"
 }
-
-histchars='!;#'
 
 function  deref ()
 {
@@ -156,22 +154,18 @@ function cygsetup() {
     cmd /c start $(dos /setup.exe) "$@"
 }
 
-function mqst()
-{
+function mqst() {
     mvn -q -DskipTests "$@"
 }
-function mqsti()
-{
+function mqsti() {
     mqst install "$@"
 }
-function mqstci()
-{
+function mqstci() {
     # It's always better to do clean separate from install
     mqst clean "$@"
     mqst install "$@"
 }
-function mci()
-{
+function mci() {
     mvn clean "$@"
     mvn install "$@"
 }
@@ -190,16 +184,13 @@ then
 	# cygwin git is not usable, it's busted.
 	# msysgit comes with all its own unix programs like ls etc.
 	# so it cannot be added to PATH normally.
-	git()
-	{
+	git() {
 		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
 	}
-	gitk()
-	{
+	gitk() {
 		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
 	}
-	git-bash()
-	{
+	git-bash() {
 		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
 	}
 else
@@ -207,8 +198,7 @@ else
 fi
 
 
-function skyssh()
-{
+function skyssh() {
     [[ $# = 1 ]] || (echo "Specify port number" && return)
     local port=${1##*:}
     ssh -l dev \
@@ -220,42 +210,19 @@ function skyssh()
     services-useast.skytap.com
 }
 
-function curbranch()
-{
-    if git branch > /dev/null 2>&1 
-    then
-	    echo $(git branch | grep '^[*]' | cut -c 3-)
-    fi
-}
-
-function curbranch_bracketed()
-{
-    __git_ps1 ' (%s) '
-    
-    #local cb=$(curbranch)    
-    #if [[ $cb ]]
-    #then
-    #    echo " [$cb]"
-    #fi
-}
-
-function fixtty()
-{
+function fixtty() {
     stty sane erase ^H
 }
 
-function jenkins()
-{
+function jenkins() {
     (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
 }
 
-type stty > /dev/null 2>&1 || stty()
-{
+type stty > /dev/null 2>&1 || stty() {
 	echo -n
 }
 
-function tomcat()
-{
+function tomcat() {
 	shutdown.sh > /dev/null 2>&1
 	sleep 2
     /bin/rm /c/tools/tomcat/logs/*
@@ -269,8 +236,8 @@ function anno() {
     curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
 }
 
-function push-ui() 
-{  ( 
+function push-ui() {
+  ( 
 	trap "echo '***** FAILED *****'; exit" ERR
     #set -x;
     if [[ $1 = -b ]]
@@ -288,11 +255,10 @@ function push-ui()
 		shift
         tomcat
     fi
-    )
+  )
 }
 
-function clear-m2()
-{
+function clear-m2() {
     if [[ $# > 0 ]]
     then
         for pkg in "$@"
@@ -308,8 +274,7 @@ alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 
-function pybot()
-{
+function pybot() {
     pybot.bat \
         -L DEBUG \
         --suitestatlevel 3 \
@@ -320,4 +285,16 @@ function pybot()
         --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
         --tagstatlink "TC*:https://rally1.rallydev.com/#/3985632862d/search?keywords=TC%1:Rally" \
         "$@"
+}
+
+function palette() {
+    for code in {000..255}; do
+        print -n -P -- "${BG[$code]}[$code]"
+    done
+    print -P -- "$BG[000]"
+    print ""
+    for code in {000..255}; do
+        print -n -P -- "${FG[$code]}[$code]"
+    done
+    print -P -- "$BG[000]"
 }
