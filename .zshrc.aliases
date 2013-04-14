@@ -16,7 +16,7 @@ alias rm='rm -i'
 alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
 alias whiches='type -Pa'
 
-PROMPT_COMMAND='set +x; set +v; title ${TITLE_PREFIX}:`dirs`; fixtty' 
+PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
 
 function upto ()
 {
@@ -55,24 +55,10 @@ function ec() {
 alias e=npp
 alias s=sublime
 
-# set the terminal window title bar label 
-# e.g.: title MAIN WINDOW 
-function title() { 
-    echo -n $'\e];'"$@"$'\a' ;# works with ANSI terminals 
-    # if [ "$TERM" == cygwin ] 
-    # then 
-        # # the cd works around UNC path warnings if cd'ed to //host/path 
-        # (cd C:; cmd /c title "$@") ;# works with DOS terminals 
-    # else 
-        # echo -n $'\e];'"$@"$'\a' ;# works with ANSI terminals 
-    # fi 
-} 
-
-
 # run commands, displaying the command at as the terminal's title,
 # e.g. 
 function wt () {
-    title "$@"
+    title "$1" "$@"
     "$@" ;# no need to use "eval"; that actually causes problems
 }
 
@@ -260,7 +246,7 @@ function fixtty()
 
 function jenkins()
 {
-    (title "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
+    (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
 }
 
 type stty > /dev/null 2>&1 || stty()
@@ -273,7 +259,7 @@ function tomcat()
 	shutdown.sh > /dev/null 2>&1
 	sleep 2
     /bin/rm /c/tools/tomcat/logs/*
-    title Tomcat
+    title Tomcat Tomcat
     catalina.sh jpda run
 }
 
