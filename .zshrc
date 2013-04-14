@@ -39,3 +39,5 @@ plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
+
+. ~/.zshrc.aliases
