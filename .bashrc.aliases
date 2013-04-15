@@ -2,8 +2,7 @@
 ### ALIASES AND FUNCTIONS FOR INTERACTIVE USE
 ###############################################################
 
-prat()
-{ 
+function prat() { 
     if [[ $TERM == emacs ]]; then
         return;
     fi;
@@ -25,7 +24,7 @@ prat()
     if [[ $SHLVL > 1 ]]; then
         shlvl=" [$SHLVL]";
     fi
-    if [[ $SSH_CONNECTION ]]
+    if [[ ! -z $SSH_CONNECTION ]]
     then
         remote=" [REMOTE]"
     fi
@@ -218,7 +217,9 @@ function mci() {
     mvn clean "$@"
     mvn install "$@"
 }
-
+function ntd() {
+  $WORKSPACE/tools/deploy.sh "$@"
+}
 
 if [[ $(uname) == MINGW* ]] 
 then
@@ -364,3 +365,4 @@ function palette() {
     done
     print -P -- "$BG[000]"
 }
+
