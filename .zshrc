@@ -121,7 +121,7 @@ COMPLETION_WAITING_DOTS="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 
 
-plugins=(git)# Path to your oh-my-zsh configuration.
+plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
 histchars='!;#'
 ZSH_THEME="sm"
