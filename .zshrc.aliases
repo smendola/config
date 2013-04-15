@@ -280,6 +280,7 @@ alias ride='(pythonw -c "from robotide import main; main()"&)'
 function pybot() {
     pybot.bat \
         -L DEBUG \
+        -W $(tput cols) \
         --suitestatlevel 3 \
         --tagdoc "Bug:There is an open Defect on this scenario" \
         --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
