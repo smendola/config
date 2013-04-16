@@ -202,7 +202,10 @@ fi
 
 
 function skyssh() {
-    [[ $# = 1 ]] || (echo "Specify port number" && return)
+    if [[ $# != 1 ]] then
+        echo "Specify port number"
+        return
+    fi
     local port=${1##*:}
     ssh -l dev \
         -Y \
@@ -211,6 +214,15 @@ function skyssh() {
         -L18081:localhost:8081 \
         -L19000:localhost:9000 \
     services-useast.skytap.com
+}
+
+function skyterm() {
+    if [[ $# != 1 ]] then
+        echo "Specify port number"
+        return
+    fi
+    local port=${1##*:}
+    cygstart putty -load dev@skytap -P $port
 }
 
 function fixtty() {
@@ -280,7 +292,7 @@ alias ride='(pythonw -c "from robotide import main; main()"&)'
 function pybot() {
     pybot.bat \
         -L DEBUG \
-        -W $(tput cols) \
+        -W $(( $(tput cols) - 2 )) \
         --suitestatlevel 3 \
         --tagdoc "Bug:There is an open Defect on this scenario" \
         --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
