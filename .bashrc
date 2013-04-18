@@ -20,6 +20,8 @@ shopt -s globstar 2> /dev/null;  # foo/**/bar matches bar at any subdir depth; n
 unset HISTFILE
 histchars='!;'
 
+GLOBIGNORE=.:..
+
 ###############################################################
 ### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
 ###############################################################
@@ -51,7 +53,7 @@ export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
-export LESS=' -R '
+export LESS='-R -x4'
 
 export TOOLS_DIR=/c/tools
 
@@ -79,6 +81,10 @@ do
         PATH=$d:$PATH
     fi
 done
+
+
+# Remove various Windows crap from PATH
+PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
 
 ###############################################################
 ### Stuff...

@@ -1,7 +1,10 @@
 /*
-!/.gitconfig
+*.bak
+*~
+#*#
+!/.zshrc
+!/.zshrc.aliases
 !/.gitignore
-!/.gitconfig
 !/.bashrc
 !/.bashrc.aliases
 !/.bash_profile
