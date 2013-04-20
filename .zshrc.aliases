@@ -180,8 +180,6 @@ then
 elif [[ -f /usr/bin/git.exe ]]
 then
 	echo 'Using cygwin git'
-    # work-around for a cygwin problem
-    alias pull='PATH=/bin git pull'
 elif [[ -d /c/msysgit ]]
 then
 	echo 'Using MSYS git'

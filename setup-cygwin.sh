@@ -46,7 +46,7 @@ curl '-#' -o ./cygwin-setup.exe 'http://cygwin.com/setup.exe'
 
 # Run the installer, requesting some specific packages we need
 ./cygwin-setup.exe -q -R 'C:\cygwin' -l 'C:\cygwin-pkgs' \
-    -P tar,zip,unzip,p7zip,vi,openssh,curl,wget,git,source-highlight,dos2unix,git,git-completion
+    -P tar,zip,unzip,p7zip,vi,openssh,curl,wget,source-highlight,dos2unix,git,git-completion
 
 echo "**************************************************************"
 echo "Cygwin should now be installed."
@@ -55,7 +55,7 @@ echo ""
 echo "Changing your cygwin HOME directory to match your Windows HOME"
 echo "and your git-bash HOME"
 # Fix up home directory; instead of cygwin standard, use Windows (and MSYSGIT) standard    
-sed --in-place -e "s|/home/${USERNAME}|${HOME}|gi" /c/cygwin/etc/passwd
+sed --in-place -e "s|/home/${USERNAME}:/bin/bash|${HOME}:/bin/zsh|gi" /c/cygwin/etc/passwd
 
 echo "Mounting C: as /c, which is convenient, and also compatible with MSYSGIT"
 echo 'C:/ /c ntfs binary,user 0 0' >> /c/cygwin/etc/fstab
