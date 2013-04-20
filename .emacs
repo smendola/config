@@ -61,3 +61,4 @@
 (setq default-tab-width 4)
 (setq nxml-child-indent 4)
 (put 'narrow-to-region 'disabled nil)
+(xterm-mouse-mode)
