@@ -4,7 +4,7 @@
 
 
 # Clears the scrollback buffer, not just the current screen
-alias cls='echo -e "\ec\e[3J"'
+alias cls='echo -n -e "\ec\e[3J"'
 
 function bd () {
     cd "$OLDPWD"
