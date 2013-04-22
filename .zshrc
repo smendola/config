@@ -120,6 +120,14 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 
+zle -N cls
+function cls() {
+  echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  zle clear-screen ;# redisplays the prompt and current command line
+}
+
+bindkey '\xc2\x8c' cls ;# C-Shift-L
+bindkey '\e^L' cls ;# C-M-L
 
 plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
