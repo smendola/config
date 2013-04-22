@@ -230,7 +230,7 @@ function skyput() {
 
 function skyshell() {
     if [[ $# != 1 ]] then
-        echo "Specify port number"
+        echo "Usage: skyshell PORTNUM"
         return
     fi
     local port=${1##*:}
@@ -245,7 +245,7 @@ function skyshell() {
 
 function skyterm() {
     if [[ $# != 1 ]] then
-        echo "Specify port number"
+        echo "Usage: skyterm PORTNUM"
         return
     fi
     local port=${1##*:}
