@@ -202,7 +202,33 @@ else
 fi
 
 
-function skyssh() {
+function skyget() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyget PORTNUM SOURCE [DEST]"
+        echo "       SOURCE is either relative to ~dev on skytap, or absolute"
+        return
+    fi
+    local port=${1##*:}
+    src=$2
+    dst=${3:-.}
+    sftp -P $port dev@services-useast.skytap.com:$src "$dst"
+}
+
+function skyput() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyput PORTNUM SOURCE DEST"
+        echo "       DEST is either relative to ~dev on skytap, or absolute"
+       return
+    fi
+    local port=${1##*:}
+    src=$2
+    dst=$3
+    sftp -P $port $src "$src" "dev@services-useast.skytap.com:$dst"
+}
+
+function skyshell() {
     if [[ $# != 1 ]] then
         echo "Specify port number"
         return
