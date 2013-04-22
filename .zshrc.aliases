@@ -314,3 +314,4 @@ function palette() {
     done
     print -P -- "$BG[000]"
 }
+alias type='builtin type -f'
