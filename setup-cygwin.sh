@@ -22,9 +22,6 @@ fi
 
 echo "OK, you asked for it..."
 
-exit
-
-
 ## First, fetch all the configuration files from git repo on bitbucket
 cd $HOME
 rm -rf .config.git
