@@ -46,7 +46,7 @@ curl '-#' -o ./cygwin-setup.exe 'http://cygwin.com/setup.exe'
 
 # Run the installer, requesting some specific packages we need
 ./cygwin-setup.exe -q -R 'C:\cygwin' -l 'C:\cygwin-pkgs' \
-    -P tar,zip,unzip,p7zip,vi,openssh,curl,wget,source-highlight,dos2unix,git,git-completion
+    -P tar,zip,unzip,p7zip,vi,openssh,curl,wget,source-highlight,dos2unix,git,git-completion,zsh
 
 echo "**************************************************************"
 echo "Cygwin should now be installed."
