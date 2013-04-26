@@ -83,6 +83,9 @@ done
 # Remove various Windows crap from PATH
 PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
 
+# but add back this one for sqlcmd
+PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
+
 ###############################################################
 ### Stuff...
 ###############################################################

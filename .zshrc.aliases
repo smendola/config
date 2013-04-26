@@ -15,6 +15,7 @@ alias start=cygstart
 alias rm='rm -i'
 alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
 alias whiches='type -Pa'
+alias type='builtin type -f'
 
 #PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
 
@@ -201,9 +202,38 @@ else
 fi
 
 
-function skyssh() {
+function skyget() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
+        echo "       REMOTE_SOURCE is either relative to ~dev on skytap, or absolute"
+        return
+    fi
+    local port=${1##*:}
+    src=$2
+    dst=${3:-.}
+    sftp -P $port dev@services-useast.skytap.com:$src "$dst"
+}
+
+function skyput() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
+        echo "       REMOTE_DEST is either relative to ~dev on skytap, or absolute"
+       return
+    fi
+    local port=${1##*:}
+    src=$2
+    dst=${3:-/home/dev}
+    sftp -P $port -b - "dev@services-useast.skytap.com" << EOF
+put $src $dst
+bye
+EOF
+}
+
+function skyshell() {
     if [[ $# != 1 ]] then
-        echo "Specify port number"
+        echo "Usage: skyshell PORTNUM"
         return
     fi
     local port=${1##*:}
@@ -218,7 +248,7 @@ function skyssh() {
 
 function skyterm() {
     if [[ $# != 1 ]] then
-        echo "Specify port number"
+        echo "Usage: skyterm PORTNUM"
         return
     fi
     local port=${1##*:}
