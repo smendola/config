@@ -205,8 +205,8 @@ fi
 function skyget() {
     if [[ $# < 2 || $# > 3 ]]
     then
-        echo "Usage: skyget PORTNUM SOURCE [DEST]"
-        echo "       SOURCE is either relative to ~dev on skytap, or absolute"
+        echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
+        echo "       REMOTE_SOURCE is either relative to ~dev on skytap, or absolute"
         return
     fi
     local port=${1##*:}
@@ -218,14 +218,17 @@ function skyget() {
 function skyput() {
     if [[ $# < 2 || $# > 3 ]]
     then
-        echo "Usage: skyput PORTNUM SOURCE DEST"
-        echo "       DEST is either relative to ~dev on skytap, or absolute"
+        echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
+        echo "       REMOTE_DEST is either relative to ~dev on skytap, or absolute"
        return
     fi
     local port=${1##*:}
     src=$2
-    dst=$3
-    sftp -P $port $src "$src" "dev@services-useast.skytap.com:$dst"
+    dst=${3:-/home/dev}
+    sftp -P $port -b - "dev@services-useast.skytap.com" << EOF
+put $src $dst
+bye
+EOF
 }
 
 function skyshell() {
