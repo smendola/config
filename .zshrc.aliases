@@ -323,9 +323,7 @@ function pybot() {
     pybot.bat \
         -L DEBUG \
         -W $(( $(tput cols) - 2 )) \
-        --suitestatlevel 3 \
-        --tagdoc "Bug:There is an open Defect on this scenario" \
-        --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
+        --suitestatlevel 2 \
         --tagstatexclude "TC*" \
         --tagstatlink "DE*:https://rally1.rallydev.com/#/3985632862d/search?keywords=DE%1:Rally" \
         --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
@@ -344,4 +342,3 @@ function palette() {
     done
     print -P -- "$BG[000]"
 }
-alias type='builtin type -f'

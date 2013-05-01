@@ -1,0 +1,7 @@
+[submodule ".oh-my-zsh"]
+	path = .oh-my-zsh
+	url = git@bitbucket.org:smendola/.oh-my-zsh.git
+
+[submodule "bin.personal"]
+	path = bin.personal
+	url = git@bitbucket.org:smendola/bin.personal.git
