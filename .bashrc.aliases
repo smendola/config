@@ -38,7 +38,7 @@ function prat() {
 /bin/ls /dev/null --color > /dev/null 2>&1 && alias ls='/bin/ls --color=auto'
 
 # Clears the scrollback buffer, not just the current screen
-alias cls='echo -e "\ec\e[3J"'
+alias cls='echo -n -e "\ec\e[3J"'
 
 function bd () {
     cd "$OLDPWD"
@@ -248,10 +248,56 @@ else
 fi
 
 
-function skyssh() {
-    [[ $# = 1 ]] || (echo "Specify port number" && return)
+function skyget() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
+        echo "       REMOTE_SOURCE is either relative to ~ops on skytap, or absolute"
+        return
+    fi
     local port=${1##*:}
-    ssh -l dev \
+    local src=$2
+    local dst=${3:-.}
+    sftp -P $port ops@services-useast.skytap.com:$src "$dst"
+}
+
+function skyget-logs() {
+    echo '*** TO DO: COMPRESS / SEND / DECOMPRESS'
+    mkdir -p Robot_Logs
+    if [[ $# != 1 ]]
+    then
+        echo "Usage: skyget-logs PORTNUM"
+        return
+    fi
+    local port=$1
+    skyget $port 'DEPLOY/ng-robot-framework-*/*.*ml' Robot_Logs
+    skyget $port 'DEPLOY/ng-robot-framework-*/*.png' Robot_Logs
+}
+
+
+function skyput() {
+    if [[ $# < 2 || $# > 3 ]]
+    then
+        echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
+        echo "       REMOTE_DEST is either relative to ~ops on skytap, or absolute"
+       return
+    fi
+    local port=${1##*:}
+    local src=$2
+    local dst=${3:-/home/ops}
+    sftp -P $port -b - "ops@services-useast.skytap.com" << EOF
+put $src $dst
+bye
+EOF
+}
+
+function skyshell() {
+    if [[ $# != 1 ]] then
+        echo "Usage: skyshell PORTNUM"
+        return
+    fi
+    local port=${1##*:}
+    ssh -l ops \
         -Y \
         -p $port \
         -L18080:localhost:8080 \
@@ -260,21 +306,13 @@ function skyssh() {
     services-useast.skytap.com
 }
 
-function curbranch() {
-    if git branch > /dev/null 2>&1 
-    then
-	    echo $(git branch | grep '^[*]' | cut -c 3-)
+function skyterm() {
+    if [[ $# != 1 ]] then
+        echo "Usage: skyterm PORTNUM"
+        return
     fi
-}
-
-function curbranch_bracketed() {
-    __git_ps1 ' (%s) '
-    
-    #local cb=$(curbranch)    
-    #if [[ $cb ]]
-    #then
-    #    echo " [$cb]"
-    #fi
+    local port=${1##*:}
+    cygstart putty -load ops@skytap -P $port
 }
 
 function fixtty() {
@@ -282,7 +320,7 @@ function fixtty() {
 }
 
 function jenkins() {
-    (title "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
+    (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
 }
 
 type stty > /dev/null 2>&1 || stty() {
@@ -344,13 +382,11 @@ alias ride='(pythonw -c "from robotide import main; main()"&)'
 function pybot() {
     pybot.bat \
         -L DEBUG \
-        --suitestatlevel 3 \
-        --tagdoc "Bug:There is an open Defect on this scenario" \
-        --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
+        -W $(( $(tput cols) - 2 )) \
+        --suitestatlevel 2 \
         --tagstatexclude "TC*" \
-        --tagstatlink "DE*:https://rally1.rallydev.com/#/3985632862d/search?keywords=DE%1:Rally" \
-        --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
-        --tagstatlink "TC*:https://rally1.rallydev.com/#/3985632862d/search?keywords=TC%1:Rally" \
+        --tagstatexclude "US*" \
+        --tagstatexclude "DE*" \
         "$@"
 }
 
@@ -366,3 +402,26 @@ function palette() {
     print -P -- "$BG[000]"
 }
 
+function git() {
+    PATH=/bin:/usr/bin:~/bin:/c/tools/winmerge command git "$@"
+}
+
+
+# WIP XML processing
+function xsl() {
+    if [[ $1 = -t ]]
+    then
+        shift
+    fi
+    xmlstarlet sel -I -D -t "$@"
+}
+
+function xpath() {
+    if [[ $1 = -x ]]
+    then
+        shift
+        xmlstarlet sel -R -I -D -t -c "$1" -n "$@"
+    else
+        xmlstarlet sel -t -v "$1" -n "$@"    
+    fi
+}

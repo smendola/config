@@ -339,9 +339,8 @@ function pybot() {
         -W $(( $(tput cols) - 2 )) \
         --suitestatlevel 2 \
         --tagstatexclude "TC*" \
-        --tagstatlink "DE*:https://rally1.rallydev.com/#/3985632862d/search?keywords=DE%1:Rally" \
-        --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
-        --tagstatlink "TC*:https://rally1.rallydev.com/#/3985632862d/search?keywords=TC%1:Rally" \
+        --tagstatexclude "US*" \
+        --tagstatexclude "DE*" \
         "$@"
 }
 
