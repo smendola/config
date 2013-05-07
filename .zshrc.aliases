@@ -382,3 +382,20 @@ function xpath() {
         xmlstarlet sel -t -v "$1" -n "$@"    
     fi
 }
+
+function jpda() {
+    local port=9000
+    local suspend=n
+    
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
+}
