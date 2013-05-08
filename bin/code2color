@@ -1,0 +1,10 @@
+#!/bin/sh
+echo "$@" > /tmp/stuff
+
+if type pygmentize > /dev/null
+then
+	pygmentize -g -f 256 -O style=default "$2"
+elif type source-highlight > /dev/null
+then
+	source-highlight --failsafe -f esc -i "$2"
+fi
