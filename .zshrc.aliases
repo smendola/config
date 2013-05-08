@@ -245,19 +245,22 @@ bye
 EOF
 }
 
+function skytunnel() {
+    if [[ $# != 1 ]] then
+        echo "Usage: skytunnel PORTNUM"
+        return
+    fi
+    local port=${1##*:}
+    ssh -f -N -p $port skytap
+}
+
 function skyshell() {
     if [[ $# != 1 ]] then
         echo "Usage: skyshell PORTNUM"
         return
     fi
     local port=${1##*:}
-    ssh -l ops \
-        -Y \
-        -p $port \
-        -L18080:localhost:8080 \
-        -L18081:localhost:8081 \
-        -L19000:localhost:9000 \
-    services-useast.skytap.com
+    ssh -p $port skytap
 }
 
 function skyterm() {
@@ -378,4 +381,21 @@ function xpath() {
     else
         xmlstarlet sel -t -v "$1" -n "$@"    
     fi
+}
+
+function jpda() {
+    local port=9000
+    local suspend=n
+    
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
 }
