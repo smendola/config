@@ -49,7 +49,7 @@ export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
-export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
+export LESSOPEN='|lesspipe.sh %s'
 export LESS='-R -x4'
 
 export TOOLS_DIR=/c/tools

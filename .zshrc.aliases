@@ -206,29 +206,52 @@ function skyget() {
     if [[ $# < 2 || $# > 3 ]]
     then
         echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
-        echo "       REMOTE_SOURCE is either relative to ~dev on skytap, or absolute"
+        echo "       REMOTE_SOURCE is either relative to ~ops on skytap, or absolute"
         return
     fi
     local port=${1##*:}
-    src=$2
-    dst=${3:-.}
-    sftp -P $port dev@services-useast.skytap.com:$src "$dst"
+    local src=$2
+    local dst=${3:-.}
+    sftp -P $port ops@services-useast.skytap.com:$src "$dst"
 }
+
+function skyget-logs() {
+    echo '*** TO DO: COMPRESS / SEND / DECOMPRESS'
+    mkdir -p Robot_Logs
+    if [[ $# != 1 ]]
+    then
+        echo "Usage: skyget-logs PORTNUM"
+        return
+    fi
+    local port=$1
+    skyget $port 'DEPLOY/ng-robot-framework-*/*.*ml' Robot_Logs
+    skyget $port 'DEPLOY/ng-robot-framework-*/*.png' Robot_Logs
+}
+
 
 function skyput() {
     if [[ $# < 2 || $# > 3 ]]
     then
         echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
-        echo "       REMOTE_DEST is either relative to ~dev on skytap, or absolute"
+        echo "       REMOTE_DEST is either relative to ~ops on skytap, or absolute"
        return
     fi
     local port=${1##*:}
-    src=$2
-    dst=${3:-/home/dev}
-    sftp -P $port -b - "dev@services-useast.skytap.com" << EOF
+    local src=$2
+    local dst=${3:-/home/ops}
+    sftp -P $port -b - "ops@services-useast.skytap.com" << EOF
 put $src $dst
 bye
 EOF
+}
+
+function skytunnel() {
+    if [[ $# != 1 ]] then
+        echo "Usage: skytunnel PORTNUM"
+        return
+    fi
+    local port=${1##*:}
+    ssh -f -N -p $port skytap
 }
 
 function skyshell() {
@@ -237,13 +260,7 @@ function skyshell() {
         return
     fi
     local port=${1##*:}
-    ssh -l dev \
-        -Y \
-        -p $port \
-        -L18080:localhost:8080 \
-        -L18081:localhost:8081 \
-        -L19000:localhost:9000 \
-    services-useast.skytap.com
+    ssh -p $port skytap
 }
 
 function skyterm() {
@@ -252,7 +269,7 @@ function skyterm() {
         return
     fi
     local port=${1##*:}
-    cygstart putty -load dev@skytap -P $port
+    cygstart putty -load ops@skytap -P $port
 }
 
 function fixtty() {
@@ -323,13 +340,10 @@ function pybot() {
     pybot.bat \
         -L DEBUG \
         -W $(( $(tput cols) - 2 )) \
-        --suitestatlevel 3 \
-        --tagdoc "Bug:There is an open Defect on this scenario" \
-        --tagdoc "WorkInProgress:Either this test, or the feature, is incomplete" \
+        --suitestatlevel 2 \
         --tagstatexclude "TC*" \
-        --tagstatlink "DE*:https://rally1.rallydev.com/#/3985632862d/search?keywords=DE%1:Rally" \
-        --tagstatlink "US*:https://rally1.rallydev.com/#/3985632862d/search?keywords=US%1:Rally" \
-        --tagstatlink "TC*:https://rally1.rallydev.com/#/3985632862d/search?keywords=TC%1:Rally" \
+        --tagstatexclude "US*" \
+        --tagstatexclude "DE*" \
         "$@"
 }
 
@@ -344,3 +358,52 @@ function palette() {
     done
     print -P -- "$BG[000]"
 }
+
+function git() {
+    PATH=/bin:/usr/bin:~/bin:/c/tools/winmerge command git "$@"
+}
+
+
+# WIP XML processing
+function xsl() {
+    if [[ $1 = -t ]]
+    then
+        shift
+    fi
+    xmlstarlet sel -I -D -t "$@"
+}
+
+function xpath() {
+    if [[ $1 = -x ]]
+    then
+        shift
+        xmlstarlet sel -R -I -D -t -c "$1" -n "$@"
+    else
+        xmlstarlet sel -t -v "$1" -n "$@"    
+    fi
+}
+
+function jpda() {
+    local port=9000
+    local suspend=n
+    
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
+}
+
+function merge_ini() {
+	diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
+		$HOME/ng-install.ini \
+		install.ini-common-ancestor.ini \
+		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
+}
+
