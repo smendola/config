@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
 [user]
-	email = @@EMAIL@@
-	name = @@FULL_NAME@@
+	email = smendola@phtcorp.com
+	name = Salvatore Mendola
 
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
