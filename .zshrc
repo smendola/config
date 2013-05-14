@@ -137,7 +137,7 @@ ZSH=$HOME/.oh-my-zsh
 histchars='!;#'
 ZSH_THEME="sm"
 #MYBG=057
-MYBG=021
+MYBG=012
 source $ZSH/oh-my-zsh.sh
 
 
