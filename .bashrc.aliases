@@ -292,7 +292,8 @@ EOF
 }
 
 function skyshell() {
-    if [[ $# != 1 ]] then
+    if [[ $# != 1 ]]
+    then
         echo "Usage: skyshell PORTNUM"
         return
     fi
@@ -307,7 +308,8 @@ function skyshell() {
 }
 
 function skyterm() {
-    if [[ $# != 1 ]] then
+    if [[ $# != 1 ]]
+    then
         echo "Usage: skyterm PORTNUM"
         return
     fi
@@ -315,6 +317,24 @@ function skyterm() {
     cygstart putty -load ops@skytap -P $port
 }
 
+function curbranch()
+{
+    if git branch > /dev/null 2>&1 
+    then
+	    echo $(git branch | grep '^[*]' | cut -c 3-)
+    fi
+}
+
+function curbranch_bracketed()
+{
+    __git_ps1 ' (%s) '
+    
+    #local cb=$(curbranch)    
+    #if [[ $cb ]]
+    #then
+    #    echo " [$cb]"
+    #fi
+}
 function fixtty() {
     stty sane erase ^H
 }
