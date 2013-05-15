@@ -132,12 +132,17 @@ function cls() {
 bindkey '\xc2\x8c' cls ;# C-Shift-L
 bindkey '\e^L' cls ;# C-M-L
 
-plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
 histchars='!;#'
-ZSH_THEME="sm"
-#MYBG=057
-MYBG=012
-source $ZSH/oh-my-zsh.sh
 
+ZSH=$HOME/.oh-my-zsh
+if [[ -f $ZSH/oh-my-zsh.sh ]]
+then
+    plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
+    ZSH_THEME="sm"
+    #MYBG=057
+    MYBG=012
+    source $ZSH/oh-my-zsh.sh
+else
+    echo "*** Oh-my-zsh is not present"
+fi
 
