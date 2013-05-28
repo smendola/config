@@ -2,40 +2,6 @@
 ### ALIASES AND FUNCTIONS FOR INTERACTIVE USE
 ###############################################################
 
-function prat() { 
-    if [[ $TERM == emacs ]]; then
-        return;
-    fi;
-
-    PRAT=$*;
-    local attr_list='0';
-#    local attr_list2='0;31;47;7'
-    local attr_list2='41'
-    local shlvl;
-    local title;
-    local prompt;
-    local remote;
-
-    for attr in $*;
-    do
-        attr_list="$attr_list;$attr";
-    done;
-
-    if [[ $SHLVL > 1 ]]; then
-        shlvl=" [$SHLVL]";
-    fi
-    if [[ ! -z $SSH_CONNECTION ]]
-    then
-        remote=" [REMOTE]"
-    fi
-
-    prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[${attr_list2}m\]\$(curbranch_bracketed)$shlvl$remote\[\033[0m\] \n\$ ";
-    PS1=$prompt
-}
-
-
-# colorize ls output, if supported
-/bin/ls /dev/null --color > /dev/null 2>&1 && alias ls='/bin/ls --color=auto'
 
 # Clears the scrollback buffer, not just the current screen
 alias cls='echo -n -e "\ec\e[3J"'
@@ -49,8 +15,9 @@ alias start=cygstart
 alias rm='rm -i'
 alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
 alias whiches='type -Pa'
+alias type='builtin type -f'
 
-PROMPT_COMMAND='set +x; set +v; title ${TITLE_PREFIX}:`dirs`; fixtty' 
+#PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
 
 function upto ()
 {
@@ -89,24 +56,10 @@ function ec() {
 alias e=npp
 alias s=sublime
 
-# set the terminal window title bar label 
-# Usage: title IGNOREDPARAM WINDOW_TITLE
-title() {
-    echo -n $'\e];'"$@"$'\a' ;# works with ANSI terminals 
-    # if [ "$TERM" == cygwin ] 
-    # then 
-        # # the cd works around UNC path warnings if cd'ed to //host/path 
-        # (cd C:; cmd /c title "$@") ;# works with DOS terminals 
-    # else 
-        # echo -n $'\e];'"$@"$'\a' ;# works with ANSI terminals 
-    # fi 
-} 
-
-
 # run commands, displaying the command at as the terminal's title,
 # e.g. 
 function wt () {
-    title "$@"
+    title "$1" "$@"
     "$@" ;# no need to use "eval"; that actually causes problems
 }
 
@@ -221,6 +174,7 @@ function ntd() {
   $WORKSPACE/tools/deploy.sh "$@"
 }
 
+
 if [[ $(uname) == MINGW* ]] 
 then
 	echo -n '';# nothing to do
@@ -291,25 +245,26 @@ bye
 EOF
 }
 
+function skytunnel() {
+    if [[ $# != 1 ]] then
+        echo "Usage: skytunnel PORTNUM"
+        return
+    fi
+    local port=${1##*:}
+    ssh -f -N -p $port skytap
+}
+
 function skyshell() {
-    if [[ $# != 1 ]]
-    then
+    if [[ $# != 1 ]] then
         echo "Usage: skyshell PORTNUM"
         return
     fi
     local port=${1##*:}
-    ssh -l ops \
-        -Y \
-        -p $port \
-        -L18080:localhost:8080 \
-        -L18081:localhost:8081 \
-        -L19000:localhost:9000 \
-    services-useast.skytap.com
+    ssh -p $port skytap
 }
 
 function skyterm() {
-    if [[ $# != 1 ]]
-    then
+    if [[ $# != 1 ]] then
         echo "Usage: skyterm PORTNUM"
         return
     fi
@@ -317,24 +272,6 @@ function skyterm() {
     cygstart putty -load ops@skytap -P $port
 }
 
-function curbranch()
-{
-    if git branch > /dev/null 2>&1 
-    then
-	    echo $(git branch | grep '^[*]' | cut -c 3-)
-    fi
-}
-
-function curbranch_bracketed()
-{
-    __git_ps1 ' (%s) '
-    
-    #local cb=$(curbranch)    
-    #if [[ $cb ]]
-    #then
-    #    echo " [$cb]"
-    #fi
-}
 function fixtty() {
     stty sane erase ^H
 }
@@ -351,7 +288,7 @@ function tomcat() {
 	shutdown.sh > /dev/null 2>&1
 	sleep 2
     /bin/rm /c/tools/tomcat/logs/*
-    title Tomcat
+    title Tomcat Tomcat
     catalina.sh jpda run
 }
 
@@ -380,7 +317,19 @@ function push-ui() {
 		shift
         tomcat
     fi
-    )
+  )
+}
+
+function clear-m2() {
+    if [[ $# > 0 ]]
+    then
+        for pkg in "$@"
+        do
+            command rm -rf ~/.m2/repository/$pkg
+        done
+    else
+        command rm -rf ~/.m2/repository/
+    fi
 }
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
@@ -433,3 +382,28 @@ function xpath() {
         xmlstarlet sel -t -v "$1" -n "$@"    
     fi
 }
+
+function jpda() {
+    local port=9000
+    local suspend=n
+    
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
+}
+
+function merge_ini() {
+	diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
+		$HOME/ng-install.ini \
+		install.ini-common-ancestor.ini \
+		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
+}
+

@@ -1,7 +1,7 @@
-set mainfont {Helvetica 10}
+set mainfont {Arial 10}
 set textfont {Consolas 9}
-set uifont {Helvetica 9 bold}
-set tabstop 8
+set uifont {Calibri 10 bold}
+set tabstop 4
 set findmergefiles 0
 set maxgraphpct 50
 set maxwidth 16
@@ -14,7 +14,7 @@ set hideremotes 0
 set showlocalchanges 1
 set datetimeformat {%Y-%m-%d %H:%M:%S}
 set limitdiffs 1
-set uicolor grey85
+set uicolor #e8e9e8
 set want_ttk 1
 set bgcolor white
 set fgcolor black
@@ -22,15 +22,15 @@ set colors {green red blue magenta darkgrey brown orange}
 set diffcolors {red "#00a000" blue}
 set markbgcolor #e0e0ff
 set diffcontext 3
-set selectbgcolor gray85
+set selectbgcolor #dcebeb
 set extdifftool {C:\Users\smendola\home\bin\diffmerge}
 set perfile_attrs 0
-set geometry(main) 1920x1114+0+16
+set geometry(main) 1797x1079+1634+58
 set geometry(state) normal
-set geometry(topwidth) 1920
+set geometry(topwidth) 1797
 set geometry(topheight) 397
-set geometry(pwsash0) "584 1"
-set geometry(pwsash1) "1182 1"
-set geometry(botwidth) 748
-set geometry(botheight) 712
+set geometry(pwsash0) "546 1"
+set geometry(pwsash1) "1105 1"
+set geometry(botwidth) 700
+set geometry(botheight) 677
 set permviews {}

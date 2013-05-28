@@ -4,7 +4,7 @@
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
-[[ $TERM ]] && echo DOT-BASHRC $HOME $TERM
+[[ -z $TERM ]] || echo DOT-BASHRC $HOME $TERM
 
 # If running in MSYS/MINGW, use some replacements for cyg programs
 [[ $(uname) = MINGW* ]] && PATH=~/bin/msys:$PATH
@@ -13,19 +13,16 @@
 ###############################################################
 ### SHELL SETTINGS
 ###############################################################
-shopt -s nullglob ; # prevents cd wrong* from causing cd ~
-shopt -u progcomp ; # having trouble with that feature
-shopt -s globstar 2> /dev/null;  # foo/**/bar matches bar at any subdir depth; not supported in MINGW
 
 unset HISTFILE
-histchars='!;'
+histchars='!;#'
 
 GLOBIGNORE=.:..
 
 ###############################################################
 ### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
 ###############################################################
-[ -f ~/.bashrc.aliases ] && . ~/.bashrc.aliases
+[ -f ~/.zshrc.aliases ] && . ~/.zshrc.aliases
 
 
 
@@ -52,7 +49,7 @@ export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
-export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
+export LESSOPEN='|lesspipe.sh %s'
 export LESS='-R -x4'
 
 export TOOLS_DIR=/c/tools
@@ -86,33 +83,66 @@ done
 # Remove various Windows crap from PATH
 PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
 
+# but add back this one for sqlcmd
+PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
+
 ###############################################################
 ### Stuff...
 ###############################################################
   
-if [[ $XCONSOLE ]]; then
-  prat 1 7 31
-elif [[ $TERM == cygwin ]]; then
-  prat 1 46
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+#ZSH_THEME="robbyrussell"
+
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Set to this to use case-sensitive completion
+# CASE_SENSITIVE="true"
+
+# Comment this out to disable bi-weekly auto-update checks
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment to change how many often would you like to wait before auto-updates occur? (in days)
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment following line if you want to disable colors in ls
+# DISABLE_LS_COLORS="true"
+
+# Uncomment following line if you want to disable autosetting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment following line if you want red dots to be displayed while waiting for completion
+COMPLETION_WAITING_DOTS="true"
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+
+zle -N cls
+function cls() {
+  echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  zle clear-screen ;# redisplays the prompt and current command line
+}
+
+bindkey '\xc2\x8c' cls ;# C-Shift-L
+bindkey '\e^L' cls ;# C-M-L
+
+histchars='!;#'
+
+ZSH=$HOME/.oh-my-zsh
+if [[ -f $ZSH/oh-my-zsh.sh ]]
+then
+    plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
+    ZSH_THEME="sm"
+    #MYBG=057
+    MYBG=012
+    source $ZSH/oh-my-zsh.sh
 else
-  prat 1 7 34 47
-fi
-
-###############################################################
-### GIT FEATURES
-### Normally, these are only loaded with --login shells, but
-### I want them even if simple "exec bash"
-###############################################################
-type __git_ps1 > /dev/null 2>&1 || if [[ -f /etc/bash_completion.d/git ]] 
-then
-    . /etc/bash_completion.d/git
-elif [[ -f /etc/git-prompt.sh ]] 
-then
-    . /etc/git-prompt.sh
-fi
-
-if [ -f /etc/bash_completion ]
-then
-    complete -o default -o nospace -F _git config
+    echo "*** Oh-my-zsh is not present"
 fi
 

@@ -1,0 +1,66 @@
+#!/bin/sh
+
+trap "echo ABORTING; exit 1" ERR
+
+if [[ ! -f ~/.skylogin ]]
+then
+    echo "Enter skytap credentials"
+    echo -n "Username: "; read username
+    echo -n "Password: "; stty -echo; read password; stty echo; echo ""
+    echo $(echo -n "$username:$password" | base64) > ~/.skylogin
+    echo "Saved."
+    echo ""
+fi
+
+if [[ $1 = -r ]]
+then
+    shift
+    resume=1
+fi
+
+if [[ $# = 0 ]]
+then
+    echo ""
+    curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.xml |
+    xmlstarlet sel -t \
+        -m '/configurations/configuration' \
+        -v id -o ' ' -v name -n |
+    sort -d -k2
+    echo ""
+    echo -n "Select configuration id: "
+    read cfgid
+    if [[ $cfgid = '' ]]
+    then
+        echo "OK, never mind."
+        exit
+    fi
+else
+    cfgid=$1
+fi
+
+port=$(
+    curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
+    xmlstarlet sel -t \
+        -m '/configuration/vms/vm[name="CentOS 6.0 x64"]' \
+        -m 'interfaces/interface/services/service[id="22"]' \
+        -v external_port \
+        -n
+)
+sed --in-place -r 's/^\t\t\t\tPort .*/\t\t\t\tPort '$port'/g' ~/.ssh/config
+echo "Skytap SSH port number set to: $port"
+
+if [[ $resume = 1 ]]
+then
+    echo -n 'Resuming configuration .'
+    curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
+    while [[ $runstate = '' || $runstate = 'busy' ]]
+    do
+        sleep 2
+        echo -n .
+        runstate=$(curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
+            xmlstarlet sel -t \
+                -m '/configuration/vms/vm[name="CentOS 6.0 x64"]' \
+                -v runstate -n)
+    done
+    echo " $runstate"
+fi

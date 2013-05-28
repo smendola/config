@@ -1,11 +1,7 @@
 ;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
 [user]
-	email = smendola@jwei-z400.phtcorp.com
+	email = smendola@phtcorp.com
 	name = Salvatore Mendola
-
-[remote "config-sal"]
-	url = git clone git@bitbucket.org:smendola/config-sal.git
-	fetch = master
 
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
@@ -54,8 +50,20 @@
 [core]
 	autocrlf = false
 
+[difftool "meld"]
+	cmd = meld \"$REMOTE\" \"$LOCAL\"
+[mergetool "meld"]
+	cmd = meld  \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = true
+
+[difftool "diffuse"]
+	cmd = diffuse \"$LOCAL\" \"$REMOTE\"
+[mergetool "diffuse"]
+	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = true
+
 [difftool "diffmerge"]
-	cmd = diffmerge \"$REMOTE\" \"$LOCAL\"
+	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
 [mergetool "diffmerge"]
 	cmd = diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 	trustExitCode = true
@@ -74,6 +82,10 @@
 
 [remote "ng"]
 	url = kando@engvmkando:studywork-ng.git
+	fetch = master
+
+[remote "config-sal"]
+	url = git@bitbucket.org:smendola/config-sal.git
 	fetch = master
 
 [remote "config"]
