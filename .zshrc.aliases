@@ -407,3 +407,4 @@ function merge_ini() {
 		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
 }
 
+alias tdc='tree -d -C -I target'
