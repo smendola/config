@@ -89,7 +89,7 @@ EOF
         <WatchedResource>WEB-INF/classes/META-INF/spring/security.xml</WatchedResource>
 </Context>
 EOF
-	;
+
 fi
 
 if [[ $RUN ]]
