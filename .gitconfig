@@ -50,8 +50,20 @@
 [core]
 	autocrlf = false
 
+[difftool "meld"]
+	cmd = meld \"$REMOTE\" \"$LOCAL\"
+[mergetool "meld"]
+	cmd = meld  \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = true
+
+[difftool "diffuse"]
+	cmd = diffuse \"$LOCAL\" \"$REMOTE\"
+[mergetool "diffuse"]
+	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = true
+
 [difftool "diffmerge"]
-	cmd = diffmerge \"$REMOTE\" \"$LOCAL\"
+	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
 [mergetool "diffmerge"]
 	cmd = diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 	trustExitCode = true
