@@ -201,77 +201,6 @@ else
     echo '*** No git found! ***'
 fi
 
-
-function skyget() {
-    if [[ $# < 2 || $# > 3 ]]
-    then
-        echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
-        echo "       REMOTE_SOURCE is either relative to ~ops on skytap, or absolute"
-        return
-    fi
-    local port=${1##*:}
-    local src=$2
-    local dst=${3:-.}
-    sftp -P $port ops@services-useast.skytap.com:$src "$dst"
-}
-
-function skyget-logs() {
-    echo '*** TO DO: COMPRESS / SEND / DECOMPRESS'
-    mkdir -p Robot_Logs
-    if [[ $# != 1 ]]
-    then
-        echo "Usage: skyget-logs PORTNUM"
-        return
-    fi
-    local port=$1
-    skyget $port 'DEPLOY/ng-robot-framework-*/*.*ml' Robot_Logs
-    skyget $port 'DEPLOY/ng-robot-framework-*/*.png' Robot_Logs
-}
-
-
-function skyput() {
-    if [[ $# < 2 || $# > 3 ]]
-    then
-        echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
-        echo "       REMOTE_DEST is either relative to ~ops on skytap, or absolute"
-       return
-    fi
-    local port=${1##*:}
-    local src=$2
-    local dst=${3:-/home/ops}
-    sftp -P $port -b - "ops@services-useast.skytap.com" << EOF
-put $src $dst
-bye
-EOF
-}
-
-function skytunnel() {
-    if [[ $# != 1 ]] then
-        echo "Usage: skytunnel PORTNUM"
-        return
-    fi
-    local port=${1##*:}
-    ssh -f -N -p $port skytap
-}
-
-function skyshell() {
-    if [[ $# != 1 ]] then
-        echo "Usage: skyshell PORTNUM"
-        return
-    fi
-    local port=${1##*:}
-    ssh -p $port skytap
-}
-
-function skyterm() {
-    if [[ $# != 1 ]] then
-        echo "Usage: skyterm PORTNUM"
-        return
-    fi
-    local port=${1##*:}
-    cygstart putty -load ops@skytap -P $port
-}
-
 function fixtty() {
     stty sane erase ^H
 }
@@ -407,3 +336,6 @@ function merge_ini() {
 		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
 }
 
+alias tdc='tree -d -C -I target'
+
+alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
