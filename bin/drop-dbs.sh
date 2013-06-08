@@ -1,15 +1,22 @@
 #!/bin/sh
-host=${1:-10.0.0.1}
-cat > .$$.sql << EOF
-drop database AccessControl
-GO
-drop database Logging
-GO
-drop database Template
-GO
-drop database FileStorage
-GO
-EOF
+if [[ $1 = -c ]]
+then
+    create=1
+    shift
+fi
 
-sqlcmd -S$host -Usa -Ppassword -i.$$.sql
-rm .$$.sql
+host=${1:-10.0.0.1}
+
+for db in AccessControl Logging Template FileStorage
+do
+    echo -n "Dropping $db ..."
+    sqlcmd -Slocalhost -Usa -Ppassword -Q "ALTER DATABASE [$db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
+    sqlcmd -Slocalhost -Usa -Ppassword -Q "drop database [$db]"
+    echo ""
+    if [[ $create = 1 ]]
+    then
+        echo -n "Creating $db as empty database, no schema ..."
+        sqlcmd -Slocalhost -Usa -Ppassword -Q "create database [$db]"
+        echo ""
+    fi
+done

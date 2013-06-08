@@ -1,9 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 trap "echo Aborting.; exit -1" ERR
 
 CONFIG_FILE=~/ng-install.ini
+REL=1.2.0
 
-while getopts brdc: OPTNAME
+while getopts XbrdTc: OPTNAME
 do
     case $OPTNAME in
     \?) # Option not recognized
@@ -13,7 +14,9 @@ do
         ;;
      b) BUILD=all;;
      c) CONFIG_FILE=$OPTARG;;
+	 T) TOMCAT_CXT=1;;
      r) RUN=1;;
+     X) X=1;;
      *) MVNOPT="$MVNOPT -$OPTNAME" ;;
     esac
 done
@@ -50,11 +53,44 @@ cd $WORKSPACE/tools/sw-ng-installer/setup
 echo development/SNAPSHOT > $WORKSPACE/tools/sw-ng-installer/setup/buildinfo.txt
 echo "Done."
 
+if [[ ! $X ]]
+then
 echo "*** Invoking installer, giving it config file $CONFIG_FILE ***"
 
 # Run installer
 cd $WORKSPACE/tools/sw-ng-installer/setup
 ./setup.sh "${CONFIG_FILE}"
+else
+echo NO INSTALL
+fi
+
+if [[ $TOMCAT_CXT ]]
+then
+	CXT_XML_DIR=$CATALINA_BASE/conf/Catalina/localhost
+	mkdir -p $CXT_XML_DIR
+	svcs=(logging files:file-storage template access-control)
+	for svc in ${svcs[@]}
+	do
+		SVC=${svc##*:}
+		ROOT=${svc%%:*}
+	    cat <<EOF > $CXT_XML_DIR/$SVC.xml
+<?xml version='1.0' encoding='utf-8'?>
+<Context
+    path="/$ROOT"
+    docBase="$WORKSPACE/services/$SVC/$SVC-implementation/target/$SVC-implementation-$REL-SNAPSHOT"
+/>
+EOF
+
+	done
+	cat <<EOF > $CXT_XML_DIR/sw-ng-ui.xml
+<?xml version='1.0' encoding='utf-8'?>
+<Context reloadable="true" docBase="c:/users/smendola/home/ng/sw-ng-ui/target/sw-ng-ui-$REL-SNAPSHOT" path="/sw">
+        <WatchedResource>WEB-INF/classes/META-INF/spring/servlet.xml</WatchedResource>
+        <WatchedResource>WEB-INF/classes/META-INF/spring/security.xml</WatchedResource>
+</Context>
+EOF
+
+fi
 
 if [[ $RUN ]]
 then
