@@ -408,3 +408,5 @@ function merge_ini() {
 }
 
 alias tdc='tree -d -C -I target'
+
+alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"

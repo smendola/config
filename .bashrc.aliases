@@ -383,6 +383,18 @@ function push-ui() {
     )
 }
 
+function clear-m2() {
+    if [[ $# > 0 ]]
+    then
+        for pkg in "$@"
+        do
+            command rm -rf ~/.m2/repository/$pkg
+        done
+    else
+        command rm -rf ~/.m2/repository/
+    fi
+}
+
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
@@ -433,3 +445,7 @@ function xpath() {
         xmlstarlet sel -t -v "$1" -n "$@"    
     fi
 }
+
+alias tdc='tree -d -C -I target'
+
+alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
