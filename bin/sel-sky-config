@@ -53,7 +53,7 @@ if [[ $resume = 1 ]]
 then
     echo -n 'Resuming configuration .'
     curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
-    while [[ $runstate = '' || $runstate = 'busy' ]]
+    while [[ $runstate = '' || $runstate = 'busy' || $runstate = 'suspended' ]]
     do
         sleep 2
         echo -n .
