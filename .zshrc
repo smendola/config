@@ -89,7 +89,8 @@ PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
 ###############################################################
 ### Stuff...
 ###############################################################
-  
+
+setopt extended_glob
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
