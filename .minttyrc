@@ -10,3 +10,4 @@ BellSound=no
 BellFlash=yes
 ForegroundColour=200,200,200
 ScrollbackLines=100000
+Font=Lucida Console

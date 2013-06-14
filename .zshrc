@@ -42,7 +42,7 @@ export JAVA_HOME=$(mix "/c/tools/jdk6")
 export CATALINA_HOME=/c/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
-export KANDO=kando@engvmkando:studywork-ng.git
+export KANDO=ssh://engvmkando:29418/studywork-ng.git
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
 export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
