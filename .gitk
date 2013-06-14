@@ -25,12 +25,12 @@ set diffcontext 3
 set selectbgcolor gray85
 set extdifftool {C:\Users\smendola\home\bin\diffmerge}
 set perfile_attrs 0
-set geometry(main) 1619x1010+176+59
+set geometry(main) 1619x1010+7+80
 set geometry(state) normal
-set geometry(topwidth) 1797
+set geometry(topwidth) 1619
 set geometry(topheight) 397
-set geometry(pwsash0) "546 1"
+set geometry(pwsash0) "640 1"
 set geometry(pwsash1) "1105 1"
-set geometry(botwidth) 700
-set geometry(botheight) 677
+set geometry(botwidth) 809
+set geometry(botheight) 608
 set permviews {}
