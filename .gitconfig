@@ -50,17 +50,19 @@
 [core]
 	autocrlf = false
 
-[difftool "meld"]
-	cmd = meld \"$REMOTE\" \"$LOCAL\"
-[mergetool "meld"]
-	cmd = meld  \"$LOCAL\" \"$BASE\" \"$REMOTE\"
-	trustExitCode = true
-
-[difftool "diffuse"]
-	cmd = diffuse \"$LOCAL\" \"$REMOTE\"
-[mergetool "diffuse"]
-	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
-	trustExitCode = true
+;;;; Git has built-in support for meld and diffuse
+;;;; no need to configure them as custom tools
+;[difftool "meld"]
+;	cmd = meld \"$REMOTE\" \"$LOCAL\"
+;[mergetool "meld"]
+;	cmd = meld  --auto-merge --oputput=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+;	trustExitCode = true
+;
+;[difftool "diffuse"]
+;	cmd = diffuse \"$LOCAL\" \"$REMOTE\"
+;[mergetool "diffuse"]
+;	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+;	trustExitCode = true
 
 [difftool "diffmerge"]
 	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
