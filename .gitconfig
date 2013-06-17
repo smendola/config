@@ -83,7 +83,7 @@
 	tool = diffmerge
 
 [remote "ng"]
-	url = kando@engvmkando:studywork-ng.git
+	url = ssh://kando/studywork-ng.git
 	fetch = master
 
 [remote "config-sal"]
