@@ -42,7 +42,7 @@ export JAVA_HOME=$(mix "/c/tools/jdk6")
 export CATALINA_HOME=/c/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
-export KANDO=kando@engvmkando:studywork-ng.git
+export KANDO=ssh://kando/studywork-ng.git
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
 export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
@@ -90,6 +90,7 @@ PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
 ### Stuff...
 ###############################################################
   
+setopt extended_glob
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -132,12 +133,17 @@ function cls() {
 bindkey '\xc2\x8c' cls ;# C-Shift-L
 bindkey '\e^L' cls ;# C-M-L
 
-plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
 histchars='!;#'
-ZSH_THEME="sm"
-#MYBG=057
-MYBG=021
-source $ZSH/oh-my-zsh.sh
 
+ZSH=$HOME/.oh-my-zsh
+if [[ -f $ZSH/oh-my-zsh.sh ]]
+then
+    plugins=(git mvn pip dircycle)# Path to your oh-my-zsh configuration.
+    ZSH_THEME="sm"
+    #MYBG=057
+    MYBG=012
+    source $ZSH/oh-my-zsh.sh
+else
+    echo "*** Oh-my-zsh is not present"
+fi
 

@@ -9,3 +9,5 @@ CursorColour=255,255,0
 BellSound=no
 BellFlash=yes
 ForegroundColour=200,200,200
+ScrollbackLines=100000
+Font=Lucida Console
