@@ -5,31 +5,35 @@
 
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
+[core]
+	autocrlf = false
+
 [color]
 	ui = true
-[color]
 	branch = auto
 	diff = auto
 	status = auto
 [color "branch"]
-	current = green bold
-	; local = yellow 
-	; remote = green
+	current = cyan bold
+	local = yellow 
+	remote = green
 [color "diff"]
 	meta = yellow bold
 	frag = magenta bold
 	old = red bold
 	new = green bold
 [color "status"]
-	; added = green
+	added = green
 	changed = yellow
-	; untracked = red
+	untracked = cyan
 
 [alias]
-	co = checkout
-	ci = commit
-	dt = difftool
+	co  = checkout
+	ci  = commit
+	dt  = difftool
 	dty = difftool -y
+    mt  = mergetool
+    mty = mergetool -y
 	
 	; see: http://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git/4991675#4991675
 	oldest-ancestor = !bash -c 'diff -u <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
@@ -46,9 +50,6 @@
 	what = !sh -c $HOME/bin/git-what
 	workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
 	permission-reset = "!git diff -p | grep -E \"^(diff|old mode|new mode)\" | sed -e \"s/^old/NEW/;s/^new/old/;s/^NEW/new/\" | git apply"
-
-[core]
-	autocrlf = false
 
 ;;;; Git has built-in support for meld and diffuse
 ;;;; no need to configure them as custom tools
