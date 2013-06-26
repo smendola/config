@@ -377,6 +377,40 @@ function xpath() {
     fi
 }
 
+function jpda() {
+    local port=9000
+    local suspend=n
+    
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+    
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
+}
+
+function merge_ini() {
+	diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
+		$HOME/ng-install.ini \
+		install.ini-common-ancestor.ini \
+		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
+}
+
 alias tdc='tree -d -C -I target'
 
 alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
+
+
+# Use mklink as an alternative to ln -s
+# the advantage is that this type of link is
+# understood by non-cygwin apps, as well
+function mklink()
+{
+	cmd /c mklink $(win "$2") $(win "$1")
+}
+
