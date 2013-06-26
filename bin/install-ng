@@ -84,7 +84,7 @@ EOF
 	done
 	cat <<EOF > $CXT_XML_DIR/sw-ng-ui.xml
 <?xml version='1.0' encoding='utf-8'?>
-<Context reloadable="true" docBase="c:/users/smendola/home/ng/sw-ng-ui/target/sw-ng-ui-$REL-SNAPSHOT" path="/sw">
+<Context reloadable="true" docBase="${WORKSPACE}/sw-ng-ui/target/sw-ng-ui-$REL-SNAPSHOT" path="/sw">
         <WatchedResource>WEB-INF/classes/META-INF/spring/servlet.xml</WatchedResource>
         <WatchedResource>WEB-INF/classes/META-INF/spring/security.xml</WatchedResource>
 </Context>
