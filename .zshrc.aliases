@@ -325,10 +325,10 @@ function clear-m2() {
     then
         for pkg in "$@"
         do
-             command rm -rf ~/.m2/repository/${pkg//.//}
+             command rm -rfv ~/.m2/repository/${pkg//.//}
         done
     else
-        command rm -rf ~/.m2/repository/
+        command rm -rfv ~/.m2/repository/
     fi
 }
 
