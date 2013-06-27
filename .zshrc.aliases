@@ -254,10 +254,10 @@ function clear-m2() {
     then
         for pkg in "$@"
         do
-            command rm -rf ~/.m2/repository/$pkg
+             command rm -rfv ~/.m2/repository/${pkg//.//}
         done
     else
-        command rm -rf ~/.m2/repository/
+        command rm -rfv ~/.m2/repository/
     fi
 }
 
@@ -340,12 +340,18 @@ alias tdc='tree -d -C -I target'
 
 alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
 
-
+# Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
 # the advantage is that this type of link is
 # understood by non-cygwin apps, as well
 function mklink()
 {
-	cmd /c mklink $(win "$2") $(win "$1")
+    src=$1
+    dest=$2
+    if [[ -d $2 ]]
+    then
+        dest=$2/${1##*/}
+    fi
+    cmd /c mklink $(win "$dest") $(win "$src")
 }
 

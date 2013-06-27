@@ -42,9 +42,9 @@ echo "*** Copying artifacts from \$WORKSPACE/install into \$WORKSPACE/tools/sw-n
 ARTIFACTS_DIR=${WORKSPACE}/tools/sw-ng-installer/setup/artifacts
 mkdir -p ${ARTIFACTS_DIR}
 
-find "${WORKSPACE}/install" -name \*.zip -print -exec cp {} ${ARTIFACTS_DIR} \;
+find "${WORKSPACE}/install" -name \*.zip -print -exec cp -u {} ${ARTIFACTS_DIR} \;
 find services tools/log-server-adapter sw-ng-ui \
-    -name \*.war -print -exec cp {} ${ARTIFACTS_DIR} \;
+    -name \*.war -print -exec cp -u {} ${ARTIFACTS_DIR} \;
 echo "Done."
 
 echo "*** Generating buildinfo.txt ***"
@@ -66,25 +66,34 @@ fi
 
 if [[ $TOMCAT_CXT ]]
 then
+    echo "-------------------------------------------------------------------------------------"
+    echo "*** Removing deployed WAR files and creating conf/Catalina/localhost/* context xml's"
+    rm -rf $CATALINA_BASE/app_bases/*/*
+    
 	CXT_XML_DIR=$CATALINA_BASE/conf/Catalina/localhost
 	mkdir -p $CXT_XML_DIR
+    rm -f CXT_XML_DIR/*
 	svcs=(logging files:file-storage template access-control)
 	for svc in ${svcs[@]}
 	do
 		SVC=${svc##*:}
 		ROOT=${svc%%:*}
-	    cat <<EOF > $CXT_XML_DIR/$SVC.xml
+        cat <<EOF > $CXT_XML_DIR/$ROOT.xml
 <?xml version='1.0' encoding='utf-8'?>
 <Context
+    reloadable="true"
     path="/$ROOT"
     docBase="$WORKSPACE/services/$SVC/$SVC-implementation/target/$SVC-implementation-$REL-SNAPSHOT"
 />
 EOF
-
 	done
-	cat <<EOF > $CXT_XML_DIR/sw-ng-ui.xml
+
+    cat <<EOF > $CXT_XML_DIR/sw.xml
 <?xml version='1.0' encoding='utf-8'?>
-<Context reloadable="true" docBase="${WORKSPACE}/sw-ng-ui/target/sw-ng-ui-$REL-SNAPSHOT" path="/sw">
+<Context
+    reloadable="true"
+    path="/sw"
+    docBase="${WORKSPACE}/sw-ng-ui/target/sw-ng-ui-$REL-SNAPSHOT">
         <WatchedResource>WEB-INF/classes/META-INF/spring/servlet.xml</WatchedResource>
         <WatchedResource>WEB-INF/classes/META-INF/spring/security.xml</WatchedResource>
 </Context>
