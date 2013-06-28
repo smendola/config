@@ -68,18 +68,19 @@ fi
 if [[ $TOMCAT_CXT ]]
 then
     echo "-------------------------------------------------------------------------------------"
-    echo "*** Removing deployed WAR files and creating conf/Catalina/localhost/* context xml's"
+    echo "*** Removing deployed WAR files and creating conf/Catalina*/localhost/* context xml's"
     rm -rf $CATALINA_BASE/app_bases/*/*
     
-    CXT_XML_DIR=$CATALINA_BASE/conf/Catalina/localhost
-    mkdir -p $CXT_XML_DIR
-    rm -f CXT_XML_DIR/*
+    PRIV_CXT_XML_DIR=$CATALINA_BASE/conf/Private/localhost
+    mkdir -p $PRIV_CXT_XML_DIR
+    rm -f $PRIV_CXT_XML_DIR/*
+    
     svcs=(logging files:file-storage template access-control)
     for svc in ${svcs[@]}
     do
         SVC=${svc##*:}
         ROOT=${svc%%:*}
-        cat <<EOF > $CXT_XML_DIR/$ROOT.xml
+        cat <<EOF > $PRIV_CXT_XML_DIR/$ROOT.xml
 <?xml version='1.0' encoding='utf-8'?>
 <Context
     reloadable="true"
@@ -89,7 +90,11 @@ then
 EOF
     done
 
-    cat <<EOF > $CXT_XML_DIR/sw.xml
+    PUB_CXT_XML_DIR=$CATALINA_BASE/conf/Public/localhost
+    mkdir -p $PUB_CXT_XML_DIR
+    rm -f $PUB_CXT_XML_DIR/*
+    
+    cat <<EOF > $PUB_CXT_XML_DIR/sw.xml
 <?xml version='1.0' encoding='utf-8'?>
 <Context
     reloadable="true"
