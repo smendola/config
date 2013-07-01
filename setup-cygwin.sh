@@ -34,8 +34,9 @@ dots pull origin master ||
    (echo '(Ignore "overwrite" errors)' && false) || 
    dots checkout --force
 
-   
-   
+# Fetch customized .oh-my-zsh config, also from bitbucket
+git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
+ 
 
 # Fetch cygwin installer
 echo "Fetching cygwin installer from cygwin.com"
@@ -43,7 +44,7 @@ curl '-#' -o ./cygwin-setup.exe 'http://cygwin.com/setup.exe'
 
 # Run the installer, requesting some specific packages we need
 ./cygwin-setup.exe -q -R 'C:\cygwin' -l 'C:\cygwin-pkgs' \
-    -P tar,zip,unzip,p7zip,vi,openssh,ca-certificates,curl,wget,source-highlight,dos2unix,git,git-completion,zsh,terminfo,xmlstarlet
+    -P tar,zip,unzip,p7zip,vi,openssh,ca-certificates,curl,wget,source-highlight,dos2unix,git,git-completion,zsh,terminfo,ncurses,xmlstarlet,nc,rsync
 
 echo "**************************************************************"
 echo "Cygwin should now be installed."
