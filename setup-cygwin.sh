@@ -23,19 +23,21 @@ fi
 echo "OK, you asked for it..."
 
 ## First, fetch all the configuration files from git repo on bitbucket
+git config --global --add core.autocrlf false
 cd $HOME
 rm -rf .config.git
 git init --separate-git-dir .config.git
 rm .git
 alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 dots remote add origin https://smendola@bitbucket.org/smendola/config.git
-## my personal config is config-sal.git; the above is the public one
+## Sal's personal config is config-sal.git; the above is the public one
 dots pull origin master || 
    (echo '(Ignore "overwrite" errors)' && false) || 
    dots checkout --force
 
-   
-   
+# ssh is picky about these things
+chown $USERNAME ~/.ssh/*
+chmod 600 ~/.ssh/*
 
 # Fetch cygwin installer
 echo "Fetching cygwin installer from cygwin.com"
