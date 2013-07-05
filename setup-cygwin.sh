@@ -36,6 +36,7 @@ dots pull origin master ||
    dots checkout --force
 
 # Fetch customized .oh-my-zsh config, also from bitbucket
+rm -rf ~/.oh-my-zsh
 git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
 
 # not available in git-bash
