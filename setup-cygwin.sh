@@ -38,9 +38,9 @@ dots pull origin master ||
 # Fetch customized .oh-my-zsh config, also from bitbucket
 git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
 
-# ssh is picky about these things
-chown $USERNAME ~/.ssh/*
-chmod 600 ~/.ssh/*
+# not available in git-bash
+#chown $USERNAME ~/.ssh/*
+#chmod 600 ~/.ssh/*
 
 # Fetch cygwin installer
 echo "Fetching cygwin installer from cygwin.com"
