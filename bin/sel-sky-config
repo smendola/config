@@ -2,21 +2,67 @@
 
 trap "echo ABORTING; exit 1" ERR
 
-if [[ ! -f ~/.skylogin ]]
-then
-    echo "Enter skytap credentials"
+function try_login()
+{
+    local msg=$( curl -s -u"$( base64 -d < ~/.skylogin )" https://cloud.skytap.com/configurations.xml |  xmlstarlet sel -t -m /error -v . -n  )
+    if [[ $msg != "" ]]
+    then
+        echo "**$msg**"
+        echo ""
+        false
+    fi
+}
+
+function get_login()
+{
+    echo "Enter your skytap credentials."
+    echo "Remember the @phtcorp.com bit!"
     echo -n "Username: "; read username
     echo -n "Password: "; stty -echo; read password; stty echo; echo ""
     echo $(echo -n "$username:$password" | base64) > ~/.skylogin
-    echo "Saved."
-    echo ""
+}
+
+function login()
+{
+    if [[ ! -f ~/.skylogin ]]
+    then
+        get_login
+    fi
+    while ! try_login
+    do
+        get_login
+    done
+}
+
+function usage()
+{
+    echo "${0##*/}: select a Skytap configuration to use with SSH"
+    echo "Usage: ${0##*/} [-l] [-r] [CONFIG_ID]"
+    echo "   -l  Re-login"
+    echo "   -r  Resume the configuration"
+    echo "   CONFIG_ID  use this configuration instead of selecting from menu"
+    exit
+}
+
+
+while getopts lr OPTNAME
+do
+    case $OPTNAME in
+    \?) # Option not recognized
+        usage;;
+     h) usage;;
+     l) LOGIN=1;;
+     r) RESUME=1;;
+    esac
+done
+shift $(( $OPTIND - 1 ))
+
+if [[ $LOGIN = 1 || ! -f ~/.skylogin ]]
+then
+    get_login
 fi
 
-if [[ $1 = -r ]]
-then
-    shift
-    resume=1
-fi
+login
 
 if [[ $# = 0 ]]
 then
@@ -49,7 +95,7 @@ port=$(
 sed --in-place -r 's/^\t\t\t\tPort .*/\t\t\t\tPort '$port'/g' ~/.ssh/config
 echo "Skytap SSH port number set to: $port"
 
-if [[ $resume = 1 ]]
+if [[ $RESUME = 1 ]]
 then
     echo -n 'Resuming configuration .'
     curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
