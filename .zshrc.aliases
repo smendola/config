@@ -211,7 +211,7 @@ function skyget-logs () {
         "skytap::suite/output.xml" \
         "skytap::suite/log.html" \
         "skytap::suite/report.html" \
-        "skytap::suite/*.html" \
+        "skytap::suite/*.png" \
     	~/Robot_Logs &&
     start ~/Robot_Logs/report.html
 }
