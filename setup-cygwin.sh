@@ -23,20 +23,20 @@ fi
 echo "OK, you asked for it..."
 
 ## First, fetch all the configuration files from git repo on bitbucket
+git config --global --add core.autocrlf false
 cd $HOME
 rm -rf .config.git
 git init --separate-git-dir .config.git
 rm .git
 alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+
 dots remote add origin https://smendola@bitbucket.org/smendola/config.git
-## my personal config is config-sal.git; the above is the public one
-dots pull origin master || 
-   (echo '(Ignore "overwrite" errors)' && false) || 
-   dots checkout --force
+dots fetch origin master
+dots checkout --force
 
 # Fetch customized .oh-my-zsh config, also from bitbucket
+rm -rf ~/.oh-my-zsh
 git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
- 
 
 # Fetch cygwin installer
 echo "Fetching cygwin installer from cygwin.com"
