@@ -201,6 +201,21 @@ else
     echo '*** No git found! ***'
 fi
 
+function skysync () {
+	RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av "$@"
+}
+
+function skyget-logs () {
+    mkdir -p Robot_Logs
+    skysync \
+        "skytap::suite/output.xml" \
+        "skytap::suite/log.html" \
+        "skytap::suite/report.html" \
+        "skytap::suite/*.html" \
+    	~/Robot_Logs &&
+    start ~/Robot_Logs/report.html
+}
+
 function fixtty() {
     stty sane erase ^H
 }
@@ -337,8 +352,6 @@ function merge_ini() {
 }
 
 alias tdc='tree -d -C -I target'
-
-alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
 
 # Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
