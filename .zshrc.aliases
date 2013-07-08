@@ -177,35 +177,35 @@ function ntd() {
 
 if [[ $(uname) == MINGW* ]] 
 then
-	echo -n '';# nothing to do
+    echo -n '';# nothing to do
 elif [[ -f /usr/bin/git.exe ]]
 then
-	echo 'Using cygwin git'
+    echo 'Using cygwin git'
 elif [[ -d /c/msysgit ]]
 then
-	echo 'Using MSYS git'
+    echo 'Using MSYS git'
 
-	# cygwin git is not usable, it's busted.
-	# msysgit comes with all its own unix programs like ls etc.
-	# so it cannot be added to PATH normally.
-	git() {
-		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
-	}
-	gitk() {
-		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
-	}
-	git-bash() {
-		PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
-	}
+    # cygwin git is not usable, it's busted.
+    # msysgit comes with all its own unix programs like ls etc.
+    # so it cannot be added to PATH normally.
+    git() {
+        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
+    }
+    gitk() {
+        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
+    }
+    git-bash() {
+        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
+    }
 else
     echo '*** No git found! ***'
 fi
 
 function skysync () {
-	RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av "$@"
+	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av "$@"
 }
 
-function skyget-logs () {
+function skylogs () {
     mkdir -p ~/Robot_Logs
     skysync \
         "skytap::suite/output.xml" \
@@ -225,12 +225,12 @@ function jenkins() {
 }
 
 type stty > /dev/null 2>&1 || stty() {
-	echo -n
+    echo -n
 }
 
 function tomcat() {
-	shutdown.sh > /dev/null 2>&1
-	sleep 2
+    shutdown.sh > /dev/null 2>&1
+    sleep 2
     /bin/rm /c/tools/tomcat/logs/*
     title Tomcat Tomcat
     catalina.sh jpda run
@@ -244,7 +244,7 @@ function anno() {
 
 function push-ui() {
   ( 
-	trap "echo '***** FAILED *****'; exit" ERR
+    trap "echo '***** FAILED *****'; exit" ERR
     #set -x;
     if [[ $1 = -b ]]
     then
@@ -258,7 +258,7 @@ function push-ui() {
     
     if [[ $1 = -r ]]
     then
-		shift
+        shift
         tomcat
     fi
   )
@@ -345,10 +345,10 @@ function jpda() {
 }
 
 function merge_ini() {
-	diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
-		$HOME/ng-install.ini \
-		install.ini-common-ancestor.ini \
-		${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
+    diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
+        $HOME/ng-install.ini \
+        install.ini-common-ancestor.ini \
+        ${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
 }
 
 alias tdc='tree -d -C -I target'
