@@ -206,7 +206,7 @@ function skysync () {
 }
 
 function skyget-logs () {
-    mkdir -p Robot_Logs
+    mkdir -p ~/Robot_Logs
     skysync \
         "skytap::suite/output.xml" \
         "skytap::suite/log.html" \
