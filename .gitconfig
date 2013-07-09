@@ -84,10 +84,6 @@
 	url = ssh://kando/studywork-ng.git
 	fetch = master
 
-[remote "config-sal"]
-	url = git@bitbucket.org:smendola/config-sal.git
-	fetch = master
-
 [remote "config"]
 	url = https://smendola@bitbucket.org/smendola/config.git
 	fetch = master
