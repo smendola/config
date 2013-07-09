@@ -1,3 +1,0 @@
-#!/bin/sh
-# needed by catalina.sh
-echo /dev/xxx0
