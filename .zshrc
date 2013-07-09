@@ -146,4 +146,3 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
-

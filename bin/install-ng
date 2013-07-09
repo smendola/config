@@ -43,6 +43,7 @@ ARTIFACTS_DIR=${WORKSPACE}/tools/sw-ng-installer/setup/artifacts
 mkdir -p ${ARTIFACTS_DIR}
 
 find "${WORKSPACE}/install" -name \*.zip -print -exec cp -u {} ${ARTIFACTS_DIR} \;
+
 find services tools/log-server-adapter sw-ng-ui \
     -name \*.war -print -exec cp -u {} ${ARTIFACTS_DIR} \;
 echo "Done."
@@ -74,11 +75,11 @@ then
     mkdir -p $PRIV_CXT_XML_DIR
     rm -f $PRIV_CXT_XML_DIR/*
     
-	svcs=(logging files:file-storage template access-control)
-	for svc in ${svcs[@]}
-	do
-		SVC=${svc##*:}
-		ROOT=${svc%%:*}
+    svcs=(logging files:file-storage template access-control)
+    for svc in ${svcs[@]}
+    do
+        SVC=${svc##*:}
+        ROOT=${svc%%:*}
         cat <<EOF > $PRIV_CXT_XML_DIR/$ROOT.xml
 <?xml version='1.0' encoding='utf-8'?>
 <Context
@@ -87,7 +88,7 @@ then
     docBase="$WORKSPACE/services/$SVC/$SVC-implementation/target/$SVC-implementation-$REL-SNAPSHOT"
 />
 EOF
-	done
+    done
 
     PUB_CXT_XML_DIR=$CATALINA_BASE/conf/Public/localhost
     mkdir -p $PUB_CXT_XML_DIR
@@ -112,4 +113,3 @@ then
   # Run tomcat
   catalina.sh jpda run
 fi
-

@@ -419,4 +419,3 @@ function mklink()
     fi
     cmd /c mklink $(win "$dest") $(win "$src")
 }
-

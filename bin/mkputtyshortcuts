@@ -1,0 +1,24 @@
+#!/bin/bash
+
+FOLDER=~/Shortcuts/Putty
+
+sessions="$(reg query HKCU\\Software\\SimonTatham\\PuTTY\\Sessions | grep . | grep -v 'Default Settings')"
+
+cd $FOLDER
+rm *.lnk
+
+for s in $sessions
+do
+    tail=${s##*\\}
+    if [ "$tail" = "Default Settings" ]
+    then
+	echo -n '';
+    else
+	decoded=$(echo $tail | sed 's/%20/ /g'| sed 's/:/../g')
+	echo \>\>\>$decoded\<\<\<
+	mkshortcut -n "$decoded" -a "-load \"$tail\"" '/c/Program Files (x86)/PuTTY/putty.exe'
+    fi
+done
+
+
+
