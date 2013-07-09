@@ -1,9 +1,0 @@
-#!/bin/sh
-trap "exit -1" ERR
-cd $WORKSPACE/test/robotframework/src/main/suite
-mkdir -p _Executable
-[[ -f $WORKSPACE/test/robotframework/target/*.jar ]] && 
-	cp $WORKSPACE/test/robotframework/target/*.jar _Executable 
-
-PATH="/c/Program Files/Microsoft SQL Server/100/Tools/Binn:$PATH" \
-cygstart cmd /K pybot "$@" .
