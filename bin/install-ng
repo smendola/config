@@ -11,6 +11,7 @@ do
         exit 1;;
      d) set -x
         PS4='+${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]}: '
+        debug=-d
         ;;
      b) BUILD=all;;
      c) CONFIG_FILE=$OPTARG;;
@@ -46,6 +47,7 @@ find "${WORKSPACE}/install" -name \*.zip -print -exec cp -u {} ${ARTIFACTS_DIR} 
 
 find services tools/log-server-adapter sw-ng-ui \
     -name \*.war -print -exec cp -u {} ${ARTIFACTS_DIR} \;
+cp ${WORKSPACE}/tools/encryptor/target/encryptor.jar ${ARTIFACTS_DIR} 
 echo "Done."
 
 echo "*** Generating buildinfo.txt ***"
@@ -60,7 +62,7 @@ echo "*** Invoking installer, giving it config file $CONFIG_FILE ***"
 
 # Run installer
 cd $WORKSPACE/tools/sw-ng-installer/setup
-./setup.sh "${CONFIG_FILE}"
+./setup.sh -a "password" ${debug} "${CONFIG_FILE}"
 else
 echo NO INSTALL
 fi
@@ -75,11 +77,11 @@ then
     mkdir -p $PRIV_CXT_XML_DIR
     rm -f $PRIV_CXT_XML_DIR/*
     
-    svcs=(logging files:file-storage template access-control)
-    for svc in ${svcs[@]}
-    do
-        SVC=${svc##*:}
-        ROOT=${svc%%:*}
+	svcs=(logging files:file-storage template access-control)
+	for svc in ${svcs[@]}
+	do
+		SVC=${svc##*:}
+		ROOT=${svc%%:*}
         cat <<EOF > $PRIV_CXT_XML_DIR/$ROOT.xml
 <?xml version='1.0' encoding='utf-8'?>
 <Context
@@ -113,3 +115,4 @@ then
   # Run tomcat
   catalina.sh jpda run
 fi
+
