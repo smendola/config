@@ -41,7 +41,7 @@ GLOBIGNORE=.:..
 ### C:\tools, and point TOOLS_DIR to that dir. Put JRE there, as
 ### well (e.g. $TOOLS_DIR/jre6)
 ###############################################################
-export JAVA_HOME=$(mix "/c/tools/jdk6")
+export JAVA_HOME=$(mix "/c/tools/jdk7)
 export CATALINA_HOME=/c/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
