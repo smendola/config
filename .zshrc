@@ -65,17 +65,24 @@ PATH=$(unx "$JAVA_HOME/bin"):$PATH
 
 
 # Add all /c/tools/springsource/*/bin and  /c/tools/*/bin to PATH
+#
+# NOTE: some of these packages may contain binaries
+#       whose names confict with cygwin utils, e.g.
+#       AccuRev has a "diff.exe"
+#       For this reason, it's safer to add these to the PATH
+#       *after* not in before, /bin
+#
 for d in $TOOLS_DIR/springsource/* $TOOLS_DIR/*
 do
     if [ -d $d/Scripts ]
     then
-        PATH=$d/Scripts:$PATH
+        PATH=$PATH:$d/Scripts
     fi
     if [ -d $d/bin ]
     then
-        PATH=$d/bin:$PATH
+        PATH=$PATH:$d/bin
     else
-        PATH=$d:$PATH
+        PATH=$PATH:$d
     fi
 done
 

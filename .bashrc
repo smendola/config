@@ -41,7 +41,7 @@ GLOBIGNORE=.:..
 ### C:\tools, and point TOOLS_DIR to that dir. Put JRE there, as
 ### well (e.g. $TOOLS_DIR/jre6)
 ###############################################################
-export JAVA_HOME=$(mix "/c/tools/jdk7)
+export JAVA_HOME=$(mix "/c/tools/jdk7")
 export CATALINA_HOME=/c/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
@@ -52,7 +52,7 @@ export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WORKSPACE=$(mix ~/ng)
 export BUILD_NUMBER=SNAPSHOT
 
-export LESSOPEN='| source-highlight --failsafe -f esc -i %s'
+export LESSOPEN='|lesspipe.sh %s'
 export LESS='-R -x4'
 
 export TOOLS_DIR=/c/tools
@@ -63,28 +63,38 @@ export JENKINS_HOME=$(mix ~/jenkins)
 ### PATH CONSTRUCTION
 ###############################################################
 
-PATH=~/bin:$PATH
+PATH=~/bin.personal:~/bin:$PATH
 PATH=$(unx "$JAVA_HOME/bin"):$PATH
 
 
 # Add all /c/tools/springsource/*/bin and  /c/tools/*/bin to PATH
+#
+# NOTE: some of these packages may contain binaries
+#       whose names confict with cygwin utils, e.g.
+#       AccuRev has a "diff.exe"
+#       For this reason, it's safer to add these to the PATH
+#       *after* not in before, /bin
+#
 for d in $TOOLS_DIR/springsource/* $TOOLS_DIR/*
 do
     if [ -d $d/Scripts ]
     then
-        PATH=$d/Scripts:$PATH
+        PATH=$PATH:$d/Scripts
     fi
     if [ -d $d/bin ]
     then
-        PATH=$d/bin:$PATH
+        PATH=$PATH:$d/bin
     else
-        PATH=$d:$PATH
+        PATH=$PATH:$d
     fi
 done
 
 
 # Remove various Windows crap from PATH
 PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
+
+# but add back this one for sqlcmd
+PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
 
 ###############################################################
 ### Stuff...
