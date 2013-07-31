@@ -247,94 +247,21 @@ else
     echo '*** No git found! ***'
 fi
 
-
-function skyget() {
-    if [[ $# < 2 || $# > 3 ]]
-    then
-        echo "Usage: skyget PORTNUM REMOTE_SOURCE [LOCAL_DEST]"
-        echo "       REMOTE_SOURCE is either relative to ~ops on skytap, or absolute"
-        return
-    fi
-    local port=${1##*:}
-    local src=$2
-    local dst=${3:-.}
-    sftp -P $port ops@services-useast.skytap.com:$src "$dst"
+function skysync () {
+	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av "$@"
 }
 
-function skyget-logs() {
-    echo '*** TO DO: COMPRESS / SEND / DECOMPRESS'
-    mkdir -p Robot_Logs
-    if [[ $# != 1 ]]
-    then
-        echo "Usage: skyget-logs PORTNUM"
-        return
-    fi
-    local port=$1
-    skyget $port 'DEPLOY/ng-robot-framework-*/*.*ml' Robot_Logs
-    skyget $port 'DEPLOY/ng-robot-framework-*/*.png' Robot_Logs
+function skylogs () {
+    mkdir -p ~/Robot_Logs
+    skysync \
+        "skytap::suite/output.xml" \
+        "skytap::suite/log.html" \
+        "skytap::suite/report.html" \
+        "skytap::suite/*.png" \
+    	~/Robot_Logs &&
+    start ~/Robot_Logs/report.html
 }
 
-
-function skyput() {
-    if [[ $# < 2 || $# > 3 ]]
-    then
-        echo "Usage: skyput PORTNUM LOCAL_SOURCE [REMOTE_DEST]"
-        echo "       REMOTE_DEST is either relative to ~ops on skytap, or absolute"
-       return
-    fi
-    local port=${1##*:}
-    local src=$2
-    local dst=${3:-/home/ops}
-    sftp -P $port -b - "ops@services-useast.skytap.com" << EOF
-put $src $dst
-bye
-EOF
-}
-
-function skyshell() {
-    if [[ $# != 1 ]]
-    then
-        echo "Usage: skyshell PORTNUM"
-        return
-    fi
-    local port=${1##*:}
-    ssh -l ops \
-        -Y \
-        -p $port \
-        -L18080:localhost:8080 \
-        -L18081:localhost:8081 \
-        -L19000:localhost:9000 \
-    services-useast.skytap.com
-}
-
-function skyterm() {
-    if [[ $# != 1 ]]
-    then
-        echo "Usage: skyterm PORTNUM"
-        return
-    fi
-    local port=${1##*:}
-    cygstart putty -load ops@skytap -P $port
-}
-
-function curbranch()
-{
-    if git branch > /dev/null 2>&1 
-    then
-	    echo $(git branch | grep '^[*]' | cut -c 3-)
-    fi
-}
-
-function curbranch_bracketed()
-{
-    __git_ps1 ' (%s) '
-    
-    #local cb=$(curbranch)    
-    #if [[ $cb ]]
-    #then
-    #    echo " [$cb]"
-    #fi
-}
 function fixtty() {
     stty sane erase ^H
 }
@@ -396,6 +323,7 @@ function clear-m2() {
 }
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+alias syncdots='dots commit -a -m bla && dots pull && dots push'
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 
@@ -471,8 +399,6 @@ function merge_ini() {
 }
 
 alias tdc='tree -d -C -I target'
-
-alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
 
 # Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
