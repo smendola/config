@@ -91,7 +91,7 @@ alias s=sublime
 
 # set the terminal window title bar label 
 # Usage: title IGNOREDPARAM WINDOW_TITLE
-title() { 
+title() {
     echo -n $'\e];'"$@"$'\a' ;# works with ANSI terminals 
     # if [ "$TERM" == cygwin ] 
     # then 
@@ -266,6 +266,23 @@ function curbranch_bracketed()
     #    echo " [$cb]"
     #fi
 }
+
+
+function skysync () {
+	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av "$@"
+}
+
+function skylogs () {
+    mkdir -p ~/Robot_Logs
+    skysync \
+        "skytap::suite/output.xml" \
+        "skytap::suite/log.html" \
+        "skytap::suite/report.html" \
+        "skytap::suite/*.png" \
+    	~/Robot_Logs &&
+    start ~/Robot_Logs/report.html
+}
+
 function fixtty() {
     stty sane erase ^H
 }
@@ -327,6 +344,7 @@ function clear-m2() {
 }
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+alias syncdots='dots commit -a -m bla && dots pull && dots push'
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 
@@ -403,8 +421,6 @@ function merge_ini() {
 
 alias tdc='tree -d -C -I target'
 
-alias skysync="RSYNC_CONNECT_PROG='nc localhost 10873' rsync -av"
-
 # Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
 # the advantage is that this type of link is
@@ -419,3 +435,4 @@ function mklink()
     fi
     cmd /c mklink $(win "$dest") $(win "$src")
 }
+
