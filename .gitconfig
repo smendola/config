@@ -91,3 +91,7 @@
 [remote "ng-jenkins"]
 	url = git@bitbucket.org:smendola/ng-jenkins.git
 	fetch = master
+
+
+
+[gui]
