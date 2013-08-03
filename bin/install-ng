@@ -46,8 +46,11 @@ mkdir -p ${ARTIFACTS_DIR}
 find "${WORKSPACE}/install" -name \*.zip -print -exec cp -u {} ${ARTIFACTS_DIR} \;
 
 find services tools/log-server-adapter sw-ng-ui \
-    -name \*.war -print -exec cp -u {} ${ARTIFACTS_DIR} \;
-cp ${WORKSPACE}/tools/encryptor/target/encryptor.jar ${ARTIFACTS_DIR} 
+    -name \*.war -print -exec cp {} ${ARTIFACTS_DIR} \;
+cp -u ${WORKSPACE}/tools/encryptor/target/encryptor.jar ${ARTIFACTS_DIR} 
+cp -u  ${WORKSPACE}/thirdparty/dbdeploy/dbdeploy*/dbdeploy-cli*.jar ${ARTIFACTS_DIR} 
+cp -u  ${WORKSPACE}/thirdparty/jars/jtds*.jar ${ARTIFACTS_DIR} 
+cp -u  ${WORKSPACE}/tools/InitializeAllChangeLogTables.sql ${ARTIFACTS_DIR} 
 echo "Done."
 
 echo "*** Generating buildinfo.txt ***"
