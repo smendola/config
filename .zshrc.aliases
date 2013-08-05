@@ -348,8 +348,8 @@ function jpda() {
 function merge_ini() {
     diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
         $HOME/ng-install.ini \
-        install.ini-common-ancestor.ini \
-        ${WORKSPACE}/tools/sw-ng-installer/setup/install.ini
+        $HOME/install.ini-common-ancestor.ini \
+        $WORKSPACE/tools/sw-ng-installer/setup/install.ini
 }
 
 alias tdc='tree -d -C -I target'
