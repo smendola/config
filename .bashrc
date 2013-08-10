@@ -65,6 +65,7 @@ export JENKINS_HOME=$(mix ~/jenkins)
 
 PATH=~/bin.personal:~/bin:$PATH
 PATH=$(unx "$JAVA_HOME/bin"):$PATH
+PATH=$(unx "$WORKSPACE/tools"):$PATH
 
 
 # Add all /c/tools/springsource/*/bin and  /c/tools/*/bin to PATH

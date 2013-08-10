@@ -150,7 +150,7 @@ alias jmeter='(cd $TOOLS_DIR/jmeter/bin; nohup ./jmeter.sh &)'
 
 
 function cygsetup() {
-    curl -\# -o /setup.exe 'http://cygwin.com/setup.exe'
+    curl -\# -o /setup.exe 'http://cygwin.com/setup-x86.exe'
     chmod +x /setup.exe
     cmd /c start $(dos /setup.exe) "$@"
 }
