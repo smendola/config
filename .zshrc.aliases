@@ -173,6 +173,9 @@ function mci() {
 function ntd() {
   $WORKSPACE/tools/deploy.sh "$@"
 }
+function nti() {
+  $WORKSPACE/tools/install-ng.sh "$@"
+}
 
 
 if [[ $(uname) == MINGW* ]] 

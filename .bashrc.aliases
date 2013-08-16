@@ -2,40 +2,6 @@
 ### ALIASES AND FUNCTIONS FOR INTERACTIVE USE
 ###############################################################
 
-function prat() { 
-    if [[ $TERM == emacs ]]; then
-        return;
-    fi;
-
-    PRAT=$*;
-    local attr_list='0';
-#    local attr_list2='0;31;47;7'
-    local attr_list2='41'
-    local shlvl;
-    local title;
-    local prompt;
-    local remote;
-
-    for attr in $*;
-    do
-        attr_list="$attr_list;$attr";
-    done;
-
-    if [[ $SHLVL > 1 ]]; then
-        shlvl=" [$SHLVL]";
-    fi
-    if [[ ! -z $SSH_CONNECTION ]]
-    then
-        remote=" [REMOTE]"
-    fi
-
-    prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[${attr_list2}m\]\$(curbranch_bracketed)$shlvl$remote\[\033[0m\] \n\$ ";
-    PS1=$prompt
-}
-
-
-# colorize ls output, if supported
-/bin/ls /dev/null --color > /dev/null 2>&1 && alias ls='/bin/ls --color=auto'
 
 # Clears the scrollback buffer, not just the current screen
 alias cls='echo -n -e "\ec\e[3J"'
@@ -220,6 +186,10 @@ function mci() {
 function ntd() {
   $WORKSPACE/tools/deploy.sh "$@"
 }
+function nti() {
+  $WORKSPACE/tools/install-ng.sh "$@"
+}
+
 
 if [[ $(uname) == MINGW* ]] 
 then
