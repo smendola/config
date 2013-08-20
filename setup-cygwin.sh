@@ -22,6 +22,7 @@ fi
 
 echo "OK, you asked for it..."
 
+set -xv
 ## First, fetch all the configuration files from git repo on bitbucket
 git config --global --add core.autocrlf false
 cd $HOME
@@ -31,8 +32,8 @@ rm .git
 alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
 dots remote add origin https://smendola@bitbucket.org/smendola/config.git
-dots fetch origin master
-dots checkout --force
+dots fetch
+dots checkout --force master
 
 # Fetch customized .oh-my-zsh config, also from bitbucket
 rm -rf ~/.oh-my-zsh
@@ -40,7 +41,7 @@ git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
 
 # Fetch cygwin installer
 echo "Fetching cygwin installer from cygwin.com"
-curl '-#' -o ./cygwin-setup.exe 'http://cygwin.com/setup.exe'
+curl '-#' -o ./cygwin-setup.exe 'http://cygwin.com/setup-x86.exe'
 
 # Run the installer, requesting some specific packages we need
 ./cygwin-setup.exe -q -R 'C:\cygwin' -l 'C:\cygwin-pkgs' \
