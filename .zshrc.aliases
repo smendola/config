@@ -161,17 +161,11 @@ function mqst() {
 function mqsti() {
     mqst install "$@"
 }
-function mqstci() {
-    # It's always better to do clean separate from install
-    mqst clean "$@"
-    mqst install "$@"
-}
-function mci() {
-    mvn clean "$@"
-    mvn install "$@"
-}
 function ntd() {
   $WORKSPACE/tools/deploy.sh "$@"
+}
+function nti() {
+  $WORKSPACE/tools/install-ng.sh "$@"
 }
 
 
