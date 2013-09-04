@@ -34,6 +34,8 @@ alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 dots remote add origin https://smendola@bitbucket.org/smendola/config.git
 dots fetch
 dots checkout --force master
+dots branch $USERNAME
+dots co $USERNAME
 
 # Fetch customized .oh-my-zsh config, also from bitbucket
 rm -rf ~/.oh-my-zsh
