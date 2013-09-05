@@ -66,12 +66,15 @@ login
 
 if [[ $# = 0 ]]
 then
-    echo ""
+    echo "----------------------------------------------------"
+    echo "     id  name"
+    echo "----------------------------------------------------"
     curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.xml |
     xmlstarlet sel -t \
         -m '/configurations/configuration' \
         -v id -o ' ' -v name -n |
-    sort -d -k2
+    sort -d -k2 |
+    awk -- '{printf "%7d  %s\n", $1, gensub("^[0-9]+ +", "", "g", $0)}'
     echo ""
     echo -n "Select configuration id: "
     read cfgid
