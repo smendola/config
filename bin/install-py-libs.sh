@@ -22,5 +22,5 @@ EOF
 for f in $(cat /tmp/py-libs.txt)
 do
   echo Installing $f...
-  pip install "$f" -U -q || echo "*** FAILED TO INSTALL $f ***"
+  pip install "$f" -U -q || echo -e "\e[31m*** FAILED TO INSTALL $f ***\e[0m"
 done
