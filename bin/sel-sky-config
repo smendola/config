@@ -48,13 +48,15 @@ function usage()
 }
 
 RESUME=1
-while getopts hln OPTNAME
+while getopts hlnr OPTNAME
 do
     case $OPTNAME in
-     h|\?) # Option not recognized
+     h|\?)
         usage;;
      l) LOGIN=1;;
      n) RESUME=0;;
+     r) echo "-r option is obsolete; resume is the default"
+        usage;;
     esac
 done
 shift $(( $OPTIND - 1 ))
