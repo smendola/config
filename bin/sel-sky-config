@@ -40,21 +40,25 @@ function usage()
 {
     echo "${0##*/}: Select a Skytap configuration to use with SSH"
     echo ""
-    echo "Usage: ${0##*/} [-l] [-r] [PATTERN]"
+    echo "Usage: ${0##*/} [-l] [-n] [-s | -t] [PATTERN]"
     echo "   -l  Re-login"
     echo "   -n  Do not resume the configuration; default is to resume"
+    echo "   -s  SSH in after selecting the configuration"
+    echo "   -t  SSH in and set up tunneling after selecting the configuration"
     echo "   PATTERN  Only list configurations whose name match PATTERN"
     exit
 }
 
 RESUME=1
-while getopts hlnr OPTNAME
+while getopts hlnrst OPTNAME
 do
     case $OPTNAME in
      h|\?)
         usage;;
      l) LOGIN=1;;
      n) RESUME=0;;
+     s) SSH=1; RESUME=1;;
+     t) TUNNEL=1; RESUME=1;;
      r) echo "-r option is obsolete; resume is the default"
         usage;;
     esac
@@ -120,4 +124,12 @@ then
                 -v runstate -n)
     done
     echo " $runstate"
+fi
+
+if [[ $SSH ]]
+then
+  ssh skytap
+elif [[ $TUNNEL ]]
+then
+  ssh skytun
 fi
