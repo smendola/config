@@ -1,4 +1,4 @@
-#!/bin/sh -xv
+#!/bin/sh
 host=${1:-10.0.0.1}
 
 sqlcmd -S$host -Usa -Ppassword -dAccessControl \
