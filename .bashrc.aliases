@@ -197,7 +197,7 @@ alias jmeter='(cd $TOOLS_DIR/jmeter/bin; nohup ./jmeter.sh &)'
 
 
 function cygsetup() {
-    curl -\# -o /setup.exe 'http://cygwin.com/setup.exe'
+    curl -\# -o /setup.exe 'http://cygwin.com/setup-x86.exe'
     chmod +x /setup.exe
     cmd /c start $(dos /setup.exe) "$@"
 }
@@ -270,6 +270,7 @@ function skysync () {
 function skylogs () {
     mkdir -p ~/Robot_Logs
     skysync \
+        "skytap::suite/pybot-args.txt" \
         "skytap::suite/output.xml" \
         "skytap::suite/log.html" \
         "skytap::suite/report.html" \
@@ -342,17 +343,9 @@ alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 alias syncdots='dots commit -a -m bla ; dots pull ; dots push'
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
-
-function pybot() {
-    pybot.bat \
-        -L DEBUG \
-        -W $(( $(tput cols) - 2 )) \
-        --suitestatlevel 2 \
-        --tagstatexclude "TC*" \
-        --tagstatexclude "US*" \
-        --tagstatexclude "DE*" \
-        "$@"
-}
+alias rebot='rebot.bat'
+# Use the whole width of the terminal for pybot output
+alias pybot='pybot.bat -W $(( $(tput cols) - 2 ))'
 
 function palette() {
     for code in {000..255}; do
