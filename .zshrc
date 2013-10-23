@@ -87,6 +87,9 @@ do
     fi
 done
 
+# There is a python in /usr/bin, but it doesn't seem to work well,
+# let's move the non-cygwin python up in front of /usr/bin
+PATH=/c/tools/Python27:/c/tools/Python27/Scripts:$PATH
 
 # Remove various Windows crap from PATH
 PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)

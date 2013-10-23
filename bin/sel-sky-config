@@ -16,9 +16,11 @@ function try_login()
 function get_login()
 {
     echo "Enter your skytap credentials."
-    echo "Remember the @phtcorp.com bit!"
+    echo "Most likely, your Skytap username is $USERNAME@phtcorp.com"
     read -p "Username: " username
     read -s -p "Password: " password
+    echo ""
+    echo ""
     echo $(echo -n "$username:$password" | base64) > ~/.skylogin
 }
 
@@ -36,23 +38,29 @@ function login()
 
 function usage()
 {
-    echo "${0##*/}: select a Skytap configuration to use with SSH"
-    echo "Usage: ${0##*/} [-l] [-r] [CONFIG_ID]"
+    echo "${0##*/}: Select a Skytap configuration to use with SSH"
+    echo ""
+    echo "Usage: ${0##*/} [-l] [-n] [-s | -t] [PATTERN]"
     echo "   -l  Re-login"
-    echo "   -r  Resume the configuration"
-    echo "   CONFIG_ID  use this configuration instead of selecting from menu"
+    echo "   -n  Do not resume the configuration; default is to resume"
+    echo "   -s  SSH in after selecting the configuration"
+    echo "   -t  SSH in and set up tunneling after selecting the configuration"
+    echo "   PATTERN  Only list configurations whose name match PATTERN"
     exit
 }
 
-
-while getopts lr OPTNAME
+RESUME=1
+while getopts hlnrst OPTNAME
 do
     case $OPTNAME in
-    \?) # Option not recognized
+     h|\?)
         usage;;
-     h) usage;;
      l) LOGIN=1;;
-     r) RESUME=1;;
+     n) RESUME=0;;
+     s) SSH=1; RESUME=1;;
+     t) TUNNEL=1; RESUME=1;;
+     r) echo "-r option is obsolete; resume is the default"
+        usage;;
     esac
 done
 shift $(( $OPTIND - 1 ))
@@ -64,24 +72,31 @@ fi
 
 login
 
-if [[ $# = 0 ]]
+if [[ $# == 0 ]]
 then
-    echo ""
-    curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.xml |
-    xmlstarlet sel -t \
-        -m '/configurations/configuration' \
-        -v id -o ' ' -v name -n |
-    sort -d -k2
-    echo ""
-    echo -n "Select configuration id: "
-    read cfgid
-    if [[ $cfgid = '' ]]
-    then
-        echo "OK, never mind."
-        exit
-    fi
+    pattern=.*
 else
-    cfgid=$1
+    pattern="^.*$1.*"
+fi
+
+echo "----------------------------------------------------"
+echo "     id  name"
+echo "----------------------------------------------------"
+curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.xml |
+xmlstarlet sel -t \
+    -m '/configurations/configuration' \
+    -v id -o ' ' -v name -n |
+  grep -E "$pattern" |
+  sort -d -k2 |
+  awk -- '{printf "%7d  %s\n", $1, gensub("^[0-9]+ +", "", "g", $0)}'
+
+echo ""
+echo -n "Select configuration id: "
+read cfgid
+if [[ $cfgid = '' ]]
+then
+    echo "OK, never mind."
+    exit
 fi
 
 port=$(
@@ -109,4 +124,12 @@ then
                 -v runstate -n)
     done
     echo " $runstate"
+fi
+
+if [[ $SSH ]]
+then
+  ssh skytap
+elif [[ $TUNNEL ]]
+then
+  ssh skytun
 fi
