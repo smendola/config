@@ -22,7 +22,6 @@ fi
 
 echo "OK, you asked for it..."
 
-set -xv
 ## First, fetch all the configuration files from git repo on bitbucket
 git config --global --add core.autocrlf false
 cd $HOME
