@@ -40,23 +40,30 @@ function usage()
 {
     echo "${0##*/}: Select a Skytap configuration to use with SSH"
     echo ""
-    echo "Usage: ${0##*/} [-l] [-r] [PATTERN]"
+    echo "Usage: ${0##*/} [-l] [-n] [-s | -t] [-u] [PATTERN]"
+    echo "   -u  Use \$USERNAME-.* as a filter pattern"
     echo "   -l  Re-login"
     echo "   -n  Do not resume the configuration; default is to resume"
-    echo "   PATTERN  Only list configurations whose name match PATTERN"
+    echo "   -s  SSH in after selecting the configuration"
+    echo "   -t  SSH in and set up tunneling after selecting the configuration"
+    echo "   PATTERN  Only list configurations whose name match PATTERN "
+    echo "            (case insensitive regexp)"
     exit
 }
 
 RESUME=1
-while getopts hlnr OPTNAME
+while getopts hlnrstu OPTNAME
 do
     case $OPTNAME in
      h|\?)
         usage;;
      l) LOGIN=1;;
      n) RESUME=0;;
+     s) SSH=1; RESUME=1;;
+     t) TUNNEL=1; RESUME=1;;
      r) echo "-r option is obsolete; resume is the default"
         usage;;
+     u) USE_USERNAME=1;;
     esac
 done
 shift $(( $OPTIND - 1 ))
@@ -68,12 +75,20 @@ fi
 
 login
 
+pattern=""
 if [[ $# == 0 ]]
 then
     pattern=.*
 else
-    pattern="^.*$1.*"
+    pattern=".*$1.*"
 fi
+if [[ $USE_USERNAME ]]
+then
+    pattern=${USERNAME}-.*${pattern}
+fi
+
+pattern="^[0-9]+ +${pattern}$"
+
 
 echo "----------------------------------------------------"
 echo "     id  name"
@@ -82,7 +97,7 @@ curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.
 xmlstarlet sel -t \
     -m '/configurations/configuration' \
     -v id -o ' ' -v name -n |
-  grep -E "$pattern" |
+  grep -iE "$pattern" |
   sort -d -k2 |
   awk -- '{printf "%7d  %s\n", $1, gensub("^[0-9]+ +", "", "g", $0)}'
 
@@ -120,4 +135,12 @@ then
                 -v runstate -n)
     done
     echo " $runstate"
+fi
+
+if [[ $SSH ]]
+then
+  ssh skytap
+elif [[ $TUNNEL ]]
+then
+  ssh skytun
 fi
