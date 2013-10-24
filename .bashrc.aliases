@@ -269,12 +269,17 @@ function skysync () {
 
 function skylogs () {
     mkdir -p ~/Robot_Logs
+    if [[ $1 = -s ]]
+    then
+        skysync "skytap::suite/results/*.png" ~/Robot_Logs
+        shift
+    fi
+    
     skysync \
         "skytap::suite/pybot-args.txt" \
-        "skytap::suite/output.xml" \
-        "skytap::suite/log.html" \
-        "skytap::suite/report.html" \
-        "skytap::suite/*.png" \
+        "skytap::suite/results/output.xml" \
+        "skytap::suite/results/log.html" \
+        "skytap::suite/results/report.html" \
     	~/Robot_Logs &&
     start ~/Robot_Logs/report.html
 }
