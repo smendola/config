@@ -22,7 +22,7 @@ GLOBIGNORE=.:..
 ###############################################################
 ### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
 ###############################################################
-[ -f ~/.zshrc.aliases ] && . ~/.zshrc.aliases
+[ -f ~/.aliases ] && . ~/.aliases
 
 
 
