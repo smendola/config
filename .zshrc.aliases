@@ -17,8 +17,6 @@ alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-ti
 alias whiches='type -Pa'
 alias type='builtin type -f'
 
-#PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
-
 function upto ()
 {
     local target="$1"
