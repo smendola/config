@@ -345,7 +345,13 @@ function clear-m2() {
 }
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
-alias syncdots='dots commit -a -m bla ; dots pull ; dots push'
+function syncdots()
+{
+    dots co .ssh/config  &&
+    dots commit -a -m bla && 
+    dots pull origin master && 
+    dots push
+}
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 alias rebot='rebot.bat'
