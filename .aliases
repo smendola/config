@@ -197,6 +197,18 @@ function skysync () {
 	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av "$@"
 }
 
+function skysuite()
+{
+  (
+    cd $WORKSPACE/test/robotframework/src/main/suite
+    skysync \
+        --exclude=Configuration.txt \
+        --exclude='*.pyc' \
+        --exclude='*.bak' \
+        ./ ::suite/
+  )
+}
+
 function skylogs () {
     mkdir -p ~/Robot_Logs
     if [[ $1 = -s ]]
