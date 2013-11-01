@@ -291,7 +291,7 @@ function syncdots()
 {
     echo co &&
     dots co .ssh/config  &&
-    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || true) && 
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
     echo pull &&
     dots pull origin master && 
     echo push &&
