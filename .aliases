@@ -289,9 +289,12 @@ function clear-m2() {
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 function syncdots()
 {
+    echo co &&
     dots co .ssh/config  &&
-    dots commit -a -m bla && 
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || true) && 
+    echo pull &&
     dots pull origin master && 
+    echo push &&
     dots push
 }
 
