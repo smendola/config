@@ -15,6 +15,7 @@
 !/.emacs
 !/.emacs.d
 !/.ssh
+/.ssh/config
 /.ssh/known_hosts
 !/bin
 !/bin.personal

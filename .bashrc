@@ -25,7 +25,7 @@ GLOBIGNORE=.:..
 ###############################################################
 ### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
 ###############################################################
-[ -f ~/.bashrc.aliases ] && . ~/.bashrc.aliases
+[ -f ~/.aliases ] && . ~/.aliases
 
 
 
@@ -111,6 +111,8 @@ elif [[ $TERM == cygwin ]]; then
 else
   prat 1 7 34 47
 fi
+
+PROMPT_COMMAND='set +x; set +v; title ${TITLE_PREFIX}:`dirs`; fixtty' 
 
 ###############################################################
 ### GIT FEATURES

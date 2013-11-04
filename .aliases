@@ -17,8 +17,6 @@ alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-ti
 alias whiches='type -Pa'
 alias type='builtin type -f'
 
-#PROMPT_COMMAND='set +x; set +v; title x ${TITLE_PREFIX}:`dirs`; fixtty' 
-
 function upto ()
 {
     local target="$1"
@@ -199,6 +197,18 @@ function skysync () {
 	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av "$@"
 }
 
+function skysuite()
+{
+  (
+    cd $WORKSPACE/test/robotframework/src/main/suite
+    skysync \
+        --exclude=Configuration.txt \
+        --exclude='*.pyc' \
+        --exclude='*.bak' \
+        ./ ::suite/
+  )
+}
+
 function skylogs () {
     mkdir -p ~/Robot_Logs
     if [[ $1 = -s ]]
@@ -277,7 +287,13 @@ function clear-m2() {
 }
 
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
-alias syncdots='dots commit -a -m bla ; dots pull ; dots push'
+function syncdots()
+{
+    echo co   &&  dots co .ssh/config  &&
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
+    echo pull &&  dots pull origin master && 
+    echo push &&  dots push
+}
 
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 alias rebot='rebot.bat'
@@ -361,3 +377,87 @@ function mklink()
     cmd /c mklink $(win "$dest") $(win "$src")
 }
 
+
+
+
+
+
+###############################################
+#### BASH SPECIFIC ALIASES                 ####
+#### Stuff you mostly get for free in ZSH  ####
+###############################################
+
+# Testing $SHELL gives false results. Try something else.
+if [[ $(type print) != *builtin ]]
+then
+
+    function prat() { 
+        if [[ $TERM == emacs ]]; then
+            return;
+        fi
+
+        PRAT=$*;
+        local attr_list='0';
+    #    local attr_list2='0;31;47;7'
+        local attr_list2='41'
+        local shlvl;
+        local title;
+        local prompt;
+        local remote;
+
+        for attr in $*;
+        do
+            attr_list="$attr_list;$attr";
+        done
+
+        if [[ $SHLVL > 1 ]]; then
+            shlvl=" [$SHLVL]";
+        fi
+        if [[ ! -z $SSH_CONNECTION ]]
+        then
+            remote=" [REMOTE]"
+        fi
+
+        prompt="\n\[\033[${attr_list}m\] \h: \w \[\033[${attr_list2}m\]\$(curbranch_bracketed)$shlvl$remote\[\033[0m\] \n\$ ";
+        PS1=$prompt
+    }
+
+    # set the terminal window title bar label 
+    # Usage: title IGNOREDPARAM WINDOW_TITLE
+    title () {
+            if [[ "$DISABLE_AUTO_TITLE" = "true" ]] || [[ "$EMACS" = *term* ]]
+            then
+                    return
+            fi
+            if [[ "$TERM" = screen* ]]
+            then
+                    echo -ne "\ek$1e\\"
+            elif [[ "$TERM" = xterm* ]] || [[ $TERM = rxvt* ]] || [[ "$TERM_PROGRAM" = "iTerm.app" ]]
+            then
+                    echo -ne "\e];$2$\a"
+                    #echo -ne "\e]2;$2\a"
+                    echo -ne "\e]1;$1\a"
+            fi
+    }
+
+
+    function curbranch()
+    {
+        if git branch > /dev/null 2>&1 
+        then
+            echo $(git branch | grep '^[*]' | cut -c 3-)
+        fi
+    }
+
+    function curbranch_bracketed()
+    {
+        __git_ps1 ' (%s) '
+        
+        #local cb=$(curbranch)    
+        #if [[ $cb ]]
+        #then
+        #    echo " [$cb]"
+        #fi
+    }
+
+fi
