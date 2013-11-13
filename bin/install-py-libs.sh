@@ -12,7 +12,7 @@ robotframework-databaselibrary==0.6
 robotframework-httplibrary==0.4.0
 robotframework-requests==0.2.4
 robotframework-ride==1.1
-robotframework-selenium2library==1.1.0
+robotframework-selenium2library==1.3.0
 selenium==2.28.0
 EOF
 
