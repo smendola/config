@@ -1,11 +1,17 @@
 #!/bin/sh
+
+# Convert all args to Windows paths and then invoke
+# Windows based editor program with those args.
+# Add double quotes around each file name; that's how
+# Windows works
+
 declare -a args
 for arg
 do
-     args[${#args[*]}]=$(cygpath -ma "$arg")
+     args[${#args[*]}]=\"$(cygpath -ma "$arg")\"
 done
 
 case "${0##*/}" in
-    npp) cygstart notepad++ "${args[@]}";;
-    sublime) cygstart sublime_text "${args[@]}";;
+    npp)     cygstart notepad++    "${args[@]}" ;;
+    sublime) cygstart sublime_text "${args[@]}" ;;
 esac
