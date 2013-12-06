@@ -7,7 +7,7 @@ fi
 
 host=${1:-localhost}
 
-for db in AccessControl Logging Template FileStorage
+for db in AccessControl Logging Template FileStorage StudyDesign
 do
     echo -n "Dropping $db ..."
     sqlcmd -S${host} -Usa -Ppassword -Q "ALTER DATABASE [$db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
