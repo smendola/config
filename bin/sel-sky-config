@@ -113,7 +113,7 @@ fi
 port=$(
     curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
     xmlstarlet sel -t \
-        -m '/configuration/vms/vm[name="CentOS 6.0 x64"]' \
+        -m '/configuration/vms/vm[name="CentOS 6.4 x64"]' \
         -m 'interfaces/interface/services/service[id="22"]' \
         -v external_port \
         -n
@@ -131,7 +131,7 @@ then
         echo -n .
         runstate=$(curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
             xmlstarlet sel -t \
-                -m '/configuration/vms/vm[name="CentOS 6.0 x64"]' \
+                -m '/configuration/vms/vm[name="CentOS 6.4 x64"]' \
                 -v runstate -n)
     done
     echo " $runstate"
