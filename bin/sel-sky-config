@@ -120,7 +120,8 @@ port=$(
         -v external_port \
         -n
 )
-sed --in-place -r 's/^\t\t\t\tPort .*/\t\t\t\tPort '$port'/g' ~/.ssh/config
+sed -r 's/\{\{SKY_PORT\}\}/'$port'/g' ~/.ssh/config.tpl >  ~/.ssh/config
+chmod 700 ~/.ssh/config
 echo "Skytap SSH port number set to: $port"
 
 if [[ $RESUME = 1 ]]
@@ -132,7 +133,7 @@ then
         # Sometimes the first ?runstate command doesn't "take", keep sending it
         curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
         sleep 2
-        echo -n .
+        echo -n . 
         runstate=$(curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
             xmlstarlet sel -t \
                 -m '/configuration/vms/vm[contains(name,"CentOS")]' \
