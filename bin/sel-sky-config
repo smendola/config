@@ -34,6 +34,8 @@ function login()
     do
         get_login
     done
+    
+    CRED="$( base64 -d < ~/.skylogin)"
 }
 
 function usage()
@@ -93,7 +95,7 @@ pattern="^[0-9]+ +${pattern}$"
 echo "----------------------------------------------------"
 echo "     id  name"
 echo "----------------------------------------------------"
-curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations.xml |
+curl -s -u"${CRED}" https://cloud.skytap.com/configurations.xml |
 xmlstarlet sel -t \
     -m '/configurations/configuration' \
     -v id -o ' ' -v name -n |
@@ -111,27 +113,30 @@ then
 fi
 
 port=$(
-    curl -s -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
+    curl -s -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
     xmlstarlet sel -t \
-        -m '/configuration/vms/vm[contains(name,'CentOS')]' \
+        -m '/configuration/vms/vm[contains(name,"CentOS")]' \
         -m 'interfaces/interface/services/service[id="22"]' \
         -v external_port \
         -n
 )
-sed --in-place -r 's/^\t\t\t\tPort .*/\t\t\t\tPort '$port'/g' ~/.ssh/config
+sed -r 's/\{\{SKY_PORT\}\}/'$port'/g' ~/.ssh/config.tpl >  ~/.ssh/config
+chmod 700 ~/.ssh/config
 echo "Skytap SSH port number set to: $port"
 
 if [[ $RESUME = 1 ]]
 then
     echo -n 'Resuming configuration .'
-    curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
+    curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
     while [[ $runstate = '' || $runstate = 'busy' || $runstate = 'suspended' ]]
     do
+        # Sometimes the first ?runstate command doesn't "take", keep sending it
+        curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml?runstate=running > /dev/null
         sleep 2
-        echo -n .
-        runstate=$(curl -s -X PUT -u"$( base64 -d < ~/.skylogin)" https://cloud.skytap.com/configurations/$cfgid.xml |
+        echo -n . 
+        runstate=$(curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
             xmlstarlet sel -t \
-                -m '/configuration/vms/vm[contains(name,'CentOS')]' \
+                -m '/configuration/vms/vm[contains(name,"CentOS")]' \
                 -v runstate -n)
     done
     echo " $runstate"

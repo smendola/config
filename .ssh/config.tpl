@@ -9,8 +9,7 @@ Host skytap
 #	UserKnownHostsFile	/dev/null
 	User			ops
 	IdentityFile	~/.ssh/id_skytap
-# Skytap Port line MUST be like: ^\t{4}Port[ ][0-9]+
-				Port 16533
+	Port {{SKY_PORT}}
 
 Host skytun
 	HostName		services-useast.skytap.com
@@ -33,5 +32,4 @@ Host skytun
 	DynamicForward 	1080
 	ForwardX11		yes
 	ForwardX11Trusted	yes
-# Skytap Port line MUST be like: ^\t{4}Port[ ][0-9]+
-				Port 16533
+	Port {{SKY_PORT}}
