@@ -20,10 +20,9 @@ histchars='!;#'
 GLOBIGNORE=.:..
 
 ###############################################################
-### LOAD ALL MY STANDARD ALIASES AND FUNCTIONS
+### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
-
 
 
 ###############################################################
@@ -33,10 +32,16 @@ GLOBIGNORE=.:..
 ###  - CATALINA_BASE (probably ingore this)
 ###  - JAVA_HOME
 ###  - PHANTOMJS_BIN (where you installed PhantomJS)
-###  - WORKSPACE (where you git-clone'd studywork-ng)
+###  - WS (where you git-clone'd studywork-ng) (Unix style path)
+###  - WORKSPACE (computed from $WS; absolute path, DOS style)
 ### Recommend installing all dev tools/sdk's in a single place, e.g.
-### C:\tools, and point TOOLS_DIR to that dir. Put JRE there, as
-### well (e.g. $TOOLS_DIR/jre6)
+### C:\tools, and point TOOLS_DIR to that dir. Put JDK there, as
+### well (e.g. $TOOLS_DIR/jdk7)
+### 
+### Keep in mind:
+###   The less you customize this file, the easier life will be
+###   when it comes time to update/merge with latest version from 
+###   master.
 ###############################################################
 export JAVA_HOME=$(mix "/c/tools/jdk7")
 export CATALINA_HOME=/c/tools/tomcat
@@ -46,7 +51,14 @@ export KANDO=ssh://kando/studywork-ng.git
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
 export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
-export WORKSPACE=$(mix ~/ng)
+export WS=~/ng
+# DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
+# The following line results in WORKSPACE being set to an absolute, DOS style
+# path, which Java and some other tools require.
+# The trailing slash is important! If ~ng is a Windows symbolic link
+# (try type mklink) and not a Cygwin symbolic link, then the absolutization
+# fails unless the trailing slash is there.
+export WORKSPACE=$(mix $WS/)
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='|lesspipe.sh %s'
