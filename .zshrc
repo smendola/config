@@ -161,7 +161,7 @@ histchars='!;#'
 ZSH=$HOME/.oh-my-zsh
 if [[ -f $ZSH/oh-my-zsh.sh ]]
 then
-    plugins=(git DISABLED-mvn pip dircycle encode64 )
+    plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 )
     # Path to your oh-my-zsh configuration.
     ZSH_THEME="sm"
     #MYBG=057
