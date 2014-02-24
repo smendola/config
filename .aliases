@@ -17,6 +17,7 @@ alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-ti
 alias whiches='type -Pa'
 alias type='builtin type -f'
 alias ar=accurev
+alias undos=dos2unix
 
 function upto ()
 {
