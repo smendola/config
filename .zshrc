@@ -109,6 +109,7 @@ PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
 # but add back this one for sqlcmd
 PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
 
+
 ###############################################################
 ### Stuff...
 ###############################################################
@@ -170,4 +171,10 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+
+
+
+# allows e.g: cd access-control-implementation
+# from anywhre. try this: cd ac<TAB>im<TAB>
+cdpath=($WS/test/robotframework/src/main $WS/services/*)
 
