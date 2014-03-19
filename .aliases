@@ -296,6 +296,16 @@ function syncdots()
     echo push &&  dots push
 }
 
+function syncconfig()
+{
+    (
+        cd ~/config &&
+        echo pull mmaster && git pull origin master &&
+        echo pull config-sal && git pull config-sal master &&
+        echo push && git push origin master
+    )
+}
+
 alias ride='(pythonw -c "from robotide import main; main()"&)'
 alias rebot='rebot.bat'
 # Use the whole width of the terminal for pybot output
@@ -341,7 +351,7 @@ function xpath() {
 # Usage: jpda [-p PORTNUM] [-s] other java args...
 #       -p PORTNUM  use PORTNUM, default 9000
 #       -s          suspend and and wait for debugger to connect
-# Example: jpda -s mvn some:plugin
+# Example: jpda -s com.my.Code arg arg
 function jpda() {
     local port=9000
     local suspend=n
@@ -367,6 +377,7 @@ function merge_ini() {
 }
 
 alias tdc='tree -d -C -I target'
+alias tcf='tree -CF --dirsfirst'
 
 # Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
