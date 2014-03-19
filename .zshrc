@@ -174,7 +174,10 @@ fi
 
 
 
-# allows e.g: cd access-control-implementation
-# from anywhre. try this: cd ac<TAB>im<TAB>
+# Allows e.g: cd access-control-implementation
+# from anywhre. try this: 
+# $ cd ac<TAB>im<TAB>
+# or even try it without cd; try 
+# $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/*)
 

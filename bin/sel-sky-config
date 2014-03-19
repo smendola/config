@@ -115,7 +115,7 @@ fi
 port=$(
     curl -s -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
     xmlstarlet sel -t \
-        -m '/configuration/vms/vm[contains(name,"CentOS")]' \
+        -m '/configuration/vms/vm[contains(name,"App Host 1")]' \
         -m 'interfaces/interface/services/service[id="22"]' \
         -v external_port \
         -n
@@ -136,7 +136,7 @@ then
         echo -n . 
         runstate=$(curl -s -X PUT -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
             xmlstarlet sel -t \
-                -m '/configuration/vms/vm[contains(name,"CentOS")]' \
+                -m '/configuration/vms/vm[contains(name,"App Host 1")]' \
                 -v runstate -n)
     done
     echo " $runstate"
