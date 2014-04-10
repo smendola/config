@@ -312,7 +312,7 @@ alias rebot='rebot.bat'
 alias pybot='pybot.bat -W $(( $(tput cols) - 2 ))'
 robotlint() {
     RF_SUITE=$WORKSPACE/test/robotframework/src/main/suite
-    PYTHONPATH="$PYTONPATH;$RF_SUITE/New/_Public;$RF_SUITE/New/Web_App/_Public;$RF_SUITE/New/Services/_Public" python $WORKSPACE/tools/robotlint.py
+    PYTHONPATH="$PYTONPATH;$RF_SUITE/New/_Global;$RF_SUITE/New/Web_App/_Public;$RF_SUITE/New/Services/_Public" python $WORKSPACE/tools/robotlint.py
 }
 
 function palette() {
