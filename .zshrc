@@ -51,7 +51,7 @@ export KANDO=ssh://kando/studywork-ng.git
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
 export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
-export WS=~/ng
+export WS=$(readlink -f ~/ng)
 # DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
 # The following line results in WORKSPACE being set to an absolute, DOS style
 # path, which Java and some other tools require.
@@ -181,3 +181,7 @@ fi
 # $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/*)
 
+
+
+export CATALINA_OPTS="-javaagent:C:/tools/jrebel/jrebel.jar -Drebel.remoting_plugin=true"
+#  "-Drebel.spring_data_plugin=true"
