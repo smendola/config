@@ -300,10 +300,6 @@ alias ride='(pythonw -c "from robotide import main; main()"&)'
 alias rebot='rebot.bat'
 # Use the whole width of the terminal for pybot output
 alias pybot='pybot.bat -W $(( $(tput cols) - 2 ))'
-robotlint() {
-    RF_SUITE=$WORKSPACE/test/robotframework/src/main/suite
-    PYTHONPATH="$PYTONPATH;$RF_SUITE/New/_Global;$RF_SUITE/New/Web_App/_Public;$RF_SUITE/New/Services/_Public" python $WORKSPACE/tools/robotlint.py
-}
 
 function palette() {
     for code in {000..255}; do
