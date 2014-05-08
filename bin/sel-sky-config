@@ -42,12 +42,12 @@ function usage()
 {
     echo "${0##*/}: Select a Skytap configuration to use with SSH"
     echo ""
-    echo "Usage: ${0##*/} [-l] [-n] [-s | -t] [-u] [PATTERN]"
+    echo "Usage: ${0##*/} [-l] [-n] [-u] [PATTERN]"
     echo "   -u  Use \$USERNAME-.* as a filter pattern"
     echo "   -l  Re-login"
     echo "   -n  Do not resume the configuration; default is to resume"
-    echo "   -s  SSH in after selecting the configuration"
-    echo "   -t  SSH in and set up tunneling after selecting the configuration"
+#    echo "   -s  SSH in after selecting the configuration"
+#    echo "   -t  SSH in and set up tunneling after selecting the configuration"
     echo "   PATTERN  Only list configurations whose name match PATTERN "
     echo "            (case insensitive regexp)"
     exit
@@ -112,17 +112,30 @@ then
     exit
 fi
 
-port=$(
+map=$(
     curl -s -u"${CRED}" https://cloud.skytap.com/configurations/$cfgid.xml |
     xmlstarlet sel -t \
-        -m '/configuration/vms/vm[contains(name,"App Host 1")]' \
+        -m '/configuration/vms/vm' \
         -m 'interfaces/interface/services/service[id="22"]' \
+        -v ../../hostname \
+        -o '=' \
         -v external_port \
         -n
 )
-sed -r 's/\{\{SKY_PORT\}\}/'$port'/g' ~/.ssh/config.tpl >  ~/.ssh/config
+
+echo "-------------------------------------------------------"
+echo $map
+echo "-------------------------------------------------------"
+
+cp ~/.ssh/config.tpl  ~/.ssh/config
+for hp in $map
+do
+    host=${hp%=*}
+    port=${hp#*=}
+    sed --in-place -r 's/\{\{'${host}'\}\}/'$port'/g' ~/.ssh/config
+done
 chmod 700 ~/.ssh/config
-echo "Skytap SSH port number set to: $port"
+
 
 if [[ $RESUME = 1 ]]
 then
@@ -142,10 +155,10 @@ then
     echo " $runstate"
 fi
 
-if [[ $SSH ]]
-then
-  ssh skytap
-elif [[ $TUNNEL ]]
-then
-  ssh skytun
-fi
+# if [[ $SSH ]]
+# then
+  # ssh skytap
+# elif [[ $TUNNEL ]]
+# then
+  # ssh skytun
+# fi

@@ -2,16 +2,34 @@ Host kando
     Hostname        engvmkando
     Port            29418
 
-Host skytap
+Host apphost1
 	HostName		services-useast.skytap.com
 	StrictHostKeyChecking	no
 	CheckHostIP		no
 #	UserKnownHostsFile	/dev/null
 	User			ops
 	IdentityFile	~/.ssh/id_skytap
-	Port {{SKY_PORT}}
+	Port {{apphost1}}
 
-Host skytun
+Host phttestenv
+	HostName		services-useast.skytap.com
+	StrictHostKeyChecking	no
+	CheckHostIP		no
+#	UserKnownHostsFile	/dev/null
+	User			ops
+	IdentityFile	~/.ssh/id_skytap
+	Port {{phttestenv}}
+
+Host pghost
+	HostName		services-useast.skytap.com
+	StrictHostKeyChecking	no
+	CheckHostIP		no
+#	UserKnownHostsFile	/dev/null
+	User			ops
+	IdentityFile	~/.ssh/id_skytap
+	Port {{pghost}}
+
+Host apphost1-tun
 	HostName		services-useast.skytap.com
 	StrictHostKeyChecking	no
 #	UserKnownHostsFile	/dev/null
@@ -32,4 +50,4 @@ Host skytun
 	DynamicForward 	1080
 	ForwardX11		yes
 	ForwardX11Trusted	yes
-	Port {{SKY_PORT}}
+	Port {{apphost1}}
