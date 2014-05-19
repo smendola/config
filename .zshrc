@@ -183,5 +183,3 @@ cdpath=($WS/test/robotframework/src/main $WS/services/*)
 
 
 
-export CATALINA_OPTS="-javaagent:C:/tools/jrebel/jrebel.jar -Drebel.remoting_plugin=true"
-#  "-Drebel.spring_data_plugin=true"
