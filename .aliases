@@ -366,8 +366,8 @@ function merge_ini() {
         $WORKSPACE/tools/sw-ng-installer/setup/install.ini
 }
 
-alias tdc='tree -d -C -I target'
-alias tcf='tree -CF --dirsfirst'
+alias tdc='tree -AdC -I target'
+alias tcf='tree -ACF --dirsfirst'
 
 # Creates a Windows native symbolic link.
 # Use mklink as an alternative to ln -s
