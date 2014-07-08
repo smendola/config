@@ -31,7 +31,6 @@ GLOBIGNORE=.:..
 ###  - CATALINA_HOME (where you installed tomcat)
 ###  - CATALINA_BASE (probably ingore this)
 ###  - JAVA_HOME
-###  - PHANTOMJS_BIN (where you installed PhantomJS)
 ###  - WS (where you git-clone'd studywork-ng) (Unix style path)
 ###  - WORKSPACE (computed from $WS; absolute path, DOS style)
 ### Recommend installing all dev tools/sdk's in a single place, e.g.
@@ -50,7 +49,6 @@ export CATALINA_BASE=$CATALINA_HOME
 export KANDO=ssh://kando/studywork-ng.git
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
-export PHANTOMJS_BIN=c:/tools/phantomjs/phantomjs.exe
 export WS=$(readlink -f ~/ng)
 # DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
 # The following line results in WORKSPACE being set to an absolute, DOS style
