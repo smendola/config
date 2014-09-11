@@ -400,8 +400,9 @@ function mklink()
 
 
 
-
-
+drop-files() {
+  rm -rf /c/static-content/* /c/file-service-storage/* /c/design-storage/* 
+}
 
 ###############################################
 #### BASH SPECIFIC ALIASES                 ####
@@ -482,3 +483,28 @@ then
     }
 
 fi
+
+
+ui()
+{
+  (
+    set -v
+    cd $WS
+    mvn clean -pl ui
+    mkdir ui/target
+    cd ui/target
+    cp ~/Work/ui-1.2.0-SNAPSHOT.war .
+    mkdir ui-1.2.0-SNAPSHOT
+    cd ui-1.2.0-SNAPSHOT
+    unzip ../ui-1.2.0-SNAPSHOT.war
+  )
+}
+
+blow-away()
+{
+	drop-dbs.sh
+    /bin/rm -rf /c/static-content/* 
+    /bin/rm -rf /c/design-storage/* 
+    /bin/rm -rf /c/file-service-storage/*
+}
+
