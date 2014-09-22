@@ -177,5 +177,5 @@ fi
 # $ cd ac<TAB>im<TAB>
 # or even try it without cd; try 
 # $ a-c-im<TAB><ENTER>
-cdpath=($WS/test/robotframework/src/main $WS/services/*)
+cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
