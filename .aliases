@@ -196,11 +196,11 @@ else
 fi
 
 function skysync-testenv () {
-	RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
+    RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
 }
 
 function skysync-apphost () {
-	RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av $@
+    RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av $@
 }
 
 function skysuite()
@@ -228,7 +228,7 @@ function skylogs () {
         "skytap::suite/results/output.xml" \
         "skytap::suite/results/log.html" \
         "skytap::suite/results/report.html" \
-    	~/Robot_Logs &&
+        ~/Robot_Logs &&
     start ~/Robot_Logs/report.html
 }
 
@@ -389,13 +389,32 @@ alias tcf='tree -ACF --dirsfirst'
 # understood by non-cygwin apps, as well
 function mklink()
 {
+    local type 
+    local symbolic
+    if [[ $1 = -s ]]
+    then
+        symbolic=1
+        shift
+    fi
     src=$1
     dest=$2
-    if [[ -d $2 ]]
+
+    if [[ $symbolic != 1 ]]
     then
-        dest=$2/${1##*/}
+        if [[ -d $src ]]
+        then
+            type='/J'
+        else
+            type='/H'
+        fi
+    else
+        type='' 
     fi
-    cmd /c mklink $(win "$dest") $(win "$src")
+    if [[ -d $dest ]]
+    then
+        dest=$dest/${src##*/}
+    fi
+    cmd /c mklink ${type} $(win "$dest") $(win "$src")
 }
 
 
@@ -502,7 +521,7 @@ ui()
 
 blow-away()
 {
-	drop-dbs.sh
+    drop-dbs.sh
     /bin/rm -rf /c/static-content/* 
     /bin/rm -rf /c/design-storage/* 
     /bin/rm -rf /c/file-service-storage/*
