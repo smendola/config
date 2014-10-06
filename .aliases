@@ -373,18 +373,27 @@ function merge_ini() {
 alias tdc='tree -AdC -I target'
 alias tcf='tree -ACF --dirsfirst'
 
-# Creates a Windows native symbolic link.
-# Use mklink as an alternative to ln -s
+# Creates a Windows native link.
+# Use mklink as an alternative to ln
 # the advantage is that this type of link is
-# understood by non-cygwin apps, as well
+# understood by non-cygwin apps, as well as Cygwin
+# Use -s for symbolic link, otherwise hard link.
+# If src is directory, then link type will be Junction
+# (except if -s)
 function mklink()
 {
-    local type 
-    local symbolic
+    local src dest opt symbolic
     if [[ $1 = -s ]]
     then
         symbolic=1
         shift
+    fi
+    
+    if [[ $# != 2 ]]
+    then
+        echo "Usage: mklink [-s] SRC DEST"
+        false
+        return
     fi
     src=$1
     dest=$2
@@ -393,20 +402,48 @@ function mklink()
     then
         if [[ -d $src ]]
         then
-            type='/J'
+            opt='/J'
         else
-            type='/H'
+            opt='/H'
         fi
     else
-        type='' 
+        opt='' 
     fi
     if [[ -d $dest ]]
     then
         dest=$dest/${src##*/}
     fi
-    cmd /c mklink ${type} $(win "$dest") $(win "$src")
+    cmd /c mklink ${opt} $(win "$dest") $(win "$src")
 }
 
+
+
+function box()
+{
+    if [[ $# < 2 ]]
+    then
+        echo "Usage: box SRC... DEST_DIR"
+        echo ""
+        echo "Move SRC to DEST_DIR, leaving a hard-links from SRC into DEST_DIR/"
+        echo "Useful for Dropbox and the like"
+        echo "e.g. box workspace /my/Dropbox"
+        false; return
+    fi
+    local dest=${argv[-1]}
+    if [[ ! -d $dest ]]
+    then
+        echo "$2 is not a directory"
+        echo ""
+        box 
+        false; return
+    fi
+    while [[ $# > 1 ]]
+    do
+        mv "$1" "$dest"
+        mklink "${dest}/${1##*/}" "$1"
+        shift
+    done
+}
 
 
 drop-files() {
