@@ -18,6 +18,8 @@ unset HISTFILE
 histchars='!;#'
 
 GLOBIGNORE=.:..
+ESC=$(echo -n \\033)
+TIMEFMT="${ESC}[1;33mElapsed: %*E${ESC}[0m"
 
 ###############################################################
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
