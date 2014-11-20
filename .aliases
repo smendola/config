@@ -413,7 +413,7 @@ function mklink()
     then
         dest=$dest/${src##*/}
     fi
-    cmd /c mklink ${opt} $(win "$dest") $(win "$src")
+    cmd /c mklink ${opt} "$(win "$dest")" "$(win "$src")"
 }
 
 
@@ -424,24 +424,25 @@ function box()
     then
         echo "Usage: box SRC... DEST_DIR"
         echo ""
-        echo "Move SRC to DEST_DIR, leaving a hard-links from SRC into DEST_DIR/"
-        echo "Useful for Dropbox and the like"
-        echo "e.g. box workspace /my/Dropbox"
+        echo "Move SRC to DEST_DIR, leaving Windows junction/hard link(s) behind."
+        echo "Useful for Dropbox and the like, e.g."
+        echo "% box workspace /my/Dropbox"
         false; return
     fi
     local dest=${argv[-1]}
     if [[ ! -d $dest ]]
     then
-        echo "$2 is not a directory"
+        echo "$dest is not a directory"
         echo ""
         box 
         false; return
     fi
     while [[ $# > 1 ]]
     do
-        mv "$1" "$dest"
-        mklink "${dest}/${1##*/}" "$1"
+        local src=$1
         shift
+        mv "$src" "$dest"
+        mklink "${dest}/${src##*/}" "$src"
     done
 }
 
