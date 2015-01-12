@@ -44,6 +44,9 @@ function ,() {
     eval "$@" | 1,000
 }
 
+# E.g. = 2+2
+= () { echo "$@" | bc -l; }
+
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
