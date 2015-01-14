@@ -1,3 +1,4 @@
+PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 ###############################################################
 ### This is Sal's standard .bashrc; use as a starting point
 ### if just getting started with cygwin. You will have to
@@ -6,9 +7,7 @@
 
 [[ -z $TERM ]] || echo DOT-BASHRC $HOME $TERM
 
-# If running in MSYS/MINGW, use some replacements for cyg programs
-[[ $(uname) = MINGW* ]] && PATH=~/bin/msys:$PATH
-
+PATH=/vagrant/bin:$PATH
 
 ###############################################################
 ### SHELL SETTINGS
@@ -44,12 +43,9 @@ TIMEFMT="${ESC}[1;33mElapsed: %*E${ESC}[0m"
 ###   when it comes time to update/merge with latest version from 
 ###   master.
 ###############################################################
-export JAVA_HOME=$(mix "/c/tools/jdk7")
-export CATALINA_HOME=/c/tools/tomcat
+export JAVA_HOME=/home/vagrant/tools/jdk7/bin/javac
+export CATALINA_HOME=/home/vagrant/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
-
-export KANDO=ssh://kando/studywork-ng.git
-#export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 
 export WS=$(readlink -f ~/ng)
 # DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
@@ -58,15 +54,14 @@ export WS=$(readlink -f ~/ng)
 # The trailing slash is important! If ~ng is a Windows symbolic link
 # (try type mklink) and not a Cygwin symbolic link, then the absolutization
 # fails unless the trailing slash is there.
-export WORKSPACE=$(mix $WS/)
+WORKSPACE=$(mix $WS/)
+export WORKSPACE
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='|lesspipe.sh %s'
 export LESS='-R -x4'
 
-export TOOLS_DIR=/c/tools
-
-export JENKINS_HOME=$(mix ~/jenkins)
+export TOOLS_DIR=/home/vagrant/tools
 
 ###############################################################
 ### PATH CONSTRUCTION
@@ -77,7 +72,7 @@ PATH=$(unx "$JAVA_HOME/bin"):$PATH
 PATH=$(unx "$WORKSPACE/tools"):$PATH
 
 
-# Add all /c/tools/springsource/*/bin and  /c/tools/*/bin to PATH
+# Add all /home/vagrant/tools/*/bin to PATH
 #
 # NOTE: some of these packages may contain binaries
 #       whose names confict with cygwin utils, e.g.
@@ -85,7 +80,7 @@ PATH=$(unx "$WORKSPACE/tools"):$PATH
 #       For this reason, it's safer to add these to the PATH
 #       *after* not in before, /bin
 #
-for d in $TOOLS_DIR/springsource/* $TOOLS_DIR/*
+for d in $TOOLS_DIR/*
 do
     if [ -d $d/Scripts ]
     then

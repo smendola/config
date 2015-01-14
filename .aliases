@@ -169,32 +169,6 @@ function nti() {
 }
 
 
-if [[ $(uname) == MINGW* ]] 
-then
-    echo -n '';# nothing to do
-elif [[ -f /usr/bin/git.exe ]]
-then
-    echo 'Using cygwin git'
-elif [[ -d /c/msysgit ]]
-then
-    echo 'Using MSYS git'
-
-    # cygwin git is not usable, it's busted.
-    # msysgit comes with all its own unix programs like ls etc.
-    # so it cannot be added to PATH normally.
-    git() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
-    }
-    gitk() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
-    }
-    git-bash() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
-    }
-else
-    echo '*** No git found! ***'
-fi
-
 function skysync-testenv () {
     RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
 }
@@ -292,7 +266,7 @@ function clear-m2() {
     fi
 }
 
-alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 function syncdots()
 {
     (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
@@ -318,7 +292,7 @@ function palette() {
 }
 
 function git() {
-    PATH=/bin:/usr/bin:~/bin:/c/tools/winmerge command git "$@"
+    PATH=/bin:/usr/bin:~/bin command git "$@"
 }
 
 
