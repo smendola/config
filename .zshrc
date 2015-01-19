@@ -43,7 +43,7 @@ TIMEFMT="${ESC}[1;33mElapsed: %*E${ESC}[0m"
 ###   when it comes time to update/merge with latest version from 
 ###   master.
 ###############################################################
-export JAVA_HOME=/home/vagrant/tools/jdk7/bin/javac
+export JAVA_HOME=/home/vagrant/tools/jdk7
 export CATALINA_HOME=/home/vagrant/tools/tomcat
 export CATALINA_BASE=$CATALINA_HOME
 
