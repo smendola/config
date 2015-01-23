@@ -1,4 +1,3 @@
-PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 ###############################################################
 ### This is Sal's standard .bashrc; use as a starting point
 ### if just getting started with cygwin. You will have to
@@ -6,6 +5,8 @@ PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 ###############################################################
 
 [[ -z $TERM ]] || echo DOT-BASHRC $HOME $TERM
+
+PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
 PATH=/vagrant/bin:$PATH
 
@@ -43,9 +44,12 @@ TIMEFMT="${ESC}[1;33mElapsed: %*E${ESC}[0m"
 ###   when it comes time to update/merge with latest version from 
 ###   master.
 ###############################################################
-export JAVA_HOME=/home/vagrant/tools/jdk7
-export CATALINA_HOME=/home/vagrant/tools/tomcat
-export CATALINA_BASE=$CATALINA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export CATALINA_HOME=/usr/share/tomcat7
+export CATALINA_BASE=~/tomcat-inst
+
+export APACHE_CONFDIR=~/apache-inst
+export APACHE_ENVVARS=~/apache-inst/envvars
 
 export WS=$(readlink -f ~/ng)
 # DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
@@ -61,7 +65,7 @@ export BUILD_NUMBER=SNAPSHOT
 export LESSOPEN='|lesspipe.sh %s'
 export LESS='-R -x4'
 
-export TOOLS_DIR=/home/vagrant/tools
+#export TOOLS_DIR=~/tools
 
 ###############################################################
 ### PATH CONSTRUCTION
@@ -70,9 +74,10 @@ export TOOLS_DIR=/home/vagrant/tools
 PATH=~/bin.personal:~/bin:$PATH
 PATH=$(unx "$JAVA_HOME/bin"):$PATH
 PATH=$(unx "$WORKSPACE/tools"):$PATH
+PATH=$CATALINA_HOME/bin:$CATALINA_BASE/bin:$JAVA_HOME/bin:$PATH
 
 
-# Add all /home/vagrant/tools/*/bin to PATH
+# Add all ~/tools/*/bin to PATH
 #
 # NOTE: some of these packages may contain binaries
 #       whose names confict with cygwin utils, e.g.
@@ -80,23 +85,23 @@ PATH=$(unx "$WORKSPACE/tools"):$PATH
 #       For this reason, it's safer to add these to the PATH
 #       *after* not in before, /bin
 #
-for d in $TOOLS_DIR/*
-do
-    if [ -d $d/Scripts ]
-    then
-        PATH=$PATH:$d/Scripts
-    fi
-    if [ -d $d/bin ]
-    then
-        PATH=$PATH:$d/bin
-    else
-        PATH=$PATH:$d
-    fi
-done
+# for d in $TOOLS_DIR/*
+# do
+    # if [ -d $d/Scripts ]
+    # then
+        # PATH=$PATH:$d/Scripts
+    # fi
+    # if [ -d $d/bin ]
+    # then
+        # PATH=$PATH:$d/bin
+    # else
+        # PATH=$PATH:$d
+    # fi
+# done
 
 # There is a python in /usr/bin, but it doesn't seem to work well,
 # let's move the non-cygwin python up in front of /usr/bin
-PATH=/c/tools/Python27:/c/tools/Python27/Scripts:$PATH
+#PATH=/c/tools/Python27:/c/tools/Python27/Scripts:$PATH
 
 # Remove various Windows crap from PATH
 PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
