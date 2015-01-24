@@ -22,3 +22,4 @@ sed --in-place \
 		$HOME/ng-install.ini
 
 sudo hostname ${EMAIL%@*}
+exec zsh
