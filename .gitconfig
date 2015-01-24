@@ -83,9 +83,9 @@
 [merge]
 	tool = diffmerge
 
-[remote "ng"]
-	url = ssh://kando/studywork-ng.git
-	fetch = master
+#[remote "ng"]
+#	url = ssh://kando/studywork-ng.git
+#	fetch = master
 
 [remote "config-sal"]
 	url = git@bitbucket.org:smendola/config-sal.git
@@ -94,11 +94,6 @@
 [remote "config"]
 	url = https://smendola@bitbucket.org/smendola/config.git
 	fetch = master
-
-[remote "ng-jenkins"]
-	url = git@bitbucket.org:smendola/ng-jenkins.git
-	fetch = master
-
 
 
 [gui]
