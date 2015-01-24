@@ -568,6 +568,8 @@ mods()
     ar stat $opt -R -fl "${@}"
 }
 
+alias sts='(sts-bundle/sts-3.6.3.SR1/STS > sts.log 2>&1 &)'
+
 # Or, how about this:
 # downside is that if ar stat errors out, err msg gets parsed as xml
 #mods()
