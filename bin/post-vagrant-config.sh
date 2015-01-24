@@ -21,5 +21,5 @@ sed --in-place \
 		-e "s/@@HOSTNAME@@/$(hostname)/g" \
 		$HOME/ng-install.ini
 
-sudo hostname ${EMAIL%@*}
+sudo hostname ${EMAIL%@*}-ng-dev
 exec zsh
