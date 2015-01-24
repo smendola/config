@@ -9,6 +9,7 @@
 !/.bashrc.aliases
 !/.bash_profile
 !/.ssh
+!/.vim
 !/.vimrc
 !/.minttyrc
 !/.ffmpeg
