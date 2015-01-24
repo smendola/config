@@ -1,7 +1,21 @@
 #!/bin/bash
+
+# Dummy version of cygpath for use in Linux until env scripts
+# are cleaned up and uses of cygpath removed
+
 echo WARNING: cygpath $* 1>&2
+unset abs
 while [[ $1 = -* ]]
 do
+    if [[ $1 = -*a* ]]
+    then
+        abs=1
+    fi
     shift
 done
-echo "$@"
+if [[ ${abs} ]]
+then
+    readlink -m $1
+else
+    echo "$1"
+fi

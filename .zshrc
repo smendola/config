@@ -206,3 +206,8 @@ unset GREP_COLOR
 cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
 my-server localhost:2080
+
+if [[ $(hostname) = vagrant-* ]]
+then
+  post-vagrant-config.sh
+fi
