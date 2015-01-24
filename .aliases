@@ -10,31 +10,45 @@ function bd () {
     cd "$OLDPWD"
 }
 
-
+alias grep='grep --color=auto'
 alias start=cygstart
 alias rm='rm -i'
 alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
 alias whiches='type -Pa'
 alias type='builtin type -f'
-alias ar=accurev
 alias undos=dos2unix
 
-function upto ()
+# AccuRev uses CRLF, which displays OK on screen but
+# does not work with pipelines 
+#  e.g. 
+#    AccuRev stat -m -fl | tr '\\' / | xargs less
+#  fails miserably, whereas this works as expected:  
+#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less 
+# Jury still out on whether to use this alias, 
+#  or accurev bla -fx | xsl as a building block
+function ar()
 {
-    local target="$1"
-    local here="$(pwd)"
-    here="${here%/*}"
-    while [  "${here##*/}" != "$target"  -a "${here#*/}" != "$here" ] 
-    do
-        here="${here%/*}"
-    done
-    
-    if [ "${here##*/}" != "$target" ]
+    accurev "$@" | dos2unix | tr '\\' '/'
+}
+
+# This implementation replaces an older one that used while/cd..
+function upto()
+{
+    if [[ $# != 1 ]]
+    then
+        echo "Usage: upto [DIRNAME]"
+        echo "       chdir upward (..) until at dir named DIRNAME, or fail"
+        return 1
+    fi
+    local pwd=$(pwd)
+    local target=$1
+    local full_target=${pwd/\/$target\/*/\/$target}
+    if [[ $full_target = $pwd ]]
     then
         echo "Not found in upward path: $target"
-        return
+        return 1
     else
-        cd "$here"
+        cd $full_target
     fi
 }
 
@@ -43,6 +57,9 @@ alias pp='echo $PATH | tr : \\12'
 function ,() {
     eval "$@" | 1,000
 }
+
+# E.g. = 2+2
+= () { echo "$@" | bc -l; }
 
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
@@ -56,6 +73,8 @@ function ec() {
 alias e=npp
 alias s=sublime
 
+alias deref=readlink
+
 # run commands, displaying the command at as the terminal's title,
 # e.g. 
 function wt () {
@@ -65,16 +84,6 @@ function wt () {
 
 function tp () {
   TITLE_PREFIX="$@"
-}
-
-function  deref ()
-{
-    if [ -L $1 ]
-    then
-        /bin/ls -ld $1 | sed -e 's/.*-> //g'
-    else
-        echo $1
-    fi
 }
 
 function lth () {
@@ -128,8 +137,6 @@ function jgrep ()
     fi
 }
 
-#alias nonag='net stop "Automatic Updates"'
-
 function unx() {
     # e.g. /c/Program Files
     cygpath -ua "$1"
@@ -162,10 +169,10 @@ function mqsti() {
     mqst install "$@"
 }
 function ntd() {
-  $WORKSPACE/tools/deploy.sh "$@"
+  $WS/tools/deploy.sh "$@"
 }
 function nti() {
-  $WORKSPACE/tools/install-ng.sh "$@"
+  $WS/tools/install-ng.sh "$@"
 }
 
 
@@ -206,7 +213,7 @@ function skysync-apphost () {
 function skysuite()
 {
   (
-    cd $WORKSPACE/test/robotframework/src/main/suite
+    cd $WS/test/robotframework/src/main/suite
     skysync-testenv \
         --exclude=Configuration.txt \
         --exclude='*.pyc' \
@@ -249,7 +256,7 @@ function tomcat() {
     sleep 2
     /bin/rm /c/tools/tomcat/logs/*
     title Tomcat Tomcat
-    catalina.sh jpda run
+    catalina.sh jpda run 2>&1 | tee /c/tools/tomcat/logs/CONSOLE_OUT
 }
 
 # Cause an annotation entry to show up in Fiddler
@@ -258,27 +265,28 @@ function anno() {
     curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
 }
 
-function push-ui() {
-  ( 
-    trap "echo '***** FAILED *****'; exit" ERR
-    #set -x;
-    if [[ $1 = -b ]]
-    then
-        shift
-        ( cd $WORKSPACE/sw-ng-ui && mvn -q -DskipTests clean install )
-    else
-        cp -vua $WORKSPACE/sw-ng-ui/src/main/webapp/* $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/
-    fi
-    
-    cp $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/index{-dev,}.html
-    
-    if [[ $1 = -r ]]
-    then
-        shift
-        tomcat
-    fi
-  )
-}
+# seems obsolete
+#function push-ui() {
+#  ( 
+#    trap "echo '***** FAILED *****'; exit" ERR
+#    #set -x;
+#    if [[ $1 = -b ]]
+#    then
+#        shift
+#        ( cd $WORKSPACE/sw-ng-ui && mvn -q -DskipTests clean install )
+#    else
+#        cp -vua $WORKSPACE/sw-ng-ui/src/main/webapp/* $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/
+#    fi
+#    
+#    cp $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/index{-dev,}.html
+#    
+#    if [[ $1 = -r ]]
+#    then
+#        shift
+#        tomcat
+#    fi
+#  )
+#}
 
 function clear-m2() {
     if [[ $# > 0 ]]
@@ -292,6 +300,15 @@ function clear-m2() {
     fi
 }
 
+# these pertain to version management of this and other cygwin environment
+# files.  Git normally could not manage a dir such as ~, but wrapped this
+# way it does a fine job.
+# Use:
+#  dots diff
+#  dots pull origin master
+#  dots commit -a -m "whatever"
+#  dots push origin master
+# you get the gist.
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 function syncdots()
 {
@@ -305,6 +322,8 @@ alias rebot='rebot.bat'
 # Use the whole width of the terminal for pybot output
 alias pybot='pybot.bat -W $(( $(tput cols) - 2 ))'
 
+# show all colors available with ansi escapes
+# show them both as BG and as FG
 function palette() {
     for code in {000..255}; do
         print -n -P -- "${BG[$code]}[$code]"
@@ -323,12 +342,36 @@ function git() {
 
 
 # WIP XML processing
+# options are like xmlstarlet sel, however, default is --text; override
+# that with -X for XML.  Also the first -t is implied.
+# Usage: xsl [-X] [-t] <xmlstarlet-sel-t-options>
+# eg. accurev show wspaces -fx | xsl -m //Element -v @Name -n
 function xsl() {
+    if [[ $# = 0 || $1 = -h ]]
+    then
+        echo "Usage: xsl [-X] [-t] <options>"
+        echo "XSL transformation using xmlstarlet sel"
+        echo "       -X XML output; default is text"
+        echo "       -t introduces template; this is optional and implied"
+        echo ""
+        echo "From xmlstarlet help:"
+        xmlstarlet sel --help | sed -n -e '/^Syntax/,/^There can be/p' | head -n -2
+        return
+    fi
+    
+    local mode
+    if [[ $1 = -X ]]
+    then
+        mode=--xml-decl
+        shift
+    else
+        mode=--text
+    fi
     if [[ $1 = -t ]]
     then
         shift
     fi
-    xmlstarlet sel -I -D -t "$@"
+    xmlstarlet sel $mode -I -D -t "$@"
 }
 
 function xpath() {
@@ -367,7 +410,7 @@ function merge_ini() {
     diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
         $HOME/ng-install.ini \
         $HOME/install.ini-common-ancestor.ini \
-        $WORKSPACE/tools/sw-ng-installer/setup/install.ini
+        $WS/tools/sw-ng-installer/setup/install.ini
 }
 
 alias tdc='tree -AdC -I target'
@@ -392,8 +435,7 @@ function mklink()
     if [[ $# != 2 ]]
     then
         echo "Usage: mklink [-s] SRC DEST"
-        false
-        return
+        return 1
     fi
     src=$1
     dest=$2
@@ -411,7 +453,7 @@ function mklink()
     fi
     if [[ -d $dest ]]
     then
-        dest=$dest/${src##*/}
+        dest=$(basename "$dest")
     fi
     cmd /c mklink ${opt} "$(win "$dest")" "$(win "$src")"
 }
@@ -427,7 +469,7 @@ function box()
         echo "Move SRC to DEST_DIR, leaving Windows junction/hard link(s) behind."
         echo "Useful for Dropbox and the like, e.g."
         echo "% box workspace /my/Dropbox"
-        false; return
+        return 1
     fi
     local dest=${argv[-1]}
     if [[ ! -d $dest ]]
@@ -435,14 +477,14 @@ function box()
         echo "$dest is not a directory"
         echo ""
         box 
-        false; return
+        return 1
     fi
     while [[ $# > 1 ]]
     do
         local src=$1
         shift
         mv "$src" "$dest"
-        mklink "${dest}/${src##*/}" "$src"
+        mklink "${dest}/$(basename "$src")" "$src"
     done
 }
 
@@ -531,27 +573,147 @@ then
 
 fi
 
-
-ui()
+# mods    - show modified files in ws
+# mods -o - show all outgoing changes
+# mods -d - show "default group" (whatever that means; kept + and locally modified?)
+# Additional args, if any, are dirs to stat; default is .
+mods()
 {
-  (
-    set -v
-    cd $WS
-    mvn clean -pl ui
-    mkdir ui/target
-    cd ui/target
-    cp ~/Work/ui-1.2.0-SNAPSHOT.war .
-    mkdir ui-1.2.0-SNAPSHOT
-    cd ui-1.2.0-SNAPSHOT
-    unzip ../ui-1.2.0-SNAPSHOT.war
-  )
+    local opt;
+    local els;
+    case "$1" in
+      -[ao]) opt=--outgoing; shift;;
+      -d) opt=-d; shift;;
+      *)  opt=-m;;
+    esac
+    if [[ $# = 0 ]]
+    then
+        set .
+    fi
+    ar stat $opt -R -fl "${@}"
 }
 
-blow-away()
+# Or, how about this:
+# downside is that if ar stat errors out, err msg gets parsed as xml
+#mods()
+#{
+#    if [[ $1 = -a ]]
+#    then
+#        accurev stat --outgoing -fx | xsl -m //element -v @location -n
+#    else
+#        accurev stat -m -fx | xsl -m //element -v @location -n
+#    fi
+#}
+
+
+list-ws()
 {
-    drop-dbs.sh
-    /bin/rm -rf /c/static-content/* 
-    /bin/rm -rf /c/design-storage/* 
-    /bin/rm -rf /c/file-service-storage/*
+    where=${1:-.}
+    find $where -maxdepth 1 -type d -name \*.git -prune -o -exec test -f {}/super/pom.xml \; -print -prune
 }
+
+# Usage:
+#   ws        - cd into workspace ($WS), and show the path
+#   ws DIR    - set WS=DIR, and cd into it; only for this shell
+#   ws -p DIR - set WS=DIR, persistently, that is re-link ~/ng -> DIR
+#               future shells will therefore use WS=DIR as well
+#               (but not any other shells that are already running!)
+ws()
+{
+    if [[ $# != 0 ]]
+    then
+    
+        if [[ $# = 2 && $1 = -p ]]
+        then
+            shift
+            echo "Persisting switch to workspace $1 for this and new shells"
+            rm -f ~/ng
+            mklink "$1" ~/ng
+        else
+            echo "*** Selecting workspace $1 for THIS SHELL ONLY."
+            echo "    (Use -p to select persistently.)"
+        fi
+        
+        export WS=$(readlink -f "$1")
+        # trailing / is important; see comment near WORKSPACE= in .zshrc
+        export WORKSPACE=$(mix $WS/)
+    fi
+    
+    # zsh does something funky with prompt string %~
+    # it's preferable to cd ~/ng over cd $WS if possible
+    if [[ $(readlink -f ~/ng) = $WS ]]
+    then
+        cd ~/ng
+    else
+        cd "$WS"
+    fi
+    echo ${WS/$HOME/\~}
+}
+
+my-server()
+{
+    MY_NG_SRV=${1:-localhost:2080}
+    API1=http://$MY_NG_SRV/api/v1
+}
+
+mark()
+{
+    if [[ $# = 0 ]]
+    then
+        echo "Usage: $0 text that will show up in tomcat log"
+        return 1
+    fi
+    # $*, NOT $@; urlencode needs one param
+    api1 GET /system/marker/$(urlencode "$*") -o /dev/null -uadmin:password1X!
+}
+
+extract-log-range()
+{
+    local start_re="\\(start \\)*$1"
+    local end_re="\\(end \\)*${2:-END}"
+    local log_file=${3:-/c/tools/tomcat/logs/CONSOLE_OUT}
+    sed -n -e "/MARKER: $start_re/,/MARKER: $end_re/IP" "$log_file"
+}
+
+api1-login()
+{
+    local un=${1:-admin}
+    local pw=${2:-password1X!}
+    api1 post login --data-urlencode "username=$un" --data-urlencode "password=$pw"
+}
+
+# WIP will likely evolve incompatibly
+api1()
+{
+    if [[ $# < 2 ]]
+    then
+        echo "Usage: $0 get|put|post|delete RESOURCE [CURL_OPTS ...]"
+        echo "        RESOURCE is path after /api/v1, w/ or w/o leading slash"
+        echo "        CURL_OPTS ahh... read the man page! :)"
+        echo ""
+        echo "E.g.: $0 get /users/count"
+        echo " Or:"
+        echo "      $0 get users/count"
+        echo " More complex:"
+        echo "     $0 get domains \\"
+        echo "        --data-urlencode query='[\"MATCH\", bla bla bla]' \\"
+        echo "        --data pageSize=10"
+        return 1
+    fi
+    local verb=$(echo -n $1 | tr a-z A-Z)
+    local resource=${2#/}
+    shift 2
+    
+    local extra_get=""
+    if [[ $verb == GET ]]
+    then
+        # --data* opts override -X GET, force POST behavior
+        # --get overrides the override :) 
+        extra_get="--get"
+    fi
+    curl -s -X $verb $extra_get --url $API1/$resource "$@"
+    echo ""
+}
+
+alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
