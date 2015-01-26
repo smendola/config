@@ -8,6 +8,8 @@
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
+# These need to be up here, for now; cygpath is in ~/bin
+PATH=~/bin:$PATH
 PATH=/vagrant/bin:$PATH
 
 ###############################################################
@@ -80,7 +82,6 @@ export AC_DIFF_CLI='WinMergeU -e %1 %2'
 ### PATH CONSTRUCTION
 ###############################################################
 
-PATH=~/bin.personal:~/bin:$PATH
 PATH=$(unx "$JAVA_HOME/bin"):$PATH
 PATH=$(unx "$WORKSPACE/tools"):$PATH
 PATH=$CATALINA_HOME/bin:$CATALINA_BASE/bin:$JAVA_HOME/bin:$PATH
