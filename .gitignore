@@ -19,6 +19,7 @@
 !/.ssh
 /.ssh/config
 /.ssh/known_hosts
+/.ssh/id_*
 !/bin
 !/bin.personal
 !/ng-install.ini

@@ -5,6 +5,9 @@ PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
+TERM=xterm-256color
+export DISPLAY=${DISPLAY:-:0}
+
 [[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
 
 PATH=/vagrant/bin:$PATH
