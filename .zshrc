@@ -5,7 +5,7 @@ PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
-[[ -z $TERM ]] || echo DOT-BASHRC $HOME $TERM
+[[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
 
 PATH=/vagrant/bin:$PATH
 
@@ -17,8 +17,15 @@ unset HISTFILE
 histchars='!;#'
 
 GLOBIGNORE=.:..
-ESC=$(echo -n \\033)
+ESC=$'\e'
+# for zsh builtin time command
 TIMEFMT="${ESC}[1;33mElapsed: %*E${ESC}[0m"
+# for /bin/time
+export TIME="${ESC}[1;33mElapsed: %E${ESC}[0m"
+
+# Format trace output with color
+# +++file-or-func:11>
+PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 
 ###############################################################
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
@@ -59,9 +66,12 @@ export WORKSPACE
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='|lesspipe.sh %s'
-export LESS='-R -x4'
+# LESS has to be set after oh-my-zsh is loaded
+#export LESS=''
 
-export TOOLS_DIR=/home/vagrant/tools
+export AC_DIFF_CLI='WinMergeU -e %1 %2'
+
+export TOOLS_DIR=/c/tools
 
 ###############################################################
 ### PATH CONSTRUCTION
@@ -157,7 +167,7 @@ histchars='!;#'
 ZSH=$HOME/.oh-my-zsh
 if [[ -f $ZSH/oh-my-zsh.sh ]]
 then
-    plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 )
+    plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 urltools)
     # Path to your oh-my-zsh configuration.
     ZSH_THEME="sm"
     #MYBG=057
@@ -167,7 +177,22 @@ else
     echo "*** Oh-my-zsh is not present"
 fi
 
+# Note: do not move this up near the other variables, e.g. near LESSOPEN;
+# oh-my-zsh sets LESS, so our own setting has to be way down here
+export LESS='-i -R -x4'
 
+# Strip out all references to "." in PATH, including :: and trailing : which
+# apparently are interpreted as .
+# . in PATH is a security threat, and also can cause unexpected behaviors.
+# TODO: also remove relative paths, such as :bin:
+PATH=${PATH/::/:}
+PATH=${PATH/:.:/:}
+PATH=${PATH/:.\/*:/:}
+PATH=${PATH%:}
+
+# deprecated variable, causes warnings to stdout
+unset GREP_OPTIONS
+unset GREP_COLOR
 
 # Allows e.g: cd access-control-implementation
 # from anywhre. try this: 
