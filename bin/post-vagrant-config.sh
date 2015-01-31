@@ -28,4 +28,4 @@ then
 fi
 
 sudo hostname $(cat ~/.hostname)
-sudo sed -i "s/^127.0.0.1[ \t]*localhost/127.0.0.1 localhost $(hostname)/g" /etc/hosts
+sudo sed -i "s/^127.0.0.1[ \t]*localhost.*$/127.0.0.1 localhost $(hostname)/g" /etc/hosts
