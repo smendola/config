@@ -4,10 +4,8 @@
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
-if [[ $(hostname) = vagrant-* ]]
-then
-  exec bin/post-vagrant-config.sh
-fi
+# First-time boot setup
+bin/post-vagrant-config.sh
 
 TERM=xterm-256color
 export DISPLAY=${DISPLAY:-:0}
