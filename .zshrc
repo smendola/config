@@ -9,6 +9,9 @@ then
   exec bin/post-vagrant-config.sh
 fi
 
+TERM=xterm-256color
+export DISPLAY=${DISPLAY:-:0}
+
 [[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
