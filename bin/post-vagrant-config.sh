@@ -1,13 +1,14 @@
 #!/bin/bash
 
-echo ""
-echo "************************************"
-echo "One-time post-vagrant-porovisioning"
-echo "************************************"
-echo ""
-
 if grep -q @@EMAIL@@ ~/.gitconfig ~/ng-install.ini
 then
+
+    echo ""
+    echo "************************************"
+    echo "One-time post-vagrant-porovisioning"
+    echo "************************************"
+    echo ""
+
 	echo -q "Enter your full name: "
 	read FULL_NAME
 	echo -n "Enter your PHT email address: "
