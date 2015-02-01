@@ -712,3 +712,8 @@ api1()
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
+alias aptitude='sudo aptitude'
+alias apt-get='sudo apt-get'
+alias docker='sudo docker'
+alias synaptic='sudo synaptic'
+alias shutdown='sudo shutdown'
