@@ -9,10 +9,16 @@ then
     echo "************************************"
     echo ""
 
-	echo -q "Enter your full name: "
+	echo -n "Enter your full name: "
 	read FULL_NAME
 	echo -n "Enter your PHT email address: "
 	read EMAIL
+
+    if [ -z "$EMAIL" ]
+    then
+      echo "Skipping this procedure"
+      exit
+    fi
 
 	sed --in-place \
 			-e "s/@@EMAIL@@/${EMAIL}/g" \
