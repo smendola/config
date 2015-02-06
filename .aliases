@@ -18,6 +18,11 @@ alias whiches='type -Pa'
 alias type='builtin type -f'
 alias undos=dos2unix
 
+dev()
+{
+    cd $WS/vagrant/dev-env; vagrant ssh -- -Y "$@"
+}
+
 # AccuRev uses CRLF, which displays OK on screen but
 # does not work with pipelines 
 #  e.g. 

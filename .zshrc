@@ -204,3 +204,4 @@ unset GREP_COLOR
 # $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
+my-server localhost:2080

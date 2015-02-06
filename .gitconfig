@@ -88,11 +88,6 @@
 	url = https://smendola@bitbucket.org/smendola/config.git
 	fetch = master
 
-[remote "ng-jenkins"]
-	url = git@bitbucket.org:smendola/ng-jenkins.git
-	fetch = master
-
-
 
 [gui]
 [url "https://"]
