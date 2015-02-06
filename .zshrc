@@ -197,6 +197,10 @@ PATH=${PATH%:}
 unset GREP_OPTIONS
 unset GREP_COLOR
 
+my-server localhost:2080
+
+# do this last, it will error out if path elems do not exist
+
 # Allows e.g: cd access-control-implementation
 # from anywhre. try this: 
 # $ cd ac<TAB>im<TAB>
@@ -204,4 +208,4 @@ unset GREP_COLOR
 # $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
-my-server localhost:2080
+

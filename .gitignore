@@ -9,6 +9,7 @@
 !/.bashrc.aliases
 !/.bash_profile
 !/.ssh
+/.ssh/authorized_keys
 !/.vim
 !/.vimrc
 !/.minttyrc
