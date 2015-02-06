@@ -208,4 +208,9 @@ my-server localhost:2080
 # $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
+# Here's everyone's chance to add custom stuff
+if [ -f $HOME/.custom.sh ]
+then
+   source $HOME/.custom.sh ]
+fi
 
