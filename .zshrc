@@ -7,7 +7,11 @@
 # First-time boot setup
 bin/post-vagrant-config.sh
 
-TERM=xterm-256color
+if [ -f /usr/lib/terminfo/x/$TERM-256color ]
+then
+   TERM=$TERM-256color
+fi
+
 export DISPLAY=${DISPLAY:-:0}
 
 [[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
@@ -66,6 +70,9 @@ export CATALINA_BASE=~/tomcat-inst
 export APACHE_CONFDIR=~/apache-inst
 export APACHE_ENVVARS=~/apache-inst/envvars
 
+export KANDO=ssh://kando/studywork-ng.git
+#export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
+
 export WS=$(readlink -f ~/ng)
 # DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
 # The following line results in WORKSPACE being set to an absolute, DOS style
@@ -73,8 +80,7 @@ export WS=$(readlink -f ~/ng)
 # The trailing slash is important! If ~ng is a Windows symbolic link
 # (try type mklink) and not a Cygwin symbolic link, then the absolutization
 # fails unless the trailing slash is there.
-WORKSPACE=$(mix $WS/)
-export WORKSPACE
+export WORKSPACE=$(mix $WS/)
 export BUILD_NUMBER=SNAPSHOT
 
 export LESSOPEN='|lesspipe.sh %s'
@@ -216,4 +222,9 @@ my-server localhost:2080
 # $ a-c-im<TAB><ENTER>
 cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 
+# Here's everyone's chance to add custom stuff
+if [ -f $HOME/.custom.sh ]
+then
+   source $HOME/.custom.sh ]
+fi
 

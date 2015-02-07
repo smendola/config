@@ -4,6 +4,7 @@
 #*#
 !/.zshrc
 !/.zshrc.aliases
+!/.custom.sh
 !/.gitignore
 !/.bashrc
 !/.bashrc.aliases
