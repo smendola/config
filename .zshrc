@@ -4,6 +4,13 @@
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
+if [ -f /usr/lib/terminfo/x/$TERM-256color ]
+then
+   TERM=$TERM-256color
+fi
+
+export DISPLAY=${DISPLAY:-:0}
+
 [[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
 
 # If running in MSYS/MINGW, use some replacements for cyg programs
