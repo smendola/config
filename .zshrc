@@ -4,7 +4,7 @@
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
-if [ -f /usr/lib/terminfo/x/$TERM-256color ]
+if toe | grep -qs $TERM-256color 
 then
    TERM=$TERM-256color
 fi
