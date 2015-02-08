@@ -7,7 +7,7 @@
 # First-time boot setup
 bin/post-vagrant-config.sh
 
-if [ -f /usr/lib/terminfo/x/$TERM-256color ]
+if toe | grep -qs $TERM-256color
 then
    TERM=$TERM-256color
 fi
