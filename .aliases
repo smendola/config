@@ -738,6 +738,11 @@ api1()
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
+detach()
+{
+  ( "$@" & ) > /dev/null 2>&1
+}
+
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
 alias docker='sudo docker'
