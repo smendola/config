@@ -7,7 +7,7 @@
 # First-time boot setup
 bin/post-vagrant-config.sh
 
-if toe | grep -qs $TERM-256color
+if toe -a | grep -qs $TERM-256color
 then
    TERM=$TERM-256color
 fi
@@ -211,7 +211,7 @@ my-server localhost:2080
 # $ cd ac<TAB>im<TAB>
 # or even try it without cd; try 
 # $ a-c-im<TAB><ENTER>
-if [ -f $WS ]
+if readlink -e $WS > /dev/null
 then
     cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 fi
