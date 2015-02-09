@@ -121,16 +121,7 @@ PATH=$CATALINA_HOME/bin:$CATALINA_BASE/bin:$JAVA_HOME/bin:$PATH
     # fi
 # done
 
-# There is a python in /usr/bin, but it doesn't seem to work well,
-# let's move the non-cygwin python up in front of /usr/bin
-#PATH=/c/tools/Python27:/c/tools/Python27/Scripts:$PATH
-
-# Remove various Windows crap from PATH
-PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
-
-# but add back this one for sqlcmd
-PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
-
+PATH=$PATH:/opt/AccuRev/bin
 
 ###############################################################
 ### Stuff...
@@ -220,7 +211,10 @@ my-server localhost:2080
 # $ cd ac<TAB>im<TAB>
 # or even try it without cd; try 
 # $ a-c-im<TAB><ENTER>
-cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
+if [ -f $WS ]
+then
+    cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
+fi
 
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]
