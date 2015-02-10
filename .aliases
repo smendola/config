@@ -13,8 +13,6 @@ function bd () {
 alias grep='grep --color=auto'
 alias start=cygstart
 alias rm='rm -i'
-alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
-alias whiches='type -Pa'
 alias type='builtin type -f'
 alias undos=dos2unix
 
