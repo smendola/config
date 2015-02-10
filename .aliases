@@ -196,32 +196,6 @@ function nti() {
 }
 
 
-if [[ $(uname) == MINGW* ]] 
-then
-    echo -n '';# nothing to do
-elif [[ -f /usr/bin/git.exe ]]
-then
-    echo 'Using cygwin git'
-elif [[ -d /c/msysgit ]]
-then
-    echo 'Using MSYS git'
-
-    # cygwin git is not usable, it's busted.
-    # msysgit comes with all its own unix programs like ls etc.
-    # so it cannot be added to PATH normally.
-    git() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
-    }
-    gitk() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
-    }
-    git-bash() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
-    }
-else
-    echo '*** No git found! ***'
-fi
-
 function skysync-testenv () {
     RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
 }
