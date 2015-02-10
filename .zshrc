@@ -5,7 +5,7 @@
 ###############################################################
 
 # First-time boot setup
-bin/post-vagrant-config.sh
+~/bin/post-vagrant-config.sh
 
 if toe -a | grep -qs $TERM-256color
 then

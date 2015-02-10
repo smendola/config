@@ -3,7 +3,7 @@
 # Dummy version of cygpath for use in Linux until env scripts
 # are cleaned up and uses of cygpath removed
 
-echo WARNING: cygpath $* 1>&2
+#echo WARNING: cygpath $* 1>&2
 unset abs
 while [[ $1 = -* ]]
 do
