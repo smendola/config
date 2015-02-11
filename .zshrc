@@ -12,7 +12,12 @@ then
    TERM=$TERM-256color
 fi
 
-export DISPLAY=${DISPLAY:-:0}
+if [ ! -z $SSH_CLIENT ] && xset q -display $(eval set $SSH_CLIENT; echo $1):0 > /dev/null 2>&1
+then
+  export DISPLAY=$(eval set $SSH_CLIENT; echo $1):0
+else
+  export DISPLAY=${DISPLAY:-:0}
+fi
 
 [[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
 
