@@ -168,7 +168,8 @@ COMPLETION_WAITING_DOTS="true"
 
 zle -N cls
 function cls() {
-  echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  #echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  tput reset
   zle clear-screen ;# redisplays the prompt and current command line
 }
 

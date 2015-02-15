@@ -4,7 +4,7 @@
 
 
 # Clears the scrollback buffer, not just the current screen
-alias cls='echo -n -e "\ec\e[3J"'
+alias cls='tput reset'
 
 function bd () {
     cd "$OLDPWD"
@@ -592,9 +592,20 @@ api1()
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
+gdiff()
+{
+   diffuse "%@"
+}
+
+
 detach()
 {
   ( "$@" & ) > /dev/null 2>&1
+}
+
+tt()
+{
+	detach terminator
 }
 
 alias aptitude='sudo aptitude'
