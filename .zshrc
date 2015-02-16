@@ -25,7 +25,7 @@ else
   export DISPLAY=${DISPLAY:-:0}
 fi
 
-[[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y $DISPLAY %b"
+[[ -z $TERM ]] || print -P "%B%N %n $SHELL $HOME $TERM %y $DISPLAY %b"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
