@@ -12,9 +12,13 @@ then
    TERM=$TERM-256color
 fi
 
-if [ ! -z $SSH_CLIENT ] && xset q -display $(eval set $SSH_CLIENT; echo $1):0 > /dev/null 2>&1
+_REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
+# the nc -w1 avoids long delay if X11 is not running
+if [ ! -z $SSH_CLIENT ] && 
+   nc -w1 $_REMOTE_IP 6000 &&
+   xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
 then
-  export DISPLAY=$(eval set $SSH_CLIENT; echo $1):0
+  export DISPLAY=$_REMOTE_IP:0
 else
   export DISPLAY=${DISPLAY:-:0}
 fi

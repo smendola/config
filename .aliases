@@ -157,7 +157,7 @@ function sts() {
     then
       echo "DISPLAY needs to be set"
       return 1
-    elif xlsfonts > /dev/null
+    elif xset q > /dev/null
     then
 		(/opt/sts-bundle/sts-3.6.3.SR1/STS > sts.log 2>&1 &)
     else
@@ -166,6 +166,19 @@ function sts() {
     fi
 }
 
+function idea() {
+    if [ -z "$DISPLAY" ]
+    then
+      echo "DISPLAY needs to be set"
+      return 1
+    elif xset q > /dev/null
+    then
+        detach /opt/IDEA/bin/idea.sh 
+    else
+      echo "Problem with display?"
+      return 1
+    fi
+}
 
 function mqst() {
     mvn -q -DskipTests "$@"
