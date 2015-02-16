@@ -4,7 +4,7 @@
 
 
 # Clears the scrollback buffer, not just the current screen
-alias cls='echo -n -e "\ec\e[3J"'
+alias cls='tput reset'
 
 function bd () {
     cd "$OLDPWD"
@@ -13,27 +13,12 @@ function bd () {
 alias grep='grep --color=auto'
 alias start=cygstart
 alias rm='rm -i'
-alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
-alias whiches='type -Pa'
 alias type='builtin type -f'
 alias undos=dos2unix
 
 dev()
 {
     cd $WS/vagrant/dev-env; vagrant ssh -- -Y "$@"
-}
-
-# AccuRev uses CRLF, which displays OK on screen but
-# does not work with pipelines 
-#  e.g. 
-#    AccuRev stat -m -fl | tr '\\' / | xargs less
-#  fails miserably, whereas this works as expected:  
-#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less 
-# Jury still out on whether to use this alias, 
-#  or accurev bla -fx | xsl as a building block
-function ar()
-{
-    accurev "$@" | dos2unix | tr '\\' '/'
 }
 
 # This implementation replaces an older one that used while/cd..
@@ -172,15 +157,28 @@ function sts() {
     then
       echo "DISPLAY needs to be set"
       return 1
-    elif xlsfonts > /dev/null
+    elif xset q > /dev/null
     then
-		(/opt/sts-bundle/sts-3.6.3.SR1/STS > sts.log 2>&1 &)
+		(/opt/sts-bundle/sts-*/STS > sts.log 2>&1 &)
     else
       echo "Problem with display?"
       return 1
     fi
 }
 
+function idea() {
+    if [ -z "$DISPLAY" ]
+    then
+      echo "DISPLAY needs to be set"
+      return 1
+    elif xset q > /dev/null
+    then
+        detach /opt/IDEA/bin/idea.sh 
+    else
+      echo "Problem with display?"
+      return 1
+    fi
+}
 
 function mqst() {
     mvn -q -DskipTests "$@"
@@ -195,32 +193,6 @@ function nti() {
   $WS/tools/install-ng.sh "$@"
 }
 
-
-if [[ $(uname) == MINGW* ]] 
-then
-    echo -n '';# nothing to do
-elif [[ -f /usr/bin/git.exe ]]
-then
-    echo 'Using cygwin git'
-elif [[ -d /c/msysgit ]]
-then
-    echo 'Using MSYS git'
-
-    # cygwin git is not usable, it's busted.
-    # msysgit comes with all its own unix programs like ls etc.
-    # so it cannot be added to PATH normally.
-    git() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git "$@"
-    }
-    gitk() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/gitk "$@"
-    }
-    git-bash() {
-        PATH=C:/msysgit/bin:$PATH C:/msysgit/bin/git-bash.bat "$@"
-    }
-else
-    echo '*** No git found! ***'
-fi
 
 function skysync-testenv () {
     RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
@@ -285,29 +257,6 @@ function anno() {
     curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
 }
 
-# seems obsolete
-#function push-ui() {
-#  ( 
-#    trap "echo '***** FAILED *****'; exit" ERR
-#    #set -x;
-#    if [[ $1 = -b ]]
-#    then
-#        shift
-#        ( cd $WORKSPACE/sw-ng-ui && mvn -q -DskipTests clean install )
-#    else
-#        cp -vua $WORKSPACE/sw-ng-ui/src/main/webapp/* $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/
-#    fi
-#    
-#    cp $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/index{-dev,}.html
-#    
-#    if [[ $1 = -r ]]
-#    then
-#        shift
-#        tomcat
-#    fi
-#  )
-#}
-
 function clear-m2() {
     if [[ $# > 0 ]]
     then
@@ -338,10 +287,10 @@ function syncdots()
     echo push &&  dots push
 }
 
-alias ride='(pythonw -c "from robotide import main; main()"&)'
+alias ride='(python -c "from robotide import main; main()"&)'
 alias rebot='rebot.bat'
 # Use the whole width of the terminal for pybot output
-alias pybot='pybot.bat -W $(( $(tput cols) - 2 ))'
+alias pybot='command pybot -W $(( $(tput cols) - 2 ))'
 
 # show all colors available with ansi escapes
 # show them both as BG and as FG
@@ -356,11 +305,6 @@ function palette() {
     done
     print -P -- "$BG[000]"
 }
-
-function git() {
-    PATH=/bin:/usr/bin:~/bin:/c/tools/winmerge command git "$@"
-}
-
 
 # WIP XML processing
 # options are like xmlstarlet sel, however, default is --text; override
@@ -436,83 +380,6 @@ function merge_ini() {
 
 alias tdc='tree -AdC -I target'
 alias tcf='tree -ACF --dirsfirst'
-
-# Creates a Windows native link.
-# Use mklink as an alternative to ln
-# the advantage is that this type of link is
-# understood by non-cygwin apps, as well as Cygwin
-# Use -s for symbolic link, otherwise hard link.
-# If src is directory, then link type will be Junction
-# (except if -s)
-function mklink()
-{
-    local src dest opt symbolic
-    if [[ $1 = -s ]]
-    then
-        symbolic=1
-        shift
-    fi
-    
-    if [[ $# != 2 ]]
-    then
-        echo "Usage: mklink [-s] SRC DEST"
-        return 1
-    fi
-    src=$1
-    dest=$2
-
-    if [[ $symbolic != 1 ]]
-    then
-        if [[ -d $src ]]
-        then
-            opt='/J'
-        else
-            opt='/H'
-        fi
-    else
-        opt='' 
-    fi
-    if [[ -d $dest ]]
-    then
-        dest=$(basename "$dest")
-    fi
-    cmd /c mklink ${opt} "$(win "$dest")" "$(win "$src")"
-}
-
-
-
-function box()
-{
-    if [[ $# < 2 ]]
-    then
-        echo "Usage: box SRC... DEST_DIR"
-        echo ""
-        echo "Move SRC to DEST_DIR, leaving Windows junction/hard link(s) behind."
-        echo "Useful for Dropbox and the like, e.g."
-        echo "% box workspace /my/Dropbox"
-        return 1
-    fi
-    local dest=${argv[-1]}
-    if [[ ! -d $dest ]]
-    then
-        echo "$dest is not a directory"
-        echo ""
-        box 
-        return 1
-    fi
-    while [[ $# > 1 ]]
-    do
-        local src=$1
-        shift
-        mv "$src" "$dest"
-        mklink "${dest}/$(basename "$src")" "$src"
-    done
-}
-
-
-drop-files() {
-  rm -rf /c/static-content/* /c/file-service-storage/* /c/design-storage/* 
-}
 
 ###############################################
 #### BASH SPECIFIC ALIASES                 ####
@@ -738,8 +605,33 @@ api1()
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
+gdiff()
+{
+   diffuse "%@"
+}
+
+
+detach()
+{
+  ( "$@" & ) > /dev/null 2>&1
+}
+
+tt()
+{
+	detach terminator
+}
+
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
 alias docker='sudo docker'
 alias synaptic='sudo synaptic'
+alias service='sudo service'
+alias initctl='sudo initctl'
+alias bum='sudo bum'
+alias reboot='sudo reboot'
+alias halt='sudo halt'
+alias poweroff='sudo poweroff'
 alias shutdown='sudo shutdown'
+alias ifquery='sudo ifquery'
+alias ifdown='sudo ifdown'
+alias ifup='sudo ifup'

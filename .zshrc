@@ -1,20 +1,31 @@
 ###############################################################
-### This is Sal's standard .bashrc; use as a starting point
+### This is Sal's standard .zshrc; use as a starting point
 ### if just getting started with cygwin. You will have to
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
 # First-time boot setup
-bin/post-vagrant-config.sh
+~/bin/post-vagrant-config.sh
 
-if toe | grep -qs $TERM-256color
+if toe -a | grep -qs $TERM-256color
 then
    TERM=$TERM-256color
 fi
 
-export DISPLAY=${DISPLAY:-:0}
+# If X11 display can be reached directly, do it that way
+# in preference to display tunneled over SSH; more efficient.
+_REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
+# the nc -w1 avoids long delay if X11 is not running
+if [ ! -z $SSH_CLIENT ] && 
+   nc -w1 $_REMOTE_IP 6000 &&
+   xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
+then
+  export DISPLAY=$_REMOTE_IP:0
+else
+  export DISPLAY=${DISPLAY:-:0}
+fi
 
-[[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
+[[ -z $TERM ]] || print -P "%B%N %n $SHELL $HOME $TERM %y $DISPLAY %b"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
@@ -121,16 +132,7 @@ PATH=$CATALINA_HOME/bin:$CATALINA_BASE/bin:$JAVA_HOME/bin:$PATH
     # fi
 # done
 
-# There is a python in /usr/bin, but it doesn't seem to work well,
-# let's move the non-cygwin python up in front of /usr/bin
-#PATH=/c/tools/Python27:/c/tools/Python27/Scripts:$PATH
-
-# Remove various Windows crap from PATH
-PATH=$(pp | egrep -iv '/c/Program|/AppData/' | tr '\012' :)
-
-# but add back this one for sqlcmd
-PATH=/c/Program\ Files/Microsoft\ SQL\ Server/100/Tools/Binn:$PATH
-
+PATH=$PATH:/opt/AccuRev/bin
 
 ###############################################################
 ### Stuff...
@@ -172,7 +174,8 @@ COMPLETION_WAITING_DOTS="true"
 
 zle -N cls
 function cls() {
-  echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  #echo -n -e "\ec\e[3J" ;# Clear the scrollback buffer
+  tput reset
   zle clear-screen ;# redisplays the prompt and current command line
 }
 
@@ -220,7 +223,10 @@ my-server localhost:2080
 # $ cd ac<TAB>im<TAB>
 # or even try it without cd; try 
 # $ a-c-im<TAB><ENTER>
-cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
+if readlink -e $WS > /dev/null
+then
+    cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
+fi
 
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]
