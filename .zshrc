@@ -1,5 +1,5 @@
 ###############################################################
-### This is Sal's standard .bashrc; use as a starting point
+### This is Sal's standard .zshrc; use as a starting point
 ### if just getting started with cygwin. You will have to
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
@@ -12,6 +12,8 @@ then
    TERM=$TERM-256color
 fi
 
+# If X11 display can be reached directly, do it that way
+# in preference to display tunneled over SSH; more efficient.
 _REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
 # the nc -w1 avoids long delay if X11 is not running
 if [ ! -z $SSH_CLIENT ] && 
@@ -23,7 +25,7 @@ else
   export DISPLAY=${DISPLAY:-:0}
 fi
 
-[[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y %b"
+[[ -z $TERM ]] || print -P "%B%N %n $SHELL %N $HOME $TERM %y $DISPLAY %b"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
