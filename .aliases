@@ -159,7 +159,7 @@ function sts() {
       return 1
     elif xset q > /dev/null
     then
-		(/opt/sts-bundle/sts-3.6.3.SR1/STS > sts.log 2>&1 &)
+		(/opt/sts-bundle/sts-*/STS > sts.log 2>&1 &)
     else
       echo "Problem with display?"
       return 1
@@ -632,4 +632,6 @@ alias reboot='sudo reboot'
 alias halt='sudo halt'
 alias poweroff='sudo poweroff'
 alias shutdown='sudo shutdown'
-
+alias ifquery='sudo ifquery'
+alias ifdown='sudo ifdown'
+alias ifup='sudo ifup'
