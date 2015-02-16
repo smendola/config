@@ -20,8 +20,29 @@ alias undos=dos2unix
 
 dev()
 {
-    cd $WS/vagrant/dev-env; vagrant ssh -- -Y "$@"
+    cd $WS/vagrant/dev-env; 
+    vagrant up
+    vagrant ssh "$@"
 }
+
+# Remote terminal
+# Usage:
+#   rtt [ [USER@]HOST[:PORT] ]
+#   defaults: vagrant dev16 22
+rtt () {
+    local port=22
+    local host=${1:-vagrant@dev16}
+    if [[ $host = *:* ]]
+    then
+        port=${host#*:}
+    fi
+    host=${host%:*}
+    port=${port:-22}
+        ssh -l vagrant -p $port $host "sh -c '(DISPLAY=10.0.2.2:0 terminator&) > /dev/null 2>&1 < /dev/null '"
+}
+
+
+
 
 # AccuRev uses CRLF, which displays OK on screen but
 # does not work with pipelines 

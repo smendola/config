@@ -1,2 +1,5 @@
 #XCONSOLE=1 SHLVL=0 xterm -bg whitesmoke -fg firebrick -n console
-XCONSOLE=1 SHLVL=0 rxvt -n "X11 console"
+while true
+do
+   sleep 60
+done
