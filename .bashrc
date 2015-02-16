@@ -4,7 +4,7 @@
 ### customize the ENVIRONMENT VARIABLES.  
 ###############################################################
 
-[[ $TERM ]] && echo DOT-BASHRC $HOME $TERM
+#[[ $TERM ]] && echo DOT-BASHRC $HOME $TERM
 
 # If running in MSYS/MINGW, use some replacements for cyg programs
 [[ $(uname) = MINGW* ]] && PATH=~/bin/msys:$PATH
