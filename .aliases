@@ -159,7 +159,7 @@ function sts() {
       return 1
     elif xset q > /dev/null
     then
-		(/opt/sts-bundle/sts-*/STS > sts.log 2>&1 &)
+		detach /opt/sts-bundle/sts-*/STS
     else
       echo "Problem with display?"
       return 1
