@@ -76,9 +76,9 @@
 	trustExitCode = false
 
 [diff]
-	tool = winmerge
+	tool = diffuse
 [merge]
-	tool = diffmerge
+	tool = diffuse
 
 #[remote "ng"]
 #	url = ssh://kando/studywork-ng.git
