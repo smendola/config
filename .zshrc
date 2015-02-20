@@ -17,7 +17,7 @@ fi
 _REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
 # the nc -w1 avoids long delay if X11 is not running
 if [ ! -z $SSH_CLIENT ] && 
-   nc -w1 $_REMOTE_IP 6000 &&
+   nc -w1 $_REMOTE_IP 6000 < /dev/null &&
    xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
 then
   export DISPLAY=$_REMOTE_IP:0
