@@ -12,6 +12,7 @@
     background_image = None
     cursor_color = "#ff0000"
     foreground_color = "#e1e1e1"
+    backspace_binding = control-h
     font = Consolas 10
     background_color = "#2c2c2c"
     scrollback_lines = 5000

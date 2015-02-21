@@ -461,6 +461,11 @@ then
 
 fi
 
+ar()
+{
+	accurev "$@"
+}
+
 # mods    - show modified files in ws
 # mods -o - show all outgoing changes
 # mods -d - show "default group" (whatever that means; kept + and locally modified?)
