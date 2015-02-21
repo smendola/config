@@ -54,7 +54,7 @@ function ,() {
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
-  
+
   # Connect to running emacs, or start emacs as server and then connect
   # -nw means TTY mode
   emacsclient -a '' -nw "$@"
@@ -66,7 +66,7 @@ alias s=sublime
 alias deref=readlink
 
 # run commands, displaying the command at as the terminal's title,
-# e.g. 
+# e.g.
 function wt () {
     title "$1" "$@"
     "$@" ;# no need to use "eval"; that actually causes problems
@@ -89,7 +89,7 @@ function y () {
 
 # Comma-format numbers
 # Usage: , <cmd> [args]
-# e.g.: 
+# e.g.:
 # $ , ls -l
 # $ , du
 # This causes large numbers in the output of cmd to be formatted with commas,
@@ -105,7 +105,7 @@ function  , ()
 
 # Usage: <cmd> | 1,000
 #        1,000 < <textfile>
-# e.g: 
+# e.g:
 # $ ls -l | 1,000
 # Note: normally, you would not invoke 1,000 directly, but through , (above)
 function 1,000 ()
@@ -173,7 +173,7 @@ function idea() {
       return 1
     elif xset q > /dev/null
     then
-        detach /opt/IDEA/bin/idea.sh 
+        detach /opt/IDEA/bin/idea.sh
     else
       echo "Problem with display?"
       return 1
@@ -221,7 +221,7 @@ function skylogs () {
         skysync-testenv "skytap::suite/results/*.png" ~/Robot_Logs
         shift
     fi
-    
+
     skysync-testenv \
         "skytap::suite/pybot-args.txt" \
         "skytap::suite/results/output.xml" \
@@ -254,7 +254,7 @@ function tomcat() {
 # Cause an annotation entry to show up in Fiddler
 function anno() {
     anno=$(echo $* | tr ' ' '_')
-    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
+    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
 }
 
 function clear-m2() {
@@ -282,8 +282,8 @@ alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
 function syncdots()
 {
-    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
-    echo pull &&  dots pull origin master && 
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
+    echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
 
@@ -323,7 +323,7 @@ function xsl() {
         xmlstarlet sel --help | sed -n -e '/^Syntax/,/^There can be/p' | head -n -2
         return
     fi
-    
+
     local mode
     if [[ $1 = -X ]]
     then
@@ -345,7 +345,7 @@ function xpath() {
         shift
         xmlstarlet sel -R -I -D -t -c "$1" -n "$@"
     else
-        xmlstarlet sel -t -v "$1" -n "$@"    
+        xmlstarlet sel -t -v "$1" -n "$@"
     fi
 }
 
@@ -357,7 +357,7 @@ function xpath() {
 function jpda() {
     local port=9000
     local suspend=n
-    
+
     while getopts :sp: OPTNAME "$@"
     do
         case $OPTNAME in
@@ -367,7 +367,7 @@ function jpda() {
         esac
     done
     shift $(( $OPTIND - 1 ))
-    
+
     java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
 }
 
@@ -390,7 +390,7 @@ alias tcf='tree -ACF --dirsfirst'
 if [[ $(type print) != *builtin ]]
 then
 
-    function prat() { 
+    function prat() {
         if [[ $TERM == emacs ]]; then
             return;
         fi
@@ -421,7 +421,7 @@ then
         PS1=$prompt
     }
 
-    # set the terminal window title bar label 
+    # set the terminal window title bar label
     # Usage: title IGNOREDPARAM WINDOW_TITLE
     title () {
             if [[ "$DISABLE_AUTO_TITLE" = "true" ]] || [[ "$EMACS" = *term* ]]
@@ -442,7 +442,7 @@ then
 
     function curbranch()
     {
-        if git branch > /dev/null 2>&1 
+        if git branch > /dev/null 2>&1
         then
             echo $(git branch | grep '^[*]' | cut -c 3-)
         fi
@@ -451,8 +451,8 @@ then
     function curbranch_bracketed()
     {
         __git_ps1 ' (%s) '
-        
-        #local cb=$(curbranch)    
+
+        #local cb=$(curbranch)
         #if [[ $cb ]]
         #then
         #    echo " [$cb]"
@@ -515,7 +515,7 @@ ws()
 {
     if [[ $# != 0 ]]
     then
-    
+
         if [[ $# = 2 && $1 = -p ]]
         then
             shift
@@ -526,12 +526,12 @@ ws()
             echo "*** Selecting workspace $1 for THIS SHELL ONLY."
             echo "    (Use -p to select persistently.)"
         fi
-        
+
         export WS=$(readlink -f "$1")
         # trailing / is important; see comment near WORKSPACE= in .zshrc
         export WORKSPACE=$(mix $WS/)
     fi
-    
+
     # zsh does something funky with prompt string %~
     # it's preferable to cd ~/ng over cd $WS if possible
     if [[ $(readlink -f ~/ng) = $WS ]]
@@ -596,12 +596,12 @@ api1()
     local verb=$(echo -n $1 | tr a-z A-Z)
     local resource=${2#/}
     shift 2
-    
+
     local extra_get=""
     if [[ $verb == GET ]]
     then
         # --data* opts override -X GET, force POST behavior
-        # --get overrides the override :) 
+        # --get overrides the override :)
         extra_get="--get"
     fi
     curl -s -X $verb $extra_get --url $API1/$resource "$@"
@@ -626,13 +626,18 @@ tt()
 	detach terminator
 }
 
-alias aptitude='sudo aptitude'
-alias apt-get='sudo apt-get'
-alias docker='sudo docker'
-alias synaptic='sudo synaptic'
+#These are for Ubuntu
+#alias aptitude='sudo aptitude'
+#alias apt-get='sudo apt-get'
+#alias synaptic='sudo synaptic'
+#alias bum='sudo bum'
+
+# These are for Fedora
+alias systemctl='sudo systemctl'
+alias yum='sudo yum'
+
 alias service='sudo service'
 alias initctl='sudo initctl'
-alias bum='sudo bum'
 alias reboot='sudo reboot'
 alias halt='sudo halt'
 alias poweroff='sudo poweroff'
@@ -640,3 +645,7 @@ alias shutdown='sudo shutdown'
 alias ifquery='sudo ifquery'
 alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
+
+alias docker='sudo docker'
+
+alias srnm='systemctl restart NetworkManager'

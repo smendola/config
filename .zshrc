@@ -74,7 +74,7 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###   when it comes time to update/merge with latest version from 
 ###   master.
 ###############################################################
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0
 export CATALINA_HOME=/usr/share/tomcat7
 export CATALINA_BASE=~/tomcat-inst
 
@@ -99,7 +99,7 @@ export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
 
 #export TOOLS_DIR=~/tools
-export AC_DIFF_CLI='WinMergeU -e %1 %2'
+export AC_DIFF_CLI='diffuse %1 %2'
 
 ###############################################################
 ### PATH CONSTRUCTION
