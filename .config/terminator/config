@@ -1,0 +1,27 @@
+[global_config]
+  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  title_transmit_bg_color = "#476749"
+  tab_position = bottom
+[keybindings]
+  new_window = <Alt>F2
+[profiles]
+  [[default]]
+    use_system_font = False
+    visible_bell = True
+    urgent_bell = True
+    background_image = None
+    cursor_color = "#ff0000"
+    foreground_color = "#e1e1e1"
+    font = Consolas 10
+    background_color = "#2c2c2c"
+    scrollback_lines = 5000
+[layouts]
+  [[default]]
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+    [[[window0]]]
+      type = Window
+      parent = ""
+[plugins]
+
