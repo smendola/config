@@ -152,32 +152,28 @@ function cygsetup() {
     cmd /c start $(dos /setup.exe) "$@"
 }
 
-function sts() {
+
+function check_x()
+{
     if [ -z "$DISPLAY" ]
     then
       echo "DISPLAY needs to be set"
       return 1
     elif xset q > /dev/null
     then
-		detach /opt/sts-bundle/sts-*/STS
+		return 0
     else
       echo "Problem with display?"
       return 1
     fi
 }
 
+function sts() {
+   check_x && detach /opt/sts-bundle/sts-3.6.*/STS	
+}
+
 function idea() {
-    if [ -z "$DISPLAY" ]
-    then
-      echo "DISPLAY needs to be set"
-      return 1
-    elif xset q > /dev/null
-    then
-        detach /opt/IDEA/bin/idea.sh 
-    else
-      echo "Problem with display?"
-      return 1
-    fi
+    check_x && detach /opt/IDEA/bin/idea.sh
 }
 
 function mqst() {
@@ -623,8 +619,15 @@ detach()
 
 tt()
 {
-	detach terminator
+	check_x && detach terminator "$@"
 }
+
+backup-settings()
+{
+    zip -q -r  ~/settings.zip ~/.config ~/.kde/share/config -x '**/google-chrome/**'
+    , ls -lt ~/settings.zip
+}
+
 
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
