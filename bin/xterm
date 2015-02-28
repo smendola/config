@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Substituting roxterm for xterm" 2>&1
+exec roxterm "$@"
