@@ -619,7 +619,7 @@ detach()
 
 tt()
 {
-	check_x && detach terminator "$@"
+	check_x && detach roxterm "$@"
 }
 
 backup-settings()

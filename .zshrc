@@ -256,6 +256,6 @@ then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh ]
 else
-  echo "No customizations in $HOME/.custom.sh; how sad..."
+  echo "No customizations in $HOME/.custom.sh; how sad."
 fi
 
