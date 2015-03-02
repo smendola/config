@@ -4,7 +4,7 @@
 
 
 # Clears the scrollback buffer, not just the current screen
-alias cls='echo -n -e "\ec\e[3J"'
+alias cls='tput reset'
 
 function bd () {
     cd "$OLDPWD"
@@ -20,9 +20,10 @@ alias undos=dos2unix
 
 dev()
 {
-    cd $WS/vagrant/dev-env; 
-    vagrant up
-    vagrant ssh "$@"
+    cd $WS/vagrant/dev-env &&
+    vagrant up &&
+    vagrant-ssh-config.sh  &&
+    ssh dev-ng-1.6
 }
 
 # Remote terminal
@@ -45,12 +46,12 @@ rtt () {
 
 
 # AccuRev uses CRLF, which displays OK on screen but
-# does not work with pipelines 
-#  e.g. 
+# does not work with pipelines
+#  e.g.
 #    AccuRev stat -m -fl | tr '\\' / | xargs less
-#  fails miserably, whereas this works as expected:  
-#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less 
-# Jury still out on whether to use this alias, 
+#  fails miserably, whereas this works as expected:
+#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less
+# Jury still out on whether to use this alias,
 #  or accurev bla -fx | xsl as a building block
 function ar()
 {
@@ -90,7 +91,7 @@ function ,() {
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
-  
+
   # Connect to running emacs, or start emacs as server and then connect
   # -nw means TTY mode
   emacsclient -a '' -nw "$@"
@@ -102,7 +103,7 @@ alias s=sublime
 alias deref=readlink
 
 # run commands, displaying the command at as the terminal's title,
-# e.g. 
+# e.g.
 function wt () {
     title "$1" "$@"
     "$@" ;# no need to use "eval"; that actually causes problems
@@ -125,7 +126,7 @@ function y () {
 
 # Comma-format numbers
 # Usage: , <cmd> [args]
-# e.g.: 
+# e.g.:
 # $ , ls -l
 # $ , du
 # This causes large numbers in the output of cmd to be formatted with commas,
@@ -141,7 +142,7 @@ function  , ()
 
 # Usage: <cmd> | 1,000
 #        1,000 < <textfile>
-# e.g: 
+# e.g:
 # $ ls -l | 1,000
 # Note: normally, you would not invoke 1,000 directly, but through , (above)
 function 1,000 ()
@@ -202,7 +203,7 @@ function nti() {
 }
 
 
-if [[ $(uname) == MINGW* ]] 
+if [[ $(uname) == MINGW* ]]
 then
     echo -n '';# nothing to do
 elif [[ -f /usr/bin/git.exe ]]
@@ -255,7 +256,7 @@ function skylogs () {
         skysync-testenv "skytap::suite/results/*.png" ~/Robot_Logs
         shift
     fi
-    
+
     skysync-testenv \
         "skytap::suite/pybot-args.txt" \
         "skytap::suite/results/output.xml" \
@@ -288,12 +289,12 @@ function tomcat() {
 # Cause an annotation entry to show up in Fiddler
 function anno() {
     anno=$(echo $* | tr ' ' '_')
-    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
+    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
 }
 
 # seems obsolete
 #function push-ui() {
-#  ( 
+#  (
 #    trap "echo '***** FAILED *****'; exit" ERR
 #    #set -x;
 #    if [[ $1 = -b ]]
@@ -303,9 +304,9 @@ function anno() {
 #    else
 #        cp -vua $WORKSPACE/sw-ng-ui/src/main/webapp/* $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/
 #    fi
-#    
+#
 #    cp $WORKSPACE/sw-ng-ui/target/sw-ng-ui-1.1.0-SNAPSHOT/index{-dev,}.html
-#    
+#
 #    if [[ $1 = -r ]]
 #    then
 #        shift
@@ -338,8 +339,8 @@ function clear-m2() {
 alias dots='/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 function syncdots()
 {
-    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
-    echo pull &&  dots pull origin master && 
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
+    echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
 
@@ -384,7 +385,7 @@ function xsl() {
         xmlstarlet sel --help | sed -n -e '/^Syntax/,/^There can be/p' | head -n -2
         return
     fi
-    
+
     local mode
     if [[ $1 = -X ]]
     then
@@ -406,7 +407,7 @@ function xpath() {
         shift
         xmlstarlet sel -R -I -D -t -c "$1" -n "$@"
     else
-        xmlstarlet sel -t -v "$1" -n "$@"    
+        xmlstarlet sel -t -v "$1" -n "$@"
     fi
 }
 
@@ -418,7 +419,7 @@ function xpath() {
 function jpda() {
     local port=9000
     local suspend=n
-    
+
     while getopts :sp: OPTNAME "$@"
     do
         case $OPTNAME in
@@ -428,7 +429,7 @@ function jpda() {
         esac
     done
     shift $(( $OPTIND - 1 ))
-    
+
     java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
 }
 
@@ -457,7 +458,7 @@ function mklink()
         symbolic=1
         shift
     fi
-    
+
     if [[ $# != 2 ]]
     then
         echo "Usage: mklink [-s] SRC DEST"
@@ -475,7 +476,7 @@ function mklink()
             opt='/H'
         fi
     else
-        opt='' 
+        opt=''
     fi
     if [[ -d $dest ]]
     then
@@ -502,7 +503,7 @@ function box()
     then
         echo "$dest is not a directory"
         echo ""
-        box 
+        box
         return 1
     fi
     while [[ $# > 1 ]]
@@ -516,7 +517,7 @@ function box()
 
 
 drop-files() {
-  rm -rf /c/static-content/* /c/file-service-storage/* /c/design-storage/* 
+  rm -rf /c/static-content/* /c/file-service-storage/* /c/design-storage/*
 }
 
 ###############################################
@@ -528,7 +529,7 @@ drop-files() {
 if [[ $(type print) != *builtin ]]
 then
 
-    function prat() { 
+    function prat() {
         if [[ $TERM == emacs ]]; then
             return;
         fi
@@ -559,7 +560,7 @@ then
         PS1=$prompt
     }
 
-    # set the terminal window title bar label 
+    # set the terminal window title bar label
     # Usage: title IGNOREDPARAM WINDOW_TITLE
     title () {
             if [[ "$DISABLE_AUTO_TITLE" = "true" ]] || [[ "$EMACS" = *term* ]]
@@ -580,7 +581,7 @@ then
 
     function curbranch()
     {
-        if git branch > /dev/null 2>&1 
+        if git branch > /dev/null 2>&1
         then
             echo $(git branch | grep '^[*]' | cut -c 3-)
         fi
@@ -589,8 +590,8 @@ then
     function curbranch_bracketed()
     {
         __git_ps1 ' (%s) '
-        
-        #local cb=$(curbranch)    
+
+        #local cb=$(curbranch)
         #if [[ $cb ]]
         #then
         #    echo " [$cb]"
@@ -648,7 +649,7 @@ ws()
 {
     if [[ $# != 0 ]]
     then
-    
+
         if [[ $# = 2 && $1 = -p ]]
         then
             shift
@@ -659,12 +660,12 @@ ws()
             echo "*** Selecting workspace $1 for THIS SHELL ONLY."
             echo "    (Use -p to select persistently.)"
         fi
-        
+
         export WS=$(readlink -f "$1")
         # trailing / is important; see comment near WORKSPACE= in .zshrc
         export WORKSPACE=$(mix $WS/)
     fi
-    
+
     # zsh does something funky with prompt string %~
     # it's preferable to cd ~/ng over cd $WS if possible
     if [[ $(readlink -f ~/ng) = $WS ]]
@@ -729,12 +730,12 @@ api1()
     local verb=$(echo -n $1 | tr a-z A-Z)
     local resource=${2#/}
     shift 2
-    
+
     local extra_get=""
     if [[ $verb == GET ]]
     then
         # --data* opts override -X GET, force POST behavior
-        # --get overrides the override :) 
+        # --get overrides the override :)
         extra_get="--get"
     fi
     curl -s -X $verb $extra_get --url $API1/$resource "$@"
@@ -743,3 +744,7 @@ api1()
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
+detach()
+{
+  ( "$@" & ) > /dev/null 2>&1
+}
