@@ -5,6 +5,10 @@
  ;; If there is more than one, they won't work right.
  '(backup-directory-alist (quote (("." . "~/.emacs.d/backups"))))
  '(column-number-mode t)
+ '(custom-enabled-themes (quote (zenburn)))
+ '(custom-safe-themes
+   (quote
+	("ba86d681a1619773dbdfdeb70424a1bc0091b53c86bd2239ad0a9bf9f10beb78" default)))
  '(font-use-system-font t)
  '(modeline-3d-p nil)
  '(show-paren-mode t)
@@ -57,8 +61,20 @@
 (line-number-mode 1)
 (column-number-mode 1)
 (load-library "font-lock")
-(load-library "~/.emacs.d/zenburn.el")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+;(load-library "~/.emacs.d/themes/zenburn.el")
 (setq default-tab-width 4)
 (setq nxml-child-indent 4)
 (put 'narrow-to-region 'disabled nil)
 (xterm-mouse-mode)
+(load-theme 'zenburn)
+
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+;;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
+
