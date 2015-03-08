@@ -1,12 +1,13 @@
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
 ### if just getting started with cygwin. You will have to
-### customize the ENVIRONMENT VARIABLES.  
+### customize the ENVIRONMENT VARIABLES.
 ###############################################################
 
 # First-time boot setup
 ~/bin/post-vagrant-config.sh
 
+OS_ID=$(source /etc/os-release; echo $ID)
 if toe -a | grep -qs $TERM-256color
 then
    TERM=$TERM-256color
@@ -16,7 +17,7 @@ fi
 # in preference to display tunneled over SSH; more efficient.
 _REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
 # the nc -w1 avoids long delay if X11 is not running
-if [ ! -z $SSH_CLIENT ] && 
+if [ ! -z $SSH_CLIENT ] &&
    nc -w1 $_REMOTE_IP 6000 < /dev/null &&
    xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
 then
@@ -25,7 +26,20 @@ else
   export DISPLAY=${DISPLAY:-:0}
 fi
 
-[[ -z $TERM ]] || print -P "%B%N %n $SHELL $HOME $TERM %y $DISPLAY %b"
+xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+# [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
+# SSH_CONNECTION=%B$SSH_CONNECTION%b
+# HOST=%B$HOST%b
+# OS_ID=%B$OS_ID%b
+# USER=%B$USER%b
+# TERM=%B$TERM%b
+# tty=%B%y%b
+# DISPLAY=%F{$_x_status}$DISPLAY%f"
+[[ -z $PS1 ]] || print -P "Sourcing file %B%N%b
+SSH_CONNECTION=%B$SSH_CONNECTION%b
+Logged in as %B$USER@$HOST%b
+%B$TERM%b on %B%y%b
+DISPLAY=%F{$_x_status}$DISPLAY%f"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
@@ -68,10 +82,10 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ### Recommend installing all dev tools/sdk's in a single place, e.g.
 ### C:\tools, and point TOOLS_DIR to that dir. Put JDK there, as
 ### well (e.g. $TOOLS_DIR/jdk7)
-### 
+###
 ### Keep in mind:
 ###   The less you customize this file, the easier life will be
-###   when it comes time to update/merge with latest version from 
+###   when it comes time to update/merge with latest version from
 ###   master.
 ###############################################################
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
@@ -99,7 +113,7 @@ export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
 
 #export TOOLS_DIR=~/tools
-export AC_DIFF_CLI='WinMergeU -e %1 %2'
+export AC_DIFF_CLI='diffuse %1 %2'
 
 ###############################################################
 ### PATH CONSTRUCTION
@@ -219,18 +233,20 @@ my-server localhost:2080
 # do this last, it will error out if path elems do not exist
 
 # Allows e.g: cd access-control-implementation
-# from anywhre. try this: 
+# from anywhre. try this:
 # $ cd ac<TAB>im<TAB>
-# or even try it without cd; try 
+# or even try it without cd; try
 # $ a-c-im<TAB><ENTER>
 if readlink -e $WS > /dev/null
 then
     cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
 fi
 
+export SUDO_EDITOR=vim
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]
 then
+  echo "Now sourcing $HOME/.custom.sh"
    source $HOME/.custom.sh ]
 fi
 

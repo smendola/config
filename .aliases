@@ -60,13 +60,13 @@ function ec() {
   emacsclient -a '' -nw "$@"
 }
 
-alias e=npp
-alias s=sublime
+alias e=subl
+alias s=subl
 
 alias deref=readlink
 
 # run commands, displaying the command at as the terminal's title,
-# e.g. 
+# e.g.
 function wt () {
     title "$1" "$@"
     "$@" ;# no need to use "eval"; that actually causes problems
@@ -89,7 +89,7 @@ function y () {
 
 # Comma-format numbers
 # Usage: , <cmd> [args]
-# e.g.: 
+# e.g.:
 # $ , ls -l
 # $ , du
 # This causes large numbers in the output of cmd to be formatted with commas,
@@ -105,7 +105,7 @@ function  , ()
 
 # Usage: <cmd> | 1,000
 #        1,000 < <textfile>
-# e.g: 
+# e.g:
 # $ ls -l | 1,000
 # Note: normally, you would not invoke 1,000 directly, but through , (above)
 function 1,000 ()
@@ -152,32 +152,26 @@ function cygsetup() {
     cmd /c start $(dos /setup.exe) "$@"
 }
 
-function sts() {
+function check_x()
+{
     if [ -z "$DISPLAY" ]
     then
       echo "DISPLAY needs to be set"
       return 1
     elif xset q > /dev/null
     then
-		detach /opt/sts-bundle/sts-*/STS
+		return 0
     else
-      echo "Problem with display?"
+      echo "Problem with display?" 2>&1
       return 1
     fi
 }
+function sts() {
+   check_x && detach /opt/sts-bundle/sts-3.6.*/STS
+}
 
 function idea() {
-    if [ -z "$DISPLAY" ]
-    then
-      echo "DISPLAY needs to be set"
-      return 1
-    elif xset q > /dev/null
-    then
-        detach /opt/IDEA/bin/idea.sh 
-    else
-      echo "Problem with display?"
-      return 1
-    fi
+    check_x && detach /opt/IDEA/bin/idea.sh
 }
 
 function mqst() {
@@ -254,7 +248,7 @@ function tomcat() {
 # Cause an annotation entry to show up in Fiddler
 function anno() {
     anno=$(echo $* | tr ' ' '_')
-    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null; 
+    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
 }
 
 function clear-m2() {
@@ -282,8 +276,8 @@ alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 
 function syncdots()
 {
-    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) && 
-    echo pull &&  dots pull origin master && 
+    (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
+    echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
 
@@ -345,7 +339,7 @@ function xpath() {
         shift
         xmlstarlet sel -R -I -D -t -c "$1" -n "$@"
     else
-        xmlstarlet sel -t -v "$1" -n "$@"    
+        xmlstarlet sel -t -v "$1" -n "$@"
     fi
 }
 
@@ -390,7 +384,7 @@ alias tcf='tree -ACF --dirsfirst'
 if [[ $(type print) != *builtin ]]
 then
 
-    function prat() { 
+    function prat() {
         if [[ $TERM == emacs ]]; then
             return;
         fi
@@ -421,7 +415,7 @@ then
         PS1=$prompt
     }
 
-    # set the terminal window title bar label 
+    # set the terminal window title bar label
     # Usage: title IGNOREDPARAM WINDOW_TITLE
     title () {
             if [[ "$DISABLE_AUTO_TITLE" = "true" ]] || [[ "$EMACS" = *term* ]]
@@ -442,7 +436,7 @@ then
 
     function curbranch()
     {
-        if git branch > /dev/null 2>&1 
+        if git branch > /dev/null 2>&1
         then
             echo $(git branch | grep '^[*]' | cut -c 3-)
         fi
@@ -452,7 +446,7 @@ then
     {
         __git_ps1 ' (%s) '
         
-        #local cb=$(curbranch)    
+        #local cb=$(curbranch)
         #if [[ $cb ]]
         #then
         #    echo " [$cb]"
@@ -601,7 +595,7 @@ api1()
     if [[ $verb == GET ]]
     then
         # --data* opts override -X GET, force POST behavior
-        # --get overrides the override :) 
+        # --get overrides the override :)
         extra_get="--get"
     fi
     curl -s -X $verb $extra_get --url $API1/$resource "$@"
@@ -612,7 +606,7 @@ alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
 {
-   diffuse "%@"
+   diffuse "$@"
 }
 
 
@@ -625,6 +619,19 @@ tt()
 {
 	detach terminator
 }
+
+backup-settings()
+{(
+    cd;
+    rm -f settings.zip; 
+    zip -q -r settings.zip \
+        .config .kde/share/config \
+        -x '**/google-chrome/**' \
+        -x '**/sublime-text-3/Backup/**' \
+        -x '**/sublime-text-3/Cache/**' \
+        -x '**/sublime-text-3/Index/**'
+    , ls -lt settings.zip
+)}
 
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
@@ -640,3 +647,4 @@ alias shutdown='sudo shutdown'
 alias ifquery='sudo ifquery'
 alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
+alias docker='sudo docker'
