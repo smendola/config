@@ -92,8 +92,8 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###   when it comes time to update/merge with latest version from
 ###   master.
 ###############################################################
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0
-#export JAVA_HOME=/usr/java/jdk1.7.0_75
+#export JAVA_HOME=/usr/lib/jvm/java-1.8.0
+export JAVA_HOME=/usr/java/jdk1.7.0_75
 
 export CATALINA_HOME=/usr/share/tomcat7
 export CATALINA_BASE=~/tomcat-inst
