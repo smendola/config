@@ -95,11 +95,8 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 #export JAVA_HOME=/usr/lib/jvm/java-1.8.0
 export JAVA_HOME=/usr/java/jdk1.7.0_75
 
-export CATALINA_HOME=/usr/share/tomcat7
+export CATALINA_HOME=/opt/tomcat7
 export CATALINA_BASE=~/tomcat-inst
-
-export APACHE_CONFDIR=~/apache-inst
-export APACHE_ENVVARS=~/apache-inst/envvars
 
 export KANDO=ssh://kando/studywork-ng.git
 #export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
