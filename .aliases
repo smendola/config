@@ -16,11 +16,6 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
-dev()
-{
-    cd $WS/vagrant/dev-env; vagrant ssh -- -Y "$@"
-}
-
 # This implementation replaces an older one that used while/cd..
 function upto()
 {
