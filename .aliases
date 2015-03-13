@@ -164,7 +164,7 @@ function check_x()
 }
 
 function sts() {
-   check_x && detach /opt/sts-bundle/sts-3.6.*/STS
+   check_x && detach /opt/sts-bundle/sts-*/STS
 }
 
 function idea() {
