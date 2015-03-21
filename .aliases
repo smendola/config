@@ -51,8 +51,7 @@ function ec() {
   # The equivalent (and not as good) for xemacs is gnuclient
 
   # Connect to running emacs, or start emacs as server and then connect
-  # -nw means TTY mode
-  emacsclient -a '' -nw "$@"
+  emacsclient --create-frame --alternate-editor=  "$@"
 }
 
 alias e=subl
@@ -620,7 +619,7 @@ tt()
 backup-settings()
 {(
     cd;
-    rm -f settings.zip; 
+    rm -f settings.zip;
     zip -q -r settings.zip \
         .config .kde/share/config \
         -x '**/google-chrome/**' \
@@ -649,6 +648,7 @@ alias shutdown='sudo shutdown'
 alias ifquery='sudo ifquery'
 alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
+alias iptables='sudo iptables'
 
 alias docker='sudo docker'
 

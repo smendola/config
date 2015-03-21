@@ -45,16 +45,6 @@
 ;; always end a file with a newline
 (setq require-final-newline 'nil)
 
-;; GNU-emacs specific
-(when (fboundp 'set-face-inverse-video-p)
-  (set-face-inverse-video-p 'mode-line nil)
-  (set-face-background 'mode-line "blue")
-  (set-face-foreground 'mode-line "white")
-
-  (set-face-inverse-video-p 'menu nil)
-  (set-face-background 'menu "blue")
-  (set-face-foreground 'menu "yellow")
-  (set-face-foreground 'minibuffer-prompt "yellow"))
 
 (global-set-key "" 'undo)
 (setq allow-remote-paths nil)
