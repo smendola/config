@@ -9,7 +9,7 @@
  '(custom-safe-themes
    (quote
 	("ba86d681a1619773dbdfdeb70424a1bc0091b53c86bd2239ad0a9bf9f10beb78" default)))
- '(font-use-system-font t)
+; '(font-use-system-font t)
  '(modeline-3d-p nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
@@ -47,12 +47,11 @@
 
 
 (global-set-key "" 'undo)
-(setq allow-remote-paths nil)
+;(setq allow-remote-paths nil)
 (line-number-mode 1)
 (column-number-mode 1)
 (load-library "font-lock")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-;(load-library "~/.emacs.d/themes/zenburn.el")
 (setq default-tab-width 4)
 (setq nxml-child-indent 4)
 (put 'narrow-to-region 'disabled nil)
