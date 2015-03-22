@@ -4,9 +4,6 @@
 ### customize the ENVIRONMENT VARIABLES.
 ###############################################################
 
-# First-time boot setup
-~/bin/post-vagrant-config.sh
-
 OS_ID=$(source /etc/os-release; echo $ID)
 if toe -a | grep -qs $TERM-256color
 then
