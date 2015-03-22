@@ -617,7 +617,7 @@ detach()
 
 tt()
 {
-	detach terminator
+	detach roxterm
 }
 
 backup-settings()
