@@ -45,8 +45,6 @@
 ;; always end a file with a newline
 (setq require-final-newline 'nil)
 
-
-
 (global-set-key "" 'undo)
 ;(setq allow-remote-paths nil)
 (line-number-mode 1)
