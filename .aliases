@@ -16,10 +16,6 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
-dev()
-{
-    cd $WS/vagrant/dev-env; vagrant ssh -- -Y "$@"
-}
 
 # This implementation replaces an older one that used while/cd..
 function upto()
@@ -56,8 +52,7 @@ function ec() {
   # The equivalent (and not as good) for xemacs is gnuclient
   
   # Connect to running emacs, or start emacs as server and then connect
-  # -nw means TTY mode
-  emacsclient -a '' -nw "$@"
+  emacsclient --create-frame --alternate-editor=  "$@"
 }
 
 alias e=subl
@@ -167,7 +162,7 @@ function check_x()
     fi
 }
 function sts() {
-   check_x && detach /opt/sts-bundle/sts-3.6.*/STS
+   check_x && detach /opt/sts-bundle/sts-*/STS
 }
 
 function idea() {
@@ -617,18 +612,19 @@ detach()
 
 tt()
 {
-	detach terminator
+	check_x && detach roxterm "$@"
 }
 
 backup-settings()
 {(
     cd;
-    rm -f settings.zip; 
+    /bin/rm -f settings.zip;
     zip -q -r settings.zip \
         .config .kde/share/config \
         -x '**/google-chrome/**' \
         -x '**/sublime-text-3/Backup/**' \
         -x '**/sublime-text-3/Cache/**' \
+        -x '**/sublime-text-3/Packages/User/Package Control.cache/**' \
         -x '**/sublime-text-3/Index/**'
     , ls -lt settings.zip
 )}
@@ -647,4 +643,6 @@ alias shutdown='sudo shutdown'
 alias ifquery='sudo ifquery'
 alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
+alias iptables='sudo iptables'
 alias docker='sudo docker'
+alias srnm='systemctl restart NetworkManager'

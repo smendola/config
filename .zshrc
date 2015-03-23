@@ -247,6 +247,6 @@ export SUDO_EDITOR=vim
 if [ -f $HOME/.custom.sh ]
 then
   echo "Now sourcing $HOME/.custom.sh"
-   source $HOME/.custom.sh ]
+  source $HOME/.custom.sh
 fi
 
