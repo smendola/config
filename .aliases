@@ -11,7 +11,6 @@ function bd () {
 }
 
 alias grep='grep --color=auto'
-alias start=cygstart
 alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
@@ -619,7 +618,7 @@ backup-settings()
     cd;
     /bin/rm -f settings.zip;
     zip -q -r settings.zip \
-        .config .kde/share/config \
+        .custom.sh .config .kde/share/config \
         -x '**/google-chrome/**' \
         -x '**/sublime-text-3/Backup/**' \
         -x '**/sublime-text-3/Cache/**' \
@@ -645,3 +644,4 @@ alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias docker='sudo docker'
 alias srnm='systemctl restart NetworkManager'
+alias ufw='sudo ufw'
