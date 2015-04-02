@@ -20,7 +20,7 @@ alias undos=dos2unix
 
 dev()
 {
-    cd $WS/vagrant/dev-env-fedora &&
+    cd $WS/vagrant/dev-env-ubuntu &&
     vagrant up &&
     vagrant-ssh-config.sh  &&
     ssh dev-ng-1.6
