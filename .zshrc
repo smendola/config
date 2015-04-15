@@ -81,15 +81,15 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###  - WORKSPACE (computed from $WS; absolute path, DOS style)
 ### Recommend installing all dev tools/sdk's in a single place, e.g.
 ### C:\tools, and point TOOLS_DIR to that dir. Put JDK there, as
-### well (e.g. $TOOLS_DIR/jdk7)
+### well (e.g. $TOOLS_DIR/jdk8)
 ###
 ### Keep in mind:
 ###   The less you customize this file, the easier life will be
 ###   when it comes time to update/merge with latest version from
 ###   master.
 ###############################################################
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
-export CATALINA_HOME=/usr/share/tomcat7
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export CATALINA_HOME=/usr/share/tomcat8
 export CATALINA_BASE=~/tomcat-inst
 
 export APACHE_CONFDIR=~/apache-inst
