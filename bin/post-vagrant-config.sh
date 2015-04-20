@@ -11,9 +11,16 @@ then
 
 	echo -n "Enter your full name: "
 	read FULL_NAME
-	echo -n "Enter your PHT email address: "
-	read EMAIL
+    if [ -z "$FULL_NAME" ]
+    then
+      echo "Skipping this procedure"
+      exit
+    fi
 
+    guess=$(echo $FULL_NAME | tr A-Z a-z | sed -rn 's/([a-z]).*[ ]([a-z]+)/\1\2@phtcorp.com/p')
+	echo -n "Enter your PHT email address: [${guess}] "
+	read EMAIL
+    EMAIL=${EMAIL:-$guess}
     if [ -z "$EMAIL" ]
     then
       echo "Skipping this procedure"
@@ -28,7 +35,7 @@ then
 
 	# Pre-fill in some settings in ng-install.ini
 	sed --in-place \
-			-e "s/@@EMAIL@@/${LOGNAME}@phtcorp.com/g" \
+			-e "s/@@EMAIL@@/${EMAIL}/g" \
 			-e "s/@@HOSTNAME@@/$(hostname)/g" \
 			$HOME/ng-install.ini
     echo ${EMAIL%@*}-ng-dev > ~/.hostname
