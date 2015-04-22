@@ -627,6 +627,8 @@ backup-settings()
     , ls -lt settings.zip
 )}
 
+alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
+
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
 alias docker='sudo docker'
