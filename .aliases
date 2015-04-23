@@ -48,7 +48,7 @@ function ,() {
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
-  
+
   # Connect to running emacs, or start emacs as server and then connect
   emacsclient --create-frame --alternate-editor=  "$@"
 }
@@ -208,7 +208,7 @@ function skylogs () {
         skysync-testenv "skytap::suite/results/*.png" ~/Robot_Logs
         shift
     fi
-    
+
     skysync-testenv \
         "skytap::suite/pybot-args.txt" \
         "skytap::suite/results/output.xml" \
@@ -233,9 +233,9 @@ type stty > /dev/null 2>&1 || stty() {
 function tomcat() {
     shutdown.sh > /dev/null 2>&1
     sleep 2
-    /bin/rm /c/tools/tomcat/logs/*
+    /bin/rm $CATALINA_BASE/logs/*
     title Tomcat Tomcat
-    catalina.sh jpda run 2>&1 | tee /c/tools/tomcat/logs/CONSOLE_OUT
+    catalina.sh jpda run 2>&1 | sed -u '/^SLF4/ d' | tee $CATALINA_BASE/logs/CONSOLE_OUT
 }
 
 # Cause an annotation entry to show up in Fiddler
@@ -310,7 +310,7 @@ function xsl() {
         xmlstarlet sel --help | sed -n -e '/^Syntax/,/^There can be/p' | head -n -2
         return
     fi
-    
+
     local mode
     if [[ $1 = -X ]]
     then
@@ -344,7 +344,7 @@ function xpath() {
 function jpda() {
     local port=9000
     local suspend=n
-    
+
     while getopts :sp: OPTNAME "$@"
     do
         case $OPTNAME in
@@ -354,7 +354,7 @@ function jpda() {
         esac
     done
     shift $(( $OPTIND - 1 ))
-    
+
     java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
 }
 
@@ -438,7 +438,7 @@ then
     function curbranch_bracketed()
     {
         __git_ps1 ' (%s) '
-        
+
         #local cb=$(curbranch)
         #if [[ $cb ]]
         #then
@@ -502,7 +502,7 @@ ws()
 {
     if [[ $# != 0 ]]
     then
-    
+
         if [[ $# = 2 && $1 = -p ]]
         then
             shift
@@ -513,12 +513,12 @@ ws()
             echo "*** Selecting workspace $1 for THIS SHELL ONLY."
             echo "    (Use -p to select persistently.)"
         fi
-        
+
         export WS=$(readlink -f "$1")
         # trailing / is important; see comment near WORKSPACE= in .zshrc
         export WORKSPACE=$(mix $WS/)
     fi
-    
+
     # zsh does something funky with prompt string %~
     # it's preferable to cd ~/ng over cd $WS if possible
     if [[ $(readlink -f ~/ng) = $WS ]]
@@ -583,7 +583,7 @@ api1()
     local verb=$(echo -n $1 | tr a-z A-Z)
     local resource=${2#/}
     shift 2
-    
+
     local extra_get=""
     if [[ $verb == GET ]]
     then
