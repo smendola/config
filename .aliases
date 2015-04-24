@@ -591,7 +591,7 @@ api1()
         # --get overrides the override :)
         extra_get="--get"
     fi
-    curl -s -X $verb $extra_get --url $API1/$resource "$@"
+    curl -c ~/.curl_cookies -b ~/.curl_cookies -s -X $verb $extra_get --url $API1/$resource "$@"
     echo ""
 }
 
