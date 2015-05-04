@@ -20,10 +20,22 @@ alias undos=dos2unix
 
 dev()
 {
-    cd $WS/vagrant/dev-env-ubuntu &&
-    vagrant up &&
-    vagrant-ssh-config.sh  &&
-    ssh dev-ng-1.6
+    ( set -e
+        if [[ ! -e $WS/vagrant/dev-env && -e $WS/vagrant/dev-env-ubuntu ]]
+        then
+            ln -s $WS/vagrant/dev-env-ubuntu $WS/vagrant/dev-env
+        fi
+        cd $WS/vagrant/dev-env
+        if [[ $1 = -r ]]
+        then
+            shift
+            vagrant reload
+        else
+            vagrant up
+        fi
+        vagrant-ssh-config.sh  &&
+        ssh dev-ng-1.6
+    )
 }
 
 # Remote terminal

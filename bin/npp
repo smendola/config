@@ -12,6 +12,6 @@ do
 done
 
 case "${0##*/}" in
-    npp)     ( notepad++    "${args[@]}" &);;
-    sublime) ( sublime_text "${args[@]}" &) ;;
+    npp)     ( notepad++.exe "${args[@]}" &);;
+    sublime) ( sublime_text  "${args[@]}" &) ;;
 esac
