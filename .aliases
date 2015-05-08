@@ -627,6 +627,9 @@ backup-settings()
     , ls -lt settings.zip
 )}
 
+alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
+alias unvpn='sudo pkill -INT openconnect'
+
 alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
 
 alias aptitude='sudo aptitude'
