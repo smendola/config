@@ -24,5 +24,3 @@
 /.ssh/id_*
 !/bin
 !/bin.personal
-!/ng-install.ini
-!/setup-cygwin.sh
