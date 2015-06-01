@@ -618,7 +618,8 @@ backup-settings()
     cd;
     /bin/rm -f settings.zip;
     zip -q -r settings.zip \
-        .custom.sh .config .kde/share/config \
+        .eclipse workspace-sts/.metadata \
+        .custom.sh .config .kde/share/config .gtkrc-2.0 \
         -x '**/google-chrome/**' \
         -x '**/sublime-text-3/Backup/**' \
         -x '**/sublime-text-3/Cache/**' \
