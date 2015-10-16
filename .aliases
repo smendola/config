@@ -15,6 +15,51 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
+dev()
+{
+    ( set -e
+        if [[ ! -e $WS/vagrant/dev-env && -e $WS/vagrant/dev-env-ubuntu ]]
+        then
+            ln -s $WS/vagrant/dev-env-ubuntu $WS/vagrant/dev-env
+        fi
+        cd $WS/vagrant/dev-env
+        if [[ $1 = -r ]]
+        then
+            shift
+            vagrant reload
+        else
+            vagrant up
+        fi
+        vagrant-ssh-config.sh  &&
+        ssh dev-ng-1.6
+    )
+}
+
+# Remote terminal
+# Usage:
+#   rtt [REMOTE_ARGS]
+# TODO: -h HOSTNAME (default dev-ng-16)
+#       -p PROGRAM (default roxterm)
+rtt()
+{
+    check_x &&
+    ssh -f dev-ng-1.6 "DISPLAY=${DISPLAY/*:/10.0.2.2:} roxterm $@ 2>/dev/null"
+}
+
+
+# AccuRev uses CRLF, which displays OK on screen but
+# does not work with pipelines
+#  e.g.
+#    AccuRev stat -m -fl | tr '\\' / | xargs less
+#  fails miserably, whereas this works as expected:
+#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less
+# Jury still out on whether to use this alias,
+#  or accurev bla -fx | xsl as a building block
+function ar()
+{
+    accurev "$@" | dos2unix | tr '\\' '/'
+}
+
 # This implementation replaces an older one that used while/cd..
 function upto()
 {
@@ -140,7 +185,7 @@ alias jmeter='(cd $TOOLS_DIR/jmeter/bin; nohup ./jmeter.sh &)'
 
 
 function cygsetup() {
-    curl -\# -o /setup.exe 'http://cygwin.com/setup-x86.exe'
+    curl -\# -o /setup.exe 'http://cygwin.com/setup-x86_64.exe'
     chmod +x /setup.exe
     cmd /c start $(dos /setup.exe) "$@"
 }
@@ -153,12 +198,13 @@ function check_x()
       return 1
     elif xset q > /dev/null
     then
-		return 0
+        return 0
     else
       echo "Problem with display?" 2>&1
       return 1
     fi
 }
+
 function sts() {
    check_x && detach /opt/sts-bundle/sts-*/STS
 }
