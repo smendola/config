@@ -83,7 +83,7 @@ export AC_DIFF_CLI='diffuse %1 %2'
 ### PATH CONSTRUCTION
 ###############################################################
 
-PATH=$JAVA_HOME/bin:$PATH
+PATH=$PATH:$JAVA_HOME/bin:/opt/node/bin:/opt/AccuRev/bin
 
 ###############################################################
 ### Stuff...
