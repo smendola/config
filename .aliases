@@ -322,10 +322,8 @@ backup-settings()
     cd;
     /bin/rm -f settings.zip;
     zip -q -r settings.zip \
-        .eclipse/.metadata/.plugins workspace-sts/.metadata \
-        .custom.sh .config .kde/share/config .gtkrc-2.0 \
+        .accurev .custom.sh .config .kde/share/config .gtkrc-2.0 \
         .robotframework/ride \
-        -x 'workspace-sts/.metadata/.plugins/**' \
         -x '.config/google-chrome/**' \
         -x '.config/sublime-text-3/Backup/**' \
         -x '.config/sublime-text-3/Cache/**' \
@@ -333,6 +331,11 @@ backup-settings()
         -x '.config/sublime-text-3/Index/**'
     , ls -lt settings.zip
 )}
+
+function acgui()
+{
+    detach /opt/AccuRev/bin/acgui
+}
 
 function gc()
 {
