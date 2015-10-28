@@ -92,3 +92,5 @@
 [gui]
 [url "https://"]
 	insteadOf = git://
+[push]
+	default = simple
