@@ -1,3 +1,4 @@
+set nu
 set ts=4
 if has("gui_running")
   if has("gui_gtk2")

@@ -18,7 +18,7 @@
     backspace_binding = automatic
     scroll_on_output = False
     delete_binding = automatic
-    font = Consolas 10
+    font = Consolas 12
     background_color = "#2c2c2c"
     scrollback_lines = 5000
 [layouts]
