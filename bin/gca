@@ -1,0 +1,4 @@
+#!/bin/sh
+google-chrome --user-data-dir=/home/vagrant/lpdata --disable-web-security --app=$1
+
+
