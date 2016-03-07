@@ -1,4 +1,4 @@
 #!/bin/sh
-google-chrome --user-data-dir=/home/vagrant/lpdata --disable-web-security --app=$1
+google-chrome --user-data-dir=/home/vagrant/lpdata --disable-web-security --app=${1:-http://localhost:3000}
 
 
