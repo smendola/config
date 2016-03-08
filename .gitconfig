@@ -50,8 +50,8 @@
 
 ;;;; Git has built-in support for meld and diffuse
 ;;;; no need to configure them as custom tools
-;[difftool "meld"]
-;	cmd = meld \"$REMOTE\" \"$LOCAL\"
+[difftool "meld"]
+	cmd = meld \"$REMOTE\" \"$LOCAL\"
 ;[mergetool "meld"]
 ;	cmd = meld  --auto-merge --oputput=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 ;	trustExitCode = true
@@ -62,8 +62,8 @@
 ;	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 ;	trustExitCode = true
 
-[difftool "diffmerge"]
-	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
+;[difftool "diffmerge"]
+;	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
 [mergetool "diffmerge"]
 	cmd = diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 	trustExitCode = true
