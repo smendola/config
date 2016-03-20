@@ -303,7 +303,7 @@ alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
 {
-   diffuse "$@"
+   meld "$@"
 }
 
 
