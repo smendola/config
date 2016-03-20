@@ -94,3 +94,5 @@
 	insteadOf = git://
 [push]
 	default = simple
+[credential]
+	helper = cache
