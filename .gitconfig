@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;; Settings specific to me ;;;;;;;;;;;;
 [user]
-    email = @@EMAIL@@
-    name = @@FULL_NAME@@
+    email = smendola@gmail.com
+    name = Salvatore Mendola
 
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
@@ -48,47 +48,17 @@
 	workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
 	permission-reset = "!git diff -p | grep -E \"^(diff|old mode|new mode)\" | sed -e \"s/^old/NEW/;s/^new/old/;s/^NEW/new/\" | git apply"
 
-;;;; Git has built-in support for meld and diffuse
+;;;; Git has built-in support for diffmerge, meld and diffuse
 ;;;; no need to configure them as custom tools
-#[difftool "meld"]
-#	cmd = meld \"$LOCAL\" \"$REMOTE\"
-;[mergetool "meld"]
-;	cmd = meld  --auto-merge --oputput=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
-;	trustExitCode = true
-;
-;[difftool "diffuse"]
-;	cmd = diffuse \"$LOCAL\" \"$REMOTE\"
-;[mergetool "diffuse"]
-;	cmd = diffuse   \"$LOCAL\" \"$BASE\" \"$REMOTE\"
-;	trustExitCode = true
-
-;[difftool "diffmerge"]
-;	cmd = diffmerge \"$LOCAL\" \"$REMOTE\"
-[mergetool "diffmerge"]
-	cmd = diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
-	trustExitCode = true
-
-
-[difftool "winmerge"]
-	cmd = git-winmerge-wrapper.sh \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
-[mergetool "winmerge"]
-	cmd = git-winmerge-wrapper.sh \"$REMOTE\" \"$LOCAL\" \"$BASE\" \"$MERGED\"
-	trustExitCode = false
 
 [diff]
 	tool = meld
 [merge]
-	tool = diffuse
-
-#[remote "ng"]
-#	url = ssh://kando/studywork-ng.git
-#	fetch = master
+	tool = diffmerge
 
 [remote "config"]
 	url = https://smendola@bitbucket.org/smendola/config.git
 	fetch = master
-
-
 [gui]
 [url "https://"]
 	insteadOf = git://
