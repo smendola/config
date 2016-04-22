@@ -364,6 +364,8 @@ alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
 
+alias systemctl='sudo systemctl'
+alias rabbitmq-server='sudo rabbitmq-server'
 alias rabbitmqctl='sudo rabbitmqctl'
 alias rabbitctl='sudo rabbitctl'
 alias yum='sudo yum'
