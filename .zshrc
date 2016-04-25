@@ -67,7 +67,7 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
 
-export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export JAVA_HOME=/usr/lib/jvm/jre-openjdk
 export ANDROID_HOME=/opt/android-sdk-linux
 
 export WS=$(readlink -f ~/lf)
