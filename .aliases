@@ -342,6 +342,8 @@ function gc()
 	detach google-chrome "$@"
 }
 
+alias start=xdg-open
+
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
 alias unvpn='sudo pkill -INT openconnect'
 
