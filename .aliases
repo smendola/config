@@ -372,7 +372,7 @@ alias yum='sudo yum'
 
 
 alias sinopia='docker run --name sinopia -d -p 4873:4873 keyvanfatehi/sinopia:latest'
-alias backup-sinopia='docker run --volumes-from sinopia -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /opt/sinopia'
+alias backup-sinopia='docker run --volumes-from sinopia -v $(pwd):/backup ubuntu tar cvf /backup/sinopia-backup.tar /opt/sinopia'
 
 alias drun='sudo docker run -i -t --rm'
 alias docker-rm-exited='docker ps -a | grep Exited | cut -f1 -d' ' | xargs sudo docker rm -f'
