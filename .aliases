@@ -148,7 +148,7 @@ alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
 function syncdots()
 {
     (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
-    echo pull &&  dots pull origin master &&
+    echo pull &&  dots pull origin horizon &&
     echo push &&  dots push
 }
 
