@@ -149,7 +149,7 @@ function syncdots()
 {
     (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
     echo pull &&  dots pull origin horizon &&
-    echo push &&  dots push
+    echo push &&  dots push origin horizon
 }
 
 alias ride='(python -c "from robotide import main; main()"&)'
