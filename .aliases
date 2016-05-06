@@ -69,7 +69,7 @@ function ec() {
 alias e=subl
 alias s=subl
 
-alias deref=readlink
+alias deref=realpath
 
 # run commands, displaying the command at as the terminal's title,
 # e.g.
