@@ -1,0 +1,120 @@
+#!/bin/bash
+
+ar () {
+	accurev "$@"
+}
+
+run () {
+	local f=$1; shift
+	eval echo "$@"
+}
+
+mods () {
+	local opt
+	local els
+	case "$1" in
+		(-[ao]) opt=--outgoing
+			shift ;;
+		(-d) opt=-d
+			shift ;;
+		(*) opt=-m  ;;
+	esac
+	if [[ $# = 0 ]]
+	then
+		set .
+	fi
+	ar stat $opt -R -fl "${@}"
+}
+
+review () {
+	local ans yn f=$1
+	ar diff "$f" #2>/dev/null
+	while true; do
+		#echo "|"
+		read -p ">> Keep, Purge, Skip, Review, or Quit (k/p/s/r/q) [s]: " ans
+		case ${ans} in
+			(k*)
+			    ar keep $f;
+			    break
+			    ;;
+			(p*)
+				#echo "|"
+				read -p ">> Really purge ${f##*/}? (y/n) [n]: " yn
+				if [[ $yn = y* ]]; then
+					ar purge $f
+					break
+				fi
+			    ;;
+			(r*)
+				review "$f"
+				break
+				;;
+
+			(s* | "")
+			    echo "Skipped."
+			    return
+			    ;;
+
+			(q*)
+			    exit
+			    ;;
+		    (!*)
+		    	run "$f" ${ans#!}
+		    	;;
+			(*)
+			    echo "Huh?"
+			    ;;
+		esac
+	done
+}
+
+go () {
+	local f ans files=$(mods "$@")
+
+	if [[ ! -z "$files" ]]; then
+		echo '------------------------------------------------------'
+		echo "Reviewing:"
+		echo '------------------------------------------------------'
+		for f in $files; do echo "  - ${f}"; done
+		echo ""
+
+		for f in $files; do
+			echo '------------------------------------------------------'
+			echo ${f#/./}
+			echo '------------------------------------------------------'
+			while true; do
+				#echo "|"
+				read -p ">> Review, Skip, or Quit (r/s/q) [r]: " ans
+				case ${ans} in
+					(s*)
+					    echo "Skipped";
+					    break
+					    ;;
+					(r* | "")
+					    review "$f";
+					    break
+					    ;;
+
+				    (!*)
+				    	run "$f" ${ans#!}
+				    	break
+				    	;;
+					(q*)
+					    exit
+					    ;;
+					(*)
+					    echo "Huh?"
+					    ;;
+				esac
+			done
+			echo ""
+		done
+
+		echo "Finished."
+		echo "TODO: option to promote"
+	else
+		echo "No pending changes to review."
+	fi
+}
+
+go "$@"
