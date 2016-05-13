@@ -347,10 +347,10 @@ alias unvpn='sudo pkill -INT openconnect'
 
 alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
 
-#alias aptitude='sudo aptitude'
-#alias apt-get='sudo apt-get'
-#alias synaptic='sudo synaptic'
-alias docker='sudo docker'
+alias aptitude='sudo aptitude'
+alias apt-get='sudo apt-get'
+alias synaptic='sudo synaptic'
+
 alias service='sudo service'
 alias initctl='sudo initctl'
 alias bum='sudo bum'
