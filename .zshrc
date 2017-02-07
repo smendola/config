@@ -166,9 +166,7 @@ PATH=${PATH%:}
 unset GREP_OPTIONS
 unset GREP_COLOR
 
-
 # do this last, it will error out if path elems do not exist
-
 
 export SUDO_EDITOR=vim
 # Here's everyone's chance to add custom stuff

@@ -59,8 +59,6 @@
 [remote "config"]
 	url = https://smendola@bitbucket.org/smendola/config.git
 	fetch = master
-
-
 [gui]
 [url "https://"]
 	insteadOf = git://

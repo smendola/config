@@ -15,6 +15,19 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
+# AccuRev uses CRLF, which displays OK on screen but
+# does not work with pipelines
+#  e.g.
+#    AccuRev stat -m -fl | tr '\\' / | xargs less
+#  fails miserably, whereas this works as expected:
+#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less
+# Jury still out on whether to use this alias,
+#  or accurev bla -fx | xsl as a building block
+function ar()
+{
+    accurev "$@" | dos2unix | tr '\\' '/'
+}
+
 # This implementation replaces an older one that used while/cd..
 function upto()
 {
@@ -48,7 +61,7 @@ function ,() {
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
-  
+
   # Connect to running emacs, or start emacs as server and then connect
   emacsclient --create-frame --alternate-editor=  "$@"
 }
@@ -114,7 +127,7 @@ function check_x()
       return 1
     elif xset q > /dev/null
     then
-		return 0
+        return 0
     else
       echo "Problem with display?" 2>&1
       return 1
@@ -138,6 +151,10 @@ function syncdots()
     echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
+
+alias ride='(python -c "from robotide import main; main()"&)'
+# Use the whole width of the terminal for pybot output
+alias pybot='command pybot -W $(( $(tput cols) - 2 ))'
 
 # show all colors available with ansi escapes
 # show them both as BG and as FG
@@ -170,7 +187,7 @@ function xsl() {
         xmlstarlet sel --help | sed -n -e '/^Syntax/,/^There can be/p' | head -n -2
         return
     fi
-    
+
     local mode
     if [[ $1 = -X ]]
     then
@@ -198,7 +215,6 @@ function xpath() {
 
 alias tdc='tree -AdC -I target'
 alias tcf='tree -ACF --dirsfirst'
-
 
 ar()
 {
@@ -254,7 +270,7 @@ ws()
 {
     if [[ $# != 0 ]]
     then
-    
+
         if [[ $# = 2 && $1 = -p ]]
         then
             shift
@@ -265,12 +281,12 @@ ws()
             echo "*** Selecting workspace $1 for THIS SHELL ONLY."
             echo "    (Use -p to select persistently.)"
         fi
-        
+
         export WS=$(readlink -f "$1")
         # trailing / is important; see comment near WORKSPACE= in .zshrc
         export WORKSPACE=$(mix $WS/)
     fi
-    
+
     # zsh does something funky with prompt string %~
     # it's preferable to cd ~/ng over cd $WS if possible
     if [[ $(readlink -f ~/ng) = $WS ]]
@@ -316,9 +332,25 @@ backup-settings()
     , ls -lt settings.zip
 )}
 
+function acgui()
+{
+    detach /opt/AccuRev/bin/acgui
+}
+
+function gc()
+{
+	detach google-chrome "$@"
+}
+
+alias start=xdg-open
+
+alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
+alias unvpn='sudo pkill -INT openconnect'
+
+alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
+
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
-alias docker='sudo docker'
 alias synaptic='sudo synaptic'
 alias service='sudo service'
 alias initctl='sudo initctl'
@@ -331,6 +363,4 @@ alias ifquery='sudo ifquery'
 alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
-alias docker='sudo docker'
-alias srnm='systemctl restart NetworkManager'
 alias ufw='sudo ufw'
