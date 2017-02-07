@@ -130,8 +130,6 @@ function cls() {
   zle clear-screen ;# redisplays the prompt and current command line
 }
 
-bindkey '\xc2\x8c' cls ;# C-Shift-L
-bindkey '\e^L' cls ;# C-M-L
 
 histchars='!;#'
 
@@ -147,6 +145,9 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+# This needs to be set after oh-my-zsh is loaded, or else
+# it gets unset
+bindkey '^L' cls ;# C-Shift-L
 
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
 # oh-my-zsh sets LESS, so our own setting has to be way down here
