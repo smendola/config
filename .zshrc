@@ -67,82 +67,23 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
 
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export ANDROID_HOME=/opt/android-sdk-linux
 
-###############################################################
-### ENVIRONMENT VARIABLES
-### Adjust these values to your own environment; in particular:
-###  - CATALINA_HOME (where you installed tomcat)
-###  - CATALINA_BASE (probably ingore this)
-###  - JAVA_HOME
-###  - WS (where you git-clone'd studywork-ng) (Unix style path)
-###  - WORKSPACE (computed from $WS; absolute path, DOS style)
-### Recommend installing all dev tools/sdk's in a single place, e.g.
-### C:\tools, and point TOOLS_DIR to that dir. Put JDK there, as
-### well (e.g. $TOOLS_DIR/jdk7)
-###
-### Keep in mind:
-###   The less you customize this file, the easier life will be
-###   when it comes time to update/merge with latest version from
-###   master.
-###############################################################
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
-export CATALINA_HOME=/usr/share/tomcat7
-export CATALINA_BASE=~/tomcat-inst
-
-export APACHE_CONFDIR=~/apache-inst
-export APACHE_ENVVARS=~/apache-inst/envvars
-export KANDO=ssh://kando/studywork-ng.git
-#export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
-
-export WS=$(readlink -f ~/ng)
-# DO NOT CHANGE the following WORKSPACE= line; though you may change WS= line
-# The following line results in WORKSPACE being set to an absolute, DOS style
-# path, which Java and some other tools require.
-# The trailing slash is important! If ~ng is a Windows symbolic link
-# (try type mklink) and not a Cygwin symbolic link, then the absolutization
-# fails unless the trailing slash is there.
-export WORKSPACE=$(mix $WS/)
-export BUILD_NUMBER=SNAPSHOT
+export WS=$(readlink -f ~/lf)
 
 export LESSOPEN='|lesspipe.sh %s'
 # LESS has to be set after oh-my-zsh is loaded
 #export LESS=''
 
 #export TOOLS_DIR=~/tools
-export AC_DIFF_CLI='diffuse %1 %2'
+export AC_DIFF_CLI='meld %1 %2'
 
 ###############################################################
 ### PATH CONSTRUCTION
 ###############################################################
 
-PATH=$(unx "$JAVA_HOME/bin"):$PATH
-PATH=$(unx "$WORKSPACE/tools"):$PATH
-PATH=$CATALINA_HOME/bin:$CATALINA_BASE/bin:$JAVA_HOME/bin:$PATH
-
-
-# Add all ~/tools/*/bin to PATH
-#
-# NOTE: some of these packages may contain binaries
-#       whose names confict with cygwin utils, e.g.
-#       AccuRev has a "diff.exe"
-#       For this reason, it's safer to add these to the PATH
-#       *after* not in before, /bin
-#
-# for d in $TOOLS_DIR/*
-# do
-    # if [ -d $d/Scripts ]
-    # then
-        # PATH=$PATH:$d/Scripts
-    # fi
-    # if [ -d $d/bin ]
-    # then
-        # PATH=$PATH:$d/bin
-    # else
-        # PATH=$PATH:$d
-    # fi
-# done
-
-PATH=$PATH:/opt/AccuRev/bin
+PATH=$PATH:$JAVA_HOME/bin:/opt/node/bin:/opt/AccuRev/bin
 
 ###############################################################
 ### Stuff...
@@ -189,8 +130,6 @@ function cls() {
   zle clear-screen ;# redisplays the prompt and current command line
 }
 
-bindkey '\xc2\x8c' cls ;# C-Shift-L
-bindkey '\e^L' cls ;# C-M-L
 
 histchars='!;#'
 
@@ -206,9 +145,12 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+# This needs to be set after oh-my-zsh is loaded, or else
+# it gets unset
+bindkey '^L' cls ;# C-Shift-L
 
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
-# oh-my-zsh sets LESS, so our own setting has to be way down here
+# oh-my-zsh sets LESS, so our own settsing has to be way down here
 export LESS='-i -R -x4'
 
 # Strip out all references to "." in PATH, including :: and trailing : which
@@ -224,19 +166,9 @@ PATH=${PATH%:}
 unset GREP_OPTIONS
 unset GREP_COLOR
 
-my-server localhost:2080
 
 # do this last, it will error out if path elems do not exist
 
-# Allows e.g: cd access-control-implementation
-# from anywhre. try this:
-# $ cd ac<TAB>im<TAB>
-# or even try it without cd; try
-# $ a-c-im<TAB><ENTER>
-if readlink -e $WS > /dev/null
-then
-    cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
-fi
 
 export SUDO_EDITOR=vim
 # Here's everyone's chance to add custom stuff

@@ -1,6 +1,10 @@
 [global_config]
   enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
-  title_transmit_bg_color = "#476749"
+  title_transmit_fg_color = "#000000"
+  title_inactive_fg_color = "#dcdad5"
+  title_transmit_bg_color = "#dcdad5"
+  inactive_color_offset = 1.0
+  title_inactive_bg_color = "#2c2c2c"
 [keybindings]
   toggle_zoom = <Primary>Return
   new_window = <Alt>F2
@@ -14,11 +18,11 @@
     urgent_bell = True
     active_encodings = ANSI_X3.4-1968, UTF-8, ISO-8859-1
     cursor_color = "#ff0000"
-    foreground_color = "#c5c5c5"
+    foreground_color = "#eeeeee"
     backspace_binding = automatic
     scroll_on_output = False
     delete_binding = automatic
-    font = Consolas 10
+    font = Meslo LG S 10
     background_color = "#2c2c2c"
     scrollback_lines = 5000
 [layouts]
