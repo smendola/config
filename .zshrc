@@ -130,6 +130,10 @@ function cls() {
   zle clear-screen ;# redisplays the prompt and current command line
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f16958a87f0d17a3eeb449b9711797c8ca2a14d8
 histchars='!;#'
 
 ZSH=$HOME/.oh-my-zsh
@@ -144,13 +148,16 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+# This needs to be set after oh-my-zsh is loaded, or else
+# it gets unset
+bindkey '^L' cls ;# C-Shift-L
 
 # This needs to be set after oh-my-zsh is loaded, or else
 # it gets unset
 bindkey '^L' cls ;# C-Shift-L
 
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
-# oh-my-zsh sets LESS, so our own setting has to be way down here
+# oh-my-zsh sets LESS, so our own settsing has to be way down here
 export LESS='-i -R -x4'
 
 # Strip out all references to "." in PATH, including :: and trailing : which
