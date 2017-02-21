@@ -1,7 +1,9 @@
 [global_config]
-  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
+  handle_size = 0
+  title_hide_sizetext = True
   title_transmit_fg_color = "#000000"
   title_inactive_fg_color = "#dcdad5"
+  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   title_transmit_bg_color = "#dcdad5"
   inactive_color_offset = 1.0
   title_inactive_bg_color = "#2c2c2c"
