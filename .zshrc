@@ -42,7 +42,6 @@ PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
 # These need to be up here, for now; cygpath is in ~/bin
 PATH=~/bin:$PATH
-PATH=/vagrant/bin:$PATH
 
 ###############################################################
 ### SHELL SETTINGS
