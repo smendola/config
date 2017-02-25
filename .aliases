@@ -253,52 +253,6 @@ mods()
 #    fi
 #}
 
-
-list-ws()
-{
-    where=${1:-.}
-    find $where -maxdepth 1 -type d -name \*.git -prune -o -exec test -f {}/super/pom.xml \; -print -prune
-}
-
-# Usage:
-#   ws        - cd into workspace ($WS), and show the path
-#   ws DIR    - set WS=DIR, and cd into it; only for this shell
-#   ws -p DIR - set WS=DIR, persistently, that is re-link ~/ng -> DIR
-#               future shells will therefore use WS=DIR as well
-#               (but not any other shells that are already running!)
-ws()
-{
-    if [[ $# != 0 ]]
-    then
-
-        if [[ $# = 2 && $1 = -p ]]
-        then
-            shift
-            echo "Persisting switch to workspace $1 for this and new shells"
-            rm -f ~/ng
-            mklink "$1" ~/ng
-        else
-            echo "*** Selecting workspace $1 for THIS SHELL ONLY."
-            echo "    (Use -p to select persistently.)"
-        fi
-
-        export WS=$(readlink -f "$1")
-        # trailing / is important; see comment near WORKSPACE= in .zshrc
-        export WORKSPACE=$(mix $WS/)
-    fi
-
-    # zsh does something funky with prompt string %~
-    # it's preferable to cd ~/ng over cd $WS if possible
-    if [[ $(readlink -f ~/ng) = $WS ]]
-    then
-        cd ~/ng
-    else
-        cd "$WS"
-    fi
-    echo ${WS/$HOME/\~}
-}
-
-
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
