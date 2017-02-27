@@ -36,7 +36,7 @@ xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 SSH_CONNECTION=%B$SSH_CONNECTION%b
 Logged in as %B$USER@$HOST%b
 %B$TERM%b on %B%y%b
-DISPLAY=%F{$_x_status}$DISPLAY%f"
+DISPLAY=%F{$_x_status}${DISPLAY//\%/%%}%f"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
