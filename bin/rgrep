@@ -78,7 +78,8 @@ OPTIONS
       -l        (default) Print the names of files where {pattern} was
                 found.
 
-      -t        Do not look inside directories named target (for maven users).
+      -x DIR  Do not look inside directory DIR. May be repeated. May also
+                be DIR1,DIR2,...
 
       -n        Precede each detail line by its line number in the file
                 (first line is 1)
@@ -94,10 +95,10 @@ OPTIONS
                 it is not evaluated by the shell.
                 Multiple filename patterns may be specified and must
                 be separated by the \"|\" character. For example:
-                \"*abc|x*.sh|*xyz\".  
-                
-                As a special case, a pattern beginning with a dot and 
-                containing no wildcards is treated as having a leading 
+                \"*abc|x*.sh|*xyz\".
+
+                As a special case, a pattern beginning with a dot and
+                containing no wildcards is treated as having a leading
                 asterisk (e.g. .java means *.java)
 
  EXAMPLES
@@ -116,10 +117,15 @@ OPTIONS
 
 MODE="filename"        # Default is to just display file names, no details.
 GREPOPT=""
-FILT_TARGET_DIR=""
+EXCLUDE=""
+
+excl () {
+  echo "-name" $1 | sed 's/,/ -o -name /g'
+}
+
 
 # Process the options
-while getopts :cCdhiltn! OPTNAME
+while getopts :cCdhilx:n! OPTNAME
 do
     case $OPTNAME in
     \?) # Option not recognized
@@ -132,7 +138,7 @@ do
     h)    rgrep_help ;;
     l)    MODE=filename ;;
     !)    MODE=not ;;
-    t)    FILT_TARGET_DIR="-o -name target -prune" ;;
+    x)    EXCLUDE="$EXCLUDE -o \( $(excl $OPTARG) \) -prune" ;;
     *)    GREPOPT="$GREPOPT -$OPTNAME" ;;
     esac
 done
@@ -180,7 +186,7 @@ fi
 # ===========================================================================
 # PROCESSING
 
-eval find . -name .git -prune $FILT_TARGET_DIR -o -type f $FILESPEC -print | while read FILE
+eval find . -name .git -prune $EXCLUDE -o -type f $FILESPEC -print | while read FILE
 do
     case $MODE in
     not)    # Check for failure, then display the file
