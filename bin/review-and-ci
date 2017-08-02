@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source "${0%/*}/functions.sh"
+
 ar () {
 	accurev "$@"
 }
@@ -31,7 +33,9 @@ review () {
 	ar diff "$f" #2>/dev/null
 	while true; do
 		#echo "|"
-		read -p ">> Keep, Purge, Skip, Review, or Quit (k/p/s/r/q) [s]: " ans
+		read -n1 -p ">> Keep, Purge, Skip, Review, or Quit (k/p/s/r/q) [s]: " ans
+		echo ""
+
 		case ${ans} in
 			(k*)
 			    ar keep $f;
@@ -39,7 +43,9 @@ review () {
 			    ;;
 			(p*)
 				#echo "|"
-				read -p ">> Really purge ${f##*/}? (y/n) [n]: " yn
+				read -n1 -p ">> Really purge ${f##*/}? (y/n) [n]: " yn
+				echo ""
+
 				if [[ $yn = y* ]]; then
 					ar purge $f
 					break
@@ -62,7 +68,7 @@ review () {
 		    	run "$f" ${ans#!}
 		    	;;
 			(*)
-			    echo "Huh?"
+			    echo "$(style red)Huh?$(style normal)"
 			    ;;
 		esac
 	done
@@ -75,16 +81,18 @@ go () {
 		echo '------------------------------------------------------'
 		echo "Reviewing:"
 		echo '------------------------------------------------------'
-		for f in $files; do echo "  - ${f}"; done
+		for f in $files; do echo "  - $(style yellow)${f}$(style normal)"; done
 		echo ""
 
 		for f in $files; do
 			echo '------------------------------------------------------'
-			echo ${f#/./}
+			echo "$(style bold)${f#/./}$(style normal)"
 			echo '------------------------------------------------------'
 			while true; do
 				#echo "|"
-				read -p ">> Review, Skip, or Quit (r/s/q) [r]: " ans
+				read -n1 -p ">> Review, Skip, or Quit (r/s/q) [r]: " ans
+				echo ""
+
 				case ${ans} in
 					(s*)
 					    echo "Skipped";
@@ -100,17 +108,18 @@ go () {
 				    	break
 				    	;;
 					(q*)
+					    echo "Quit"
 					    exit
 					    ;;
 					(*)
-					    echo "Huh?"
+			    		echo "$(style red)Huh?$(style normal)"
 					    ;;
 				esac
 			done
 			echo ""
 		done
 
-		echo "Finished."
+		echo "$(style green)Finished.$(style normal)"
 		echo "TODO: option to promote"
 	else
 		echo "No pending changes to review."
