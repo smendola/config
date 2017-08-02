@@ -4,6 +4,8 @@ LISTING="green"
 CURRENT="yellow bold"
 OOPS="red"
 GOOD=green
+#BANNER="reverse white bg-black dim"
+BANNER=normal
 
 source "${0%/*}/functions.sh"
 
@@ -84,9 +86,10 @@ main () {
 	local f ans files=$(mods "$@")
 
 	if [[ ! -z "$files" ]]; then
-		echo '------------------------------------------------------'
-		echo "Reviewing:"
-		echo '------------------------------------------------------'
+		echo -n $(style $BANNER)
+		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+		echo "$(style $BANNER)Reviewing:                                            $(style normal)"
+		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
 		for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
 		echo ""
 
