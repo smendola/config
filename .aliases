@@ -9,7 +9,6 @@ alias cls='tput reset'
 # The above doesn't work on PuTTY (at least not with TERM=xterm or TERM=xterm-256color)
 # the following does work
 alias cls="clear; printf '\033[3J'"
-
 function bd () {
     cd "$OLDPWD"
 }
@@ -18,6 +17,7 @@ alias grep='grep --color=auto'
 alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
+
 
 # This implementation replaces an older one that used while/cd..
 function upto()
@@ -116,7 +116,7 @@ function jgrep ()
     local where="$2";
     test -z "$where" && where=.;
     if [ -d "$where" ]; then
-        /bin/find "$where" -name '*.jar' -exec sh -c "jar tf \$(dos {} ) | grep -q $what" \; -print;
+        find "$where" -name '*.jar' -exec sh -c "jar tf {}  | grep -q $what" \; -print;
     elif [ -e "$where" ]; then
         jar tf "$where" | grep "$what";
     else
@@ -150,12 +150,13 @@ function check_x()
       return 1
     elif xset q > /dev/null
     then
-		return 0
+        return 0
     else
       echo "Problem with display?" 2>&1
       return 1
     fi
 }
+
 function sts() {
    check_x && detach /opt/sts-bundle/sts-*/STS
 }
@@ -357,10 +358,8 @@ function merge_ini() {
         $HOME/install.ini-common-ancestor.ini \
         $WS/tools/sw-ng-installer/setup/install.ini
 }
-
 alias tdc='tree -AdC -I target'
 alias tcf='tree -ACF --dirsfirst'
-
 
 ar()
 {
@@ -398,7 +397,6 @@ mods()
 #        accurev stat -m -fx | xsl -m //element -v @location -n
 #    fi
 #}
-
 
 list-ws()
 {
@@ -458,7 +456,7 @@ mark()
         return 1
     fi
     # $*, NOT $@; urlencode needs one param
-    api1 GET /system/marker/$(urlencode "$*") -o /dev/null -uadmin:password1X!
+    api GET /system/marker/$(urlencode "$*") -o /dev/null -uadmin:password1X!
 }
 
 extract-log-range()
@@ -469,15 +467,15 @@ extract-log-range()
     sed -n -e "/MARKER: $start_re/,/MARKER: $end_re/IP" "$log_file"
 }
 
-api1-login()
+api-login()
 {
     local un=${1:-admin}
     local pw=${2:-password1X!}
-    api1 post login --data-urlencode "username=$un" --data-urlencode "password=$pw"
+    api post login --data-urlencode "username=$un" --data-urlencode "password=$pw"
 }
 
 # WIP will likely evolve incompatibly
-api1()
+api()
 {
     if [[ $# < 2 ]]
     then
@@ -505,10 +503,10 @@ api1()
         # --get overrides the override :)
         extra_get="--get"
     fi
+    # TODO check response headers; pipe response through appropriate beautifier
     curl -c ~/.curl_cookies -b ~/.curl_cookies -s -X $verb $extra_get --url $API1/$resource "$@"
     echo ""
 }
-
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
@@ -532,13 +530,13 @@ backup-settings()
     cd;
     /bin/rm -f settings.zip;
     zip -q -r settings.zip \
-        .eclipse workspace-sts/.metadata \
-        .custom.sh .config .kde/share/config .gtkrc-2.0 \
-        -x '**/google-chrome/**' \
-        -x '**/sublime-text-3/Backup/**' \
-        -x '**/sublime-text-3/Cache/**' \
-        -x '**/sublime-text-3/Packages/User/Package Control.cache/**' \
-        -x '**/sublime-text-3/Index/**'
+        .accurev .custom.sh .config .kde/share/config .gtkrc-2.0 \
+        .robotframework/ride \
+        -x '.config/google-chrome/**' \
+        -x '.config/sublime-text-3/Backup/**' \
+        -x '.config/sublime-text-3/Cache/**' \
+        -x '.config/sublime-text-3/Packages/User/Package Control.cache/**' \
+        -x '.config/sublime-text-3/Index/**'
     , ls -lt settings.zip
 )}
 
@@ -553,6 +551,7 @@ function gc()
 }
 
 alias start=xdg-open
+
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
 alias unvpn='sudo pkill -INT openconnect'
 
