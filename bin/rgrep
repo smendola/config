@@ -1,215 +1,34 @@
 #!/bin/bash
-#!/usr/bin/ksh
-#
-# rgrep
-#
-# $Id: rgrep,v 1.3 2002/03/28 23:21:48 root Init $
-#
-# Search for a specified string, recursively down a whole directory tree.
-# This script is written to be "sh" (bourne shell) compatible, just in case.
-#
-# MODIFICATION LOG (most recent first)
-# DATE      WHO DESCRIPTION
-# ========= === =============================================================
-# 02-Dec-14 SM  Special case pattern .whatever -> *.whatever
-#               Add -t option to prune target/ dirs
-# 09-Apr-13 SM  Fix a quoting problem; rgrep '*.xml' would do rgrep pom.xml
-#               despite quotes. Also, skip .git/
-# 05-Aug-09 KRH Modified to run on AIX.
-# 20-Sep-05 KRH Minor update to run under bash.
-# 10-Oct-01 KRH Quote the found filename to protect against weird file names.
-# 19-Jun-01 KRH Corrected action on -c. Added -C. Removed -s. Added ability
-#               to specify multiple filename patterns.
-# 04-May-01 KRH Added "eval" to correct error when {filespec} was specified.
-# 18-May-00 KRH Portability project.
-# 04-Nov-99 KRH Revised to use egrep and only a logical subset of its options
-#               Added option -!.
-# 09-Apr-97 KRH Corrected help function.
-# 28-Aug-96 KRH Resolved problems with patterns with embedded spaces, unquoted
-#               filespec, others.
-# 25-Jun-96 KRH Allow file specification to limit search. Improved parsing.
-# 26-Jan-96 KRH Modified to allow specification of all grep options.
-# 18-Jan-96 KRH Rewritten to simplify and improve.
-# 1991      KRH Initial creation.
-# ========= === =============================================================
-
-# ===========================================================================
-# function rgrep_help
-function rgrep_help
-{
- echo "\
-rgrep
-
-NAME
-      rgrep - search recursively down a tree.
-
-SYNOPSIS
-      rgrep [-cCdhin!] [{searchpattern}] [\"{filepattern}\"]
-
-DESCRIPTION
-      Search recursively down a directory tree for {pattern}. Display the
-      names of files where {pattern} was found.
-
-      The search can be limited by entering a filename pattern, but such a
-      specification is optional.
-
-      By default, rgrep displays only the filename and not the actual matching
-      lines where the string was found.  This is the opposite of standard grep.
-      You can override this behavior by specifying the '-d' option.
-
-      Options -c, -C, -d, -l and -! are mutually exclusive. The last one
-      specified takes precedence.
-
-      Note that this utility will NEVER search in the /proc directory because
-      doing so has been found to hang the system. Do not try.
-
-OPTIONS
-      -c        Print only a count of the lines that contain {pattern}.
-
-      -C        Same as -c except information is displayed only if
-                count > zero.
-
-      -d        Display found strings in addition to file names.
-
-      -h        Display help information.
-
-      -i        Ignore case during comparisons.
-
-      -l        (default) Print the names of files where {pattern} was
-                found.
-
-      -x DIR  Do not look inside directory DIR. May be repeated. May also
-                be DIR1,DIR2,...
-
-      -n        Precede each detail line by its line number in the file
-                (first line is 1)
-
-      -!        NOT. List files that DON'T have the string in them.
-
-      {pattern} Pattern to look for.  All \"egrep\" style patterns can
-                be used.
-
-      \"{filepattern}\"
-                Optional filename specification to limit the search.
-                This file specification must be quoted to ensure that
-                it is not evaluated by the shell.
-                Multiple filename patterns may be specified and must
-                be separated by the \"|\" character. For example:
-                \"*abc|x*.sh|*xyz\".
-
-                As a special case, a pattern beginning with a dot and
-                containing no wildcards is treated as having a leading
-                asterisk (e.g. .java means *.java)
-
- EXAMPLES
-      Search for the pattern \"not known\" in all files in the directory tree.
-        rgrep \"not known\"
-
-      Search for the pattern \"union\" or the pattern \"minus\" (case
-      insensitive) in all files with the extension \"sql\" or \"pls\".
-        rgrep -i \"union|minus\" \"*.sql|*.pls\"
-"
-    exit
-}
-
-# ===========================================================================
-# INITIALIZATION
-
-MODE="filename"        # Default is to just display file names, no details.
-GREPOPT=""
-EXCLUDE=""
 
 excl () {
-  echo "-name" $1 | sed 's/,/ -o -name /g'
+  echo "--exclude-dir" $1 | sed 's/,/ --exclude-dir /g'
 }
 
+SHOW=-l
 
 # Process the options
-while getopts :cCdhilx:n! OPTNAME
+while getopts :x:dc! OPTNAME
 do
     case $OPTNAME in
     \?) # Option not recognized
-        echo "rgrep: Unknown option $OPTARG" >&2
-        exit 1;;
+        # GREPOPT="$GREPOPT -$OPTNAME" ;;
+        # echo "rgrep: Unknown option $OPTARG" >&2
+        # exit 1;;
+        ;;
     # Regular options:
-    c)    MODE=count ;;
-    C)    MODE=COUNT ;;
-    d)    MODE=detail ;;
-    h)    rgrep_help ;;
-    l)    MODE=filename ;;
-    !)    MODE=not ;;
-    x)    EXCLUDE="$EXCLUDE -o \( $(excl $OPTARG) \) -prune" ;;
+    x)    EXCLUDE="$EXCLUDE $(excl $OPTARG)" ;;
+    d)    SHOW= ;;
+    c)    SHOW=-c ;;
     *)    GREPOPT="$GREPOPT -$OPTNAME" ;;
     esac
 done
 shift $(( $OPTIND - 1 ))
 
-# ===========================================================================
-# VALIDATION
-
-# The first remaining parameter must exist and must be the search pattern.
-if [[ $# -eq 0 ]]
+INCLUDE=
+if [[ ! -z $2 ]]
 then
-    echo "rgrep: missing search pattern."
-    exit 1
-fi
-PATTERN="$1"
-shift
-
-# Any remaining parameter is a filespec (like '*.sql'). There must be only one.
-# More than one means the user forgot to quote the filespec and it was expanded
-# by the shell.
-FILESPEC=""
-if [[ $# -gt 1 ]]
-then
-    echo "ERROR: rgrep: too many parameters (filespec not quoted?)" >&2
-    exit 1
-
-elif [[ $# -eq 1 ]]
-then
-    OR=""
-    # Allow for multiple filename patterns, reformat for "find".
-    for ELEMENT in "$( echo "$1" | sed 's/|/ /g;' )"
-    do
-        if [[ $ELEMENT = .*  && ! $ELEMENT = *\** ]]
-        then
-            #echo "$ELEMENT -> *$ELEMENT" 1>&2
-            ELEMENT=*$ELEMENT
-        fi
-        FILESPEC="${FILESPEC}${OR}-name '$ELEMENT'"
-        OR=" -o "
-    done
-    # Or condition applies only to filespec, isolate it
-    FILESPEC="\\( $FILESPEC \\)"
+    INCLUDE="--include ${2}"
 fi
 
-# ===========================================================================
-# PROCESSING
-
-eval find . -name .git -prune $EXCLUDE -o -type f $FILESPEC -print | while read FILE
-do
-    case $MODE in
-    not)    # Check for failure, then display the file
-            egrep $GREPOPT "$PATTERN" "$FILE" >/dev/null || echo "$FILE"
-            ;;
-    count)  # egrep doesn't display the filename. We have to.
-            echo -n "$FILE:"
-            egrep -c $GREPOPT "$PATTERN" "$FILE"
-            ;;
-    COUNT)  # Only display something if count > zero
-            COUNT=$( egrep -c $GREPOPT "$PATTERN" "$FILE" )
-            [ $COUNT -gt 0 ] && echo "$FILE:$COUNT"
-            ;;
-    detail) # Force display of filename on detail by using /dev/null
-            # Protect against binary files by using "cat"
-            egrep $GREPOPT "$PATTERN" "$FILE" /dev/null | cat -v
-            ;;
-    filename)
-            # Suppress displaying the content
-            egrep -l $GREPOPT "$PATTERN" "$FILE"
-            ;;
-    esac
-done
-#
-# End of rgrep
-#
+set -x
+/usr/bin/rgrep --color=AUTO $EXCLUDE $INCLUDE "$1" $SHOW $GREPOPT .
