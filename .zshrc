@@ -10,22 +10,22 @@ then
    TERM=$TERM-256color
 fi
 
-if [[ -z $DISPLAY ]]
-then
-# If X11 display can be reached directly, do it that way
-# in preference to display tunneled over SSH; more efficient.
-_REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
-# the nc -w1 avoids long delay if X11 is not running
-if [ ! -z $SSH_CLIENT ] &&
-   nc -w1 $_REMOTE_IP 6000 < /dev/null &&
-   xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
-then
-  export DISPLAY=$_REMOTE_IP:0
-else
-  export DISPLAY=${DISPLAY:-:0}
-fi
+if [[ -z $DISPLAY ]]; then
+    # If X11 display can be reached directly, do it that way
+    # in preference to display tunneled over SSH; more efficient.
+    _REMOTE_IP=${SSH_CLIENT%% *}
+    # the nc -w1 avoids long delay if X11 is not running
+    if [[ ! -z $SSH_CLIENT ]] &&
+       nc -w1 $_REMOTE_IP 6000 < /dev/null &&
+       xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
+    then
+      export DISPLAY=$_REMOTE_IP:0
+    else
+      export DISPLAY=${DISPLAY:-:0}
+    fi
 fi
 xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
 # HOST=%B$HOST%b
@@ -149,7 +149,7 @@ PATH=$PATH:/opt/AccuRev/bin
 ###############################################################
 ### Stuff...
 ###############################################################
-  
+
 setopt extended_glob
 
 # Set name of the theme to load.
