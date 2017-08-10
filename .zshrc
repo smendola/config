@@ -10,20 +10,22 @@ then
    TERM=$TERM-256color
 fi
 
-# If X11 display can be reached directly, do it that way
-# in preference to display tunneled over SSH; more efficient.
-_REMOTE_IP=$(eval set $SSH_CLIENT; echo $1)
-# the nc -w1 avoids long delay if X11 is not running
-if [ ! -z $SSH_CLIENT ] &&
-   nc -w1 $_REMOTE_IP 6000 < /dev/null &&
-   xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
-then
-  export DISPLAY=$_REMOTE_IP:0
-else
-  export DISPLAY=${DISPLAY:-:0}
+if [[ -z $DISPLAY ]]; then
+    # If X11 display can be reached directly, do it that way
+    # in preference to display tunneled over SSH; more efficient.
+    _REMOTE_IP=${SSH_CLIENT%% *}
+    # the nc -w1 avoids long delay if X11 is not running
+    if [[ ! -z $SSH_CLIENT ]] &&
+       nc -w1 $_REMOTE_IP 6000 < /dev/null &&
+       xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
+    then
+      export DISPLAY=$_REMOTE_IP:0
+    else
+      export DISPLAY=${DISPLAY:-:0}
+    fi
 fi
-
 xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
 # HOST=%B$HOST%b
@@ -36,7 +38,7 @@ xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 SSH_CONNECTION=%B$SSH_CONNECTION%b
 Logged in as %B$USER@$HOST%b
 %B$TERM%b on %B%y%b
-DISPLAY=%F{$_x_status}$DISPLAY%f"
+DISPLAY=%F{$_x_status}${DISPLAY//\%/%%}%f"
 
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
@@ -87,7 +89,7 @@ PATH=$PATH:$JAVA_HOME/bin:/opt/node/bin:/opt/AccuRev/bin
 ###############################################################
 ### Stuff...
 ###############################################################
-  
+
 setopt extended_glob
 
 # Set name of the theme to load.

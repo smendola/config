@@ -1,5 +1,14 @@
 #!/bin/bash
 
+LISTING="green"
+CURRENT="yellow bold"
+OOPS="red"
+GOOD=green
+#BANNER="reverse white bg-black dim"
+BANNER=normal
+
+source "${0%/*}/functions.sh"
+
 ar () {
 	accurev "$@"
 }
@@ -31,90 +40,94 @@ review () {
 	ar diff "$f" #2>/dev/null
 	while true; do
 		#echo "|"
-		read -p ">> Keep, Purge, Skip, Review, or Quit (k/p/s/r/q) [s]: " ans
+		read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q) [s]: " ans
+		echo ""
+
 		case ${ans} in
-			(k*)
+			(k)
 			    ar keep $f;
 			    break
 			    ;;
-			(p*)
+			(R)
 				#echo "|"
-				read -p ">> Really purge ${f##*/}? (y/n) [n]: " yn
+				read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
+				echo ""
+
 				if [[ $yn = y* ]]; then
-					ar purge $f
+					ar pop -O $f
 					break
 				fi
 			    ;;
-			(r*)
+			(r|d)
 				review "$f"
 				break
 				;;
 
-			(s* | "")
+			(s | "")
 			    echo "Skipped."
 			    return
 			    ;;
 
-			(q*)
+			(q)
 			    exit
 			    ;;
 		    (!*)
-		    	run "$f" ${ans#!}
+		        read ans
+		    	run "$f" ${ans#}
 		    	;;
 			(*)
-			    echo "Huh?"
+			    echo "$(style $OOPS)Huh?$(style normal)"
 			    ;;
 		esac
 	done
 }
 
-go () {
+main () {
 	local f ans files=$(mods "$@")
 
 	if [[ ! -z "$files" ]]; then
-		echo '------------------------------------------------------'
-		echo "Reviewing:"
-		echo '------------------------------------------------------'
-		for f in $files; do echo "  - ${f}"; done
+		echo -n $(style $BANNER)
+		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+		echo "$(style $BANNER)Reviewing:                                            $(style normal)"
+		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+		for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
 		echo ""
 
 		for f in $files; do
 			echo '------------------------------------------------------'
-			echo ${f#/./}
+			echo "$(style $CURRENT)${f#/./}$(style normal)"
 			echo '------------------------------------------------------'
 			while true; do
 				#echo "|"
-				read -p ">> Review, Skip, or Quit (r/s/q) [r]: " ans
+				read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
+				echo ""
+
 				case ${ans} in
-					(s*)
+					(s)
 					    echo "Skipped";
 					    break
 					    ;;
-					(r* | "")
+					(r|d|"")
 					    review "$f";
 					    break
 					    ;;
-
-				    (!*)
-				    	run "$f" ${ans#!}
-				    	break
-				    	;;
-					(q*)
+					(q)
+					    echo "Quit"
 					    exit
 					    ;;
 					(*)
-					    echo "Huh?"
+			    		echo "$(style $OOPS)Huh?$(style normal)"
 					    ;;
 				esac
 			done
 			echo ""
 		done
 
-		echo "Finished."
+		echo "$(style $GOOD)Finished.$(style normal)"
 		echo "TODO: option to promote"
 	else
 		echo "No pending changes to review."
 	fi
 }
 
-go "$@"
+main "$@"

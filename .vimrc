@@ -16,3 +16,5 @@ if &t_Co > 1
    colorscheme zenburn
 endif
 
+execute pathogen#infect()
+
