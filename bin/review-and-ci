@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
+
 LISTING="green"
 CURRENT="yellow bold"
 OOPS="red"
@@ -8,6 +10,17 @@ GOOD=green
 BANNER=normal
 
 source "${0%/*}/functions.sh"
+
+
+while [[ $1 = -* ]]
+do
+    case $1 in
+        (-c|--comment) shift; COMMENT=$1;;
+        (*) fail "Unknown option: $1" ;;
+    esac
+    shift
+done
+
 
 ar () {
 	accurev "$@"
@@ -45,7 +58,11 @@ review () {
 
 		case ${ans} in
 			(k)
-			    ar keep $f;
+			    if [[ -z $COMMENT ]]; then
+			    	ar keep $f;
+			    else
+			    	ar keep -c "${COMMENT}" $f;
+			    fi
 			    break
 			    ;;
 			(R)

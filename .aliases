@@ -344,3 +344,7 @@ alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
+
+alias npm-g='sudo npm -g'
+alias pnpm-g='sudo pnpm -g'
+
