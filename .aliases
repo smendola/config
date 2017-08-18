@@ -236,24 +236,11 @@ mods()
     ar stat $opt -R -fl "${@}"
 }
 
-# Or, how about this:
-# downside is that if ar stat errors out, err msg gets parsed as xml
-#mods()
-#{
-#    if [[ $1 = -a ]]
-#    then
-#        accurev stat --outgoing -fx | xsl -m //element -v @location -n
-#    else
-#        accurev stat -m -fx | xsl -m //element -v @location -n
-#    fi
-#}
-
 list-ws()
 {
     where=${1:-.}
     find $where -maxdepth 1 -type d -name \*.git -prune -o -exec test -f {}/super/pom.xml \; -print -prune
 }
-
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
