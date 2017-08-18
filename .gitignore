@@ -2,6 +2,7 @@
 *.bak
 *~
 #*#
+.gitk
 !/.zshrc
 !/.zshrc.aliases
 !/.gitignore
