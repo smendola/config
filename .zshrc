@@ -68,6 +68,7 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
+[ -f ~/.aliases.ng ] && . ~/.aliases.ng
 
 
 ###############################################################
