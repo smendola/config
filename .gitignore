@@ -2,6 +2,7 @@
 *.bak
 *~
 #*#
+.gitk
 !/.zshrc
 !/.zshrc.aliases
 !/.gitignore
@@ -12,6 +13,7 @@
 /.ssh/authorized_keys
 !/.vim
 !/.vimrc
+.vim/.netrwhist
 !/.minttyrc
 !/.ffmpeg
 !/.emacs

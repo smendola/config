@@ -6,6 +6,9 @@
 # Clears the scrollback buffer, not just the current screen
 alias cls='tput reset'
 
+# The above doesn't work on PuTTY (at least not with TERM=xterm or TERM=xterm-256color)
+# the following does work
+alias cls="clear; printf '\033[3J'"
 function bd () {
     cd "$OLDPWD"
 }
@@ -15,18 +18,6 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
-# AccuRev uses CRLF, which displays OK on screen but
-# does not work with pipelines
-#  e.g.
-#    AccuRev stat -m -fl | tr '\\' / | xargs less
-#  fails miserably, whereas this works as expected:
-#     AccuRev stat -m -fl |dos2unix| tr '\\' / | xargs less
-# Jury still out on whether to use this alias,
-#  or accurev bla -fx | xsl as a building block
-function ar()
-{
-    accurev "$@" | dos2unix | tr '\\' '/'
-}
 
 # This implementation replaces an older one that used while/cd..
 function upto()
@@ -119,6 +110,7 @@ function 1,000 ()
     sed -e ': start' -e 's/\( \?\)\( \?\)\([0-9]\{1,\}\)\([0-9]\{3\}\)/\1\3,\4/g' -e 't start'
 }
 
+
 function check_x()
 {
     if [ -z "$DISPLAY" ]
@@ -131,6 +123,45 @@ function check_x()
     else
       echo "Problem with display?" 2>&1
       return 1
+    fi
+}
+
+
+function fixtty() {
+    stty sane erase ^H
+}
+
+function jenkins() {
+    (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
+}
+
+type stty > /dev/null 2>&1 || stty() {
+    echo -n
+}
+
+function tomcat() {
+    shutdown.sh > /dev/null 2>&1
+    sleep 2
+    /bin/rm $CATALINA_BASE/logs/*
+    title Tomcat Tomcat
+    catalina.sh jpda run 2>&1 | sed -u '/^SLF4/ d' | tee $CATALINA_BASE/logs/CONSOLE_OUT
+}
+
+# Cause an annotation entry to show up in Fiddler
+function anno() {
+    anno=$(echo $* | tr ' ' '_')
+    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
+}
+
+function clear-m2() {
+    if [[ $# > 0 ]]
+    then
+        for pkg in "$@"
+        do
+             command rm -rfv ~/.m2/repository/${pkg//.//}
+        done
+    else
+        command rm -rfv ~/.m2/repository/
     fi
 }
 
@@ -153,6 +184,7 @@ function syncdots()
 }
 
 alias ride='(python -c "from robotide import main; main()"&)'
+alias rebot='rebot.bat'
 # Use the whole width of the terminal for pybot output
 alias pybot='command pybot -W $(( $(tput cols) - 2 ))'
 
@@ -241,17 +273,11 @@ mods()
     ar stat $opt -R -fl "${@}"
 }
 
-# Or, how about this:
-# downside is that if ar stat errors out, err msg gets parsed as xml
-#mods()
-#{
-#    if [[ $1 = -a ]]
-#    then
-#        accurev stat --outgoing -fx | xsl -m //element -v @location -n
-#    else
-#        accurev stat -m -fx | xsl -m //element -v @location -n
-#    fi
-#}
+list-ws()
+{
+    where=${1:-.}
+    find $where -maxdepth 1 -type d -name \*.git -prune -o -exec test -f {}/super/pom.xml \; -print -prune
+}
 
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
