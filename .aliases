@@ -110,7 +110,6 @@ function 1,000 ()
     sed -e ': start' -e 's/\( \?\)\( \?\)\([0-9]\{1,\}\)\([0-9]\{3\}\)/\1\3,\4/g' -e 't start'
 }
 
-
 function check_x()
 {
     if [ -z "$DISPLAY" ]
@@ -126,43 +125,12 @@ function check_x()
     fi
 }
 
-
 function fixtty() {
     stty sane erase ^H
 }
 
-function jenkins() {
-    (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
-}
-
 type stty > /dev/null 2>&1 || stty() {
     echo -n
-}
-
-function tomcat() {
-    shutdown.sh > /dev/null 2>&1
-    sleep 2
-    /bin/rm $CATALINA_BASE/logs/*
-    title Tomcat Tomcat
-    catalina.sh jpda run 2>&1 | sed -u '/^SLF4/ d' | tee $CATALINA_BASE/logs/CONSOLE_OUT
-}
-
-# Cause an annotation entry to show up in Fiddler
-function anno() {
-    anno=$(echo $* | tr ' ' '_')
-    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
-}
-
-function clear-m2() {
-    if [[ $# > 0 ]]
-    then
-        for pkg in "$@"
-        do
-             command rm -rfv ~/.m2/repository/${pkg//.//}
-        done
-    else
-        command rm -rfv ~/.m2/repository/
-    fi
 }
 
 # these pertain to version management of this and other cygwin environment
@@ -182,11 +150,6 @@ function syncdots()
     echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
-
-alias ride='(python -c "from robotide import main; main()"&)'
-alias rebot='rebot.bat'
-# Use the whole width of the terminal for pybot output
-alias pybot='command pybot -W $(( $(tput cols) - 2 ))'
 
 # show all colors available with ansi escapes
 # show them both as BG and as FG

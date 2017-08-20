@@ -68,6 +68,8 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
+[ -f ~/.aliases.ng ] && . ~/.aliases.ng
+
 
 export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
@@ -188,6 +190,10 @@ unset GREP_COLOR
 # do this last, it will error out if path elems do not exist
 
 export SUDO_EDITOR=vim
+
+# NG-specific settings
+[ -f ~/.zshrc.ng ] && . ~/.zshrc.ng
+
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]
 then
