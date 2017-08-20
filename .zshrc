@@ -189,16 +189,6 @@ unset GREP_COLOR
 
 # do this last, it will error out if path elems do not exist
 
-# Allows e.g: cd access-control-implementation
-# from anywhre. try this:
-# $ cd ac<TAB>im<TAB>
-# or even try it without cd; try
-# $ a-c-im<TAB><ENTER>
-if readlink -e $WS > /dev/null
-then
-    cdpath=($WS/test/robotframework/src/main $WS/services/* $WS/api/src/main/java/com/phtcorp/sw)
-fi
-
 export SUDO_EDITOR=vim
 
 # NG-specific settings
