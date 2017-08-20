@@ -1,0 +1,222 @@
+function jgrep ()
+{
+    local what="$(echo "$1" | tr / .)";
+    local where="$2";
+    test -z "$where" && where=.;
+    if [ -d "$where" ]; then
+        find "$where" -name '*.jar' -exec sh -c "jar tf {}  | grep -q $what" \; -print;
+    elif [ -e "$where" ]; then
+        jar tf "$where" | grep "$what";
+    else
+        echo "jgrep: No such file or directory: $where"
+    fi
+}
+
+function unx() {
+    # e.g. /c/Program Files
+    cygpath -ua "$1"
+}
+function dos() {
+    # e.g. C:\PROGRA~1
+    cygpath -da "$1"
+}
+function win() {
+    cygpath -wa "$1"
+}
+function mix() {
+    # e.g. C:/Program Files
+    cygpath -ma "$1"
+}
+
+alias jmeter='(cd $TOOLS_DIR/jmeter/bin; nohup ./jmeter.sh &)'
+
+function sts() {
+   check_x && detach /opt/sts-bundle/sts-*/STS
+}
+
+function mqst() {
+    mvn -q -DskipTests "$@"
+}
+function mqsti() {
+    mqst install "$@"
+}
+function ntd() {
+  $WS/tools/deploy.sh "$@"
+}
+function nti() {
+  $WS/tools/install-ng.sh "$@"
+}
+
+
+function skysync-testenv () {
+    RSYNC_CONNECT_PROG='nc localhost 11873' rsync --compress-level=9 -av $@
+}
+
+function skysync-apphost () {
+    RSYNC_CONNECT_PROG='nc localhost 10873' rsync --compress-level=9 -av $@
+}
+
+function skysuite()
+{
+  (
+    cd $WS/test/robotframework/src/main/suite
+    skysync-testenv \
+        --exclude=Configuration.txt \
+        --exclude='*.pyc' \
+        --exclude='*.bak' \
+        ./ ::suite/
+  )
+}
+
+function skylogs () {
+    mkdir -p ~/Robot_Logs
+    if [[ $1 = -s ]]
+    then
+        skysync-testenv "skytap::suite/results/*.png" ~/Robot_Logs
+        shift
+    fi
+
+    skysync-testenv \
+        "skytap::suite/pybot-args.txt" \
+        "skytap::suite/results/output.xml" \
+        "skytap::suite/results/log.html" \
+        "skytap::suite/results/report.html" \
+        ~/Robot_Logs &&
+    start ~/Robot_Logs/report.html
+}
+
+# Run a Java program in debug mode, so as to be attached in debugger
+# Usage: jpda [-p PORTNUM] [-s] other java args...
+#       -p PORTNUM  use PORTNUM, default 9000
+#       -s          suspend and and wait for debugger to connect
+# Example: jpda -s com.my.Code arg arg
+function jpda() {
+    local port=9000
+    local suspend=n
+
+    while getopts :sp: OPTNAME "$@"
+    do
+        case $OPTNAME in
+         p) port=$OPTARG;;
+         s) suspend=y;;
+         *) break;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+
+    java -Xdebug -Xrunjdwp:"server=y,transport=dt_socket,address=$port,suspend=$suspend" "$@"
+}
+
+function merge_ini() {
+    diffmerge --merge --result $HOME/ng-install.ini --title2 MERGED \
+        $HOME/ng-install.ini \
+        $HOME/install.ini-common-ancestor.ini \
+        $WS/tools/sw-ng-installer/setup/install.ini
+}
+
+
+# Usage:
+#   ws        - cd into workspace ($WS), and show the path
+#   ws DIR    - set WS=DIR, and cd into it; only for this shell
+#   ws -p DIR - set WS=DIR, persistently, that is re-link ~/ng -> DIR
+#               future shells will therefore use WS=DIR as well
+#               (but not any other shells that are already running!)
+ws()
+{
+    if [[ $# != 0 ]]
+    then
+
+        if [[ $# = 2 && $1 = -p ]]
+        then
+            shift
+            echo "Persisting switch to workspace $1 for this and new shells"
+            rm -f ~/ng
+            mklink "$1" ~/ng
+        else
+            echo "*** Selecting workspace $1 for THIS SHELL ONLY."
+            echo "    (Use -p to select persistently.)"
+        fi
+
+        export WS=$(readlink -f "$1")
+        # trailing / is important; see comment near WORKSPACE= in .zshrc
+        export WORKSPACE=$(mix $WS/)
+    fi
+
+    # zsh does something funky with prompt string %~
+    # it's preferable to cd ~/ng over cd $WS if possible
+    if [[ $(readlink -f ~/ng) = $WS ]]
+    then
+        cd ~/ng
+    else
+        cd "$WS"
+    fi
+    echo ${WS/$HOME/\~}
+}
+
+my-server()
+{
+    MY_NG_SRV=${1:-localhost:2080}
+    API1=http://$MY_NG_SRV/api/v1
+}
+
+mark()
+{
+    if [[ $# = 0 ]]
+    then
+        echo "Usage: $0 text that will show up in tomcat log"
+        return 1
+    fi
+    # $*, NOT $@; urlencode needs one param
+    api GET /system/marker/$(urlencode "$*") -o /dev/null -uadmin:password1X!
+}
+
+extract-log-range()
+{
+    local start_re="\\(start \\)*$1"
+    local end_re="\\(end \\)*${2:-END}"
+    local log_file=${3:-/c/tools/tomcat/logs/CONSOLE_OUT}
+    sed -n -e "/MARKER: $start_re/,/MARKER: $end_re/IP" "$log_file"
+}
+
+api-login()
+{
+    local un=${1:-admin}
+    local pw=${2:-password1X!}
+    api post login --data-urlencode "username=$un" --data-urlencode "password=$pw"
+}
+
+# WIP will likely evolve incompatibly
+api()
+{
+    if [[ $# < 2 ]]
+    then
+        echo "Usage: $0 get|put|post|delete RESOURCE [CURL_OPTS ...]"
+        echo "        RESOURCE is path after /api/v1, w/ or w/o leading slash"
+        echo "        CURL_OPTS ahh... read the man page! :)"
+        echo ""
+        echo "E.g.: $0 get /users/count"
+        echo " Or:"
+        echo "      $0 get users/count"
+        echo " More complex:"
+        echo "     $0 get domains \\"
+        echo "        --data-urlencode query='[\"MATCH\", bla bla bla]' \\"
+        echo "        --data pageSize=10"
+        return 1
+    fi
+    local verb=$(echo -n $1 | tr a-z A-Z)
+    local resource=${2#/}
+    shift 2
+
+    local extra_get=""
+    if [[ $verb == GET ]]
+    then
+        # --data* opts override -X GET, force POST behavior
+        # --get overrides the override :)
+        extra_get="--get"
+    fi
+    # TODO check response headers; pipe response through appropriate beautifier
+    curl -c ~/.curl_cookies -b ~/.curl_cookies -s -X $verb $extra_get --url $API1/$resource "$@"
+    echo ""
+}
+
+
