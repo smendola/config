@@ -292,11 +292,15 @@ alias unvpn='sudo pkill -INT openconnect'
 
 alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
 
+alias yum='sudo yum'
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
 alias synaptic='sudo synaptic'
 alias service='sudo service'
+alias systemctl='sudo systemctl'
+alias sys='sudo systemctl'
 alias initctl='sudo initctl'
+alias journalctl='journalctl'
 alias bum='sudo bum'
 alias reboot='sudo reboot'
 alias halt='sudo halt'
