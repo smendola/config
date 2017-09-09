@@ -158,13 +158,8 @@ if [[ -f $ZSH/oh-my-zsh.sh ]]
 then
     plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 urltools)
     # Path to your oh-my-zsh configuration.
-    if [[ $TERM = linux ]]; then
-      echo "Not using fancy prompt because TERM=linux"
-    else
-      ZSH_THEME="sm"
-      #MYBG=057
-      MYBG=012
-    fi
+    ZSH_THEME="sm"
+    MYBG=012
     source $ZSH/oh-my-zsh.sh
 else
     echo "*** Oh-my-zsh is not present"
