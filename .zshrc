@@ -190,15 +190,9 @@ unset GREP_COLOR
 
 export SUDO_EDITOR=vim
 
-# NG-specific settings
-[ -f ~/.zshrc.ng ] && . ~/.zshrc.ng
-
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]
 then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh
 fi
-
-export NVM_DIR="/home/ng/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
