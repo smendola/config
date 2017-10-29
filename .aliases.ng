@@ -85,6 +85,10 @@ function skylogs () {
     start ~/Robot_Logs/report.html
 }
 
+function skytun () {
+    ssh -fN skytun "$@"
+}
+
 # Run a Java program in debug mode, so as to be attached in debugger
 # Usage: jpda [-p PORTNUM] [-s] other java args...
 #       -p PORTNUM  use PORTNUM, default 9000

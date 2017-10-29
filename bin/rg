@@ -5,6 +5,8 @@ excl () {
 }
 
 SHOW=-l
+INCLUDE=('*')
+EXCLUDE=('')
 
 # Process the options
 while getopts :x:dc! OPTNAME
@@ -12,7 +14,7 @@ do
     case $OPTNAME in
     \?)  GREPOPT="$GREPOPT -$OPTARG" ;;
     # Regular options:
-    x)    EXCLUDE="$EXCLUDE $(excl $OPTARG)" ;;
+    x)    EXCLUDE+=$OPTARG ;;
     d)    SHOW= ;;
     c)    SHOW=-c ;;
     *)    choke
@@ -23,10 +25,10 @@ shift $(( $OPTIND - 1 ))
 # Treat .foo as *.foo
 # X prefix required because () not allowed as case label
 case "X${2}" in
-    (X)    INCLUDE= ;;
-    (X.*)  INCLUDE="--include *${2}" ;;
-    (X*)   INCLUDE="--include ${2}" ;;
+    (X)    ;;
+    (X.*)  INCLUDE+="*${2}"
+    (X*)   INCLUDE+=${2}
 esac
 
 set -x
-/usr/bin/rgrep $GREPOPT --color=AUTO $EXCLUDE $INCLUDE "$1" $SHOW .
+/usr/bin/rgrep $GREPOPT --color=AUTO --include $INCLUDE --exclude $EXCLUDE "$1" $SHOW .

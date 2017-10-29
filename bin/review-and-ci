@@ -12,6 +12,8 @@ COMMENT="BATCH"
 TXN_KEEPS=()
 LOOSE_KEEPS=()
 
+export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
+
 source "${0%/*}/functions.sh"
 
 ar () {
