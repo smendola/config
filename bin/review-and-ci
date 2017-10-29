@@ -2,6 +2,7 @@
 
 LISTING="green"
 CURRENT="yellow bold"
+PROMPT="cyan bold"
 OOPS="red"
 GOOD=green
 #BANNER="reverse white bg-black dim"
@@ -23,8 +24,7 @@ run () {
 }
 
 mods () {
-    local opt
-    local els
+    local opt els
     case "$1" in
         (-[ao]) opt=--outgoing
             shift ;;
@@ -39,8 +39,18 @@ mods () {
     ar stat $opt -R -fl "${@}"
 }
 
+prompt () {
+    local args=("$@")
+    local prompt=${args[-1]}
+    local response
+    unset args[-1]
+    read -p "$(style $PROMPT)>> ${prompt}: $(style normal)" -e "${args[@]}" response
+    echo "$response"
+}
+
 keep1 () {
-    read -e -i "${COMMENT}" -p "Comment: " comment
+    local comment=$(prompt -i "$COMMENT" "Comment")
+    #read -e -i "${COMMENT}" -p ">> Comment: " comment
     if [[ $comment = $COMMENT ]]
     then
         TXN_KEEPS+=( "$1" )
@@ -50,6 +60,7 @@ keep1 () {
 }
 
 commit () {
+    local f k comment
     if [[ ${#TXN_KEEPS[*]} != 0 ]]
     then
         echo "Batch commit"
@@ -57,7 +68,8 @@ commit () {
         do
             echo "- $f"
         done
-        read -e -p "Batch comment: " comment
+        #read -e -p ">> Batch comment: " comment
+        comment=$(prompt "Batch comment")
         comment=${comment:-Batch of ${#TXN_KEEPS[@]} files}
         ar keep -c "${comment}" "${TXN_KEEPS[@]}"
     fi
@@ -75,13 +87,32 @@ commit () {
     fi
 }
 
+quit () {
+    if [[ ${#TXN_KEEPS[*]} != 0 || ${#LOOSE_KEEPS[*]} != 0 ]]
+    then
+        local yn
+        #read -n1 -p ">> Commit the keeps before exiting? (y/n) [n]: " yn
+        while [[ $yn != y && $yn != n ]]
+        do
+          yn=$(prompt -n1 "Commit the keeps before exiting? (y/n)")
+        done
+        if [[ $yn = y ]]
+        then
+            commit
+        fi
+    fi
+    echo "Quit"
+    exit
+}
+
 review () {
     local ans yn f=$1
     ar diff "$f" #2>/dev/null
     while true; do
         #echo "|"
-        read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
-        echo ""
+        #read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
+        ans=$(prompt -n1 "(k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q)")
+        #echo ""
 
         case ${ans} in
             (k)
@@ -90,8 +121,9 @@ review () {
                 ;;
             (R)
                 #echo "|"
-                read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
-                echo ""
+                yn=$(prompt -n1 "Really revert ${f##*/}? (y/n) [n]")
+                #read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
+                #echo ""
 
                 if [[ $yn = y* ]]; then
                     ar pop -O $f
@@ -109,7 +141,7 @@ review () {
                 ;;
 
             (q)
-                exit
+                quit
                 ;;
             (!*)
                 read ans
@@ -142,10 +174,19 @@ main () {
             echo '------------------------------------------------------'
             while true; do
                 #echo "|"
-                read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
-                echo ""
+                #read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
+                ans=$(prompt -n1 "(r)eview, (s)kip, or (q)uit (r/s/q) [r]")
+                #echo ""
 
                 case ${ans} in
+                    (k)
+                        yn=$(prompt -n1 "Really keep without reviewing? (y/n) [n]")
+                        if [[ $yn = y ]]
+                        then
+                            keep1 "$f"
+                            break;
+                        fi
+                        ;;
                     (s)
                         echo "Skipped";
                         break
@@ -155,8 +196,7 @@ main () {
                         break
                         ;;
                     (q)
-                        echo "Quit"
-                        exit
+                        quit
                         ;;
                     (*)
                         echo "$(style $OOPS)Huh?$(style normal)"
