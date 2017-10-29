@@ -6,128 +6,174 @@ OOPS="red"
 GOOD=green
 #BANNER="reverse white bg-black dim"
 BANNER=normal
+COMMENT="BATCH"
+
+TXN_KEEPS=()
+LOOSE_KEEPS=()
 
 source "${0%/*}/functions.sh"
 
 ar () {
-	accurev "$@"
+    accurev "$@"
 }
 
 run () {
-	local f=$1; shift
-	eval echo "$@"
+    local f=$1; shift
+    eval echo "$@"
 }
 
 mods () {
-	local opt
-	local els
-	case "$1" in
-		(-[ao]) opt=--outgoing
-			shift ;;
-		(-d) opt=-d
-			shift ;;
-		(*) opt=-m  ;;
-	esac
-	if [[ $# = 0 ]]
-	then
-		set .
-	fi
-	ar stat $opt -R -fl "${@}"
+    local opt
+    local els
+    case "$1" in
+        (-[ao]) opt=--outgoing
+            shift ;;
+        (-d) opt=-d
+            shift ;;
+        (*) opt=-m  ;;
+    esac
+    if [[ $# = 0 ]]
+    then
+        set .
+    fi
+    ar stat $opt -R -fl "${@}"
+}
+
+keep1 () {
+    read -e -i "${COMMENT}" -p "Comment: " comment
+    if [[ $comment = $COMMENT ]]
+    then
+        TXN_KEEPS+=( "$1" )
+    else
+        LOOSE_KEEPS+=("$1:$comment")
+    fi
+}
+
+commit () {
+    if [[ ${#TXN_KEEPS[*]} != 0 ]]
+    then
+        echo "Batch commit"
+        for f in ${TXN_KEEPS[@]}
+        do
+            echo "- $f"
+        done
+        read -e -p "Batch comment: " comment
+        comment=${comment:-Batch of ${#TXN_KEEPS[@]} files}
+        ar keep -c "${comment}" "${TXN_KEEPS[@]}"
+    fi
+
+    if [[ ${#LOOSE_KEEPS[*]} != 0 ]]
+    then
+        for k in "${LOOSE_KEEPS[@]}"
+        do
+            f=${k%:*}
+            comment=${k#*:}
+            echo "- $f"
+            echo "  ($comment)"
+            ar keep -c "$comment" $f
+        done
+    fi
 }
 
 review () {
-	local ans yn f=$1
-	ar diff "$f" #2>/dev/null
-	while true; do
-		#echo "|"
-		read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q) [s]: " ans
-		echo ""
+    local ans yn f=$1
+    ar diff "$f" #2>/dev/null
+    while true; do
+        #echo "|"
+        read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
+        echo ""
 
-		case ${ans} in
-			(k)
-			    ar keep $f;
-			    break
-			    ;;
-			(R)
-				#echo "|"
-				read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
-				echo ""
+        case ${ans} in
+            (k)
+                keep1 "$f";
+                break
+                ;;
+            (R)
+                #echo "|"
+                read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
+                echo ""
 
-				if [[ $yn = y* ]]; then
-					ar pop -O $f
-					break
-				fi
-			    ;;
-			(r|d)
-				review "$f"
-				break
-				;;
+                if [[ $yn = y* ]]; then
+                    ar pop -O $f
+                    break
+                fi
+                ;;
+            (r|d)
+                review "$f"
+                break
+                ;;
 
-			(s | "")
-			    echo "Skipped."
-			    return
-			    ;;
+            (s)
+                echo "Skipped."
+                return
+                ;;
 
-			(q)
-			    exit
-			    ;;
-		    (!*)
-		        read ans
-		    	run "$f" ${ans#}
-		    	;;
-			(*)
-			    echo "$(style $OOPS)Huh?$(style normal)"
-			    ;;
-		esac
-	done
+            (q)
+                exit
+                ;;
+            (!*)
+                read ans
+                run "$f" ${ans#}
+                ;;
+            ("")
+                # There's no default action on this prompt
+                ;;
+            (*)
+                echo "$(style $OOPS)Huh?$(style normal)"
+                ;;
+        esac
+    done
 }
 
 main () {
-	local f ans files=$(mods "$@")
+    local f ans files=$(mods "$@")
 
-	if [[ ! -z "$files" ]]; then
-		echo -n $(style $BANNER)
-		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
-		echo "$(style $BANNER)Reviewing:                                            $(style normal)"
-		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
-		for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
-		echo ""
+    if [[ ! -z "$files" ]]; then
+        echo -n $(style $BANNER)
+        echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+        echo "$(style $BANNER)Reviewing:                                            $(style normal)"
+        echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+        for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
+        echo ""
 
-		for f in $files; do
-			echo '------------------------------------------------------'
-			echo "$(style $CURRENT)${f#/./}$(style normal)"
-			echo '------------------------------------------------------'
-			while true; do
-				#echo "|"
-				read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
-				echo ""
+        for f in $files; do
+            echo '------------------------------------------------------'
+            echo "$(style $CURRENT)${f#/./}$(style normal)"
+            echo '------------------------------------------------------'
+            while true; do
+                #echo "|"
+                read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
+                echo ""
 
-				case ${ans} in
-					(s)
-					    echo "Skipped";
-					    break
-					    ;;
-					(r|d|"")
-					    review "$f";
-					    break
-					    ;;
-					(q)
-					    echo "Quit"
-					    exit
-					    ;;
-					(*)
-			    		echo "$(style $OOPS)Huh?$(style normal)"
-					    ;;
-				esac
-			done
-			echo ""
-		done
+                case ${ans} in
+                    (s)
+                        echo "Skipped";
+                        break
+                        ;;
+                    (r|d|"")
+                        review "$f";
+                        break
+                        ;;
+                    (q)
+                        echo "Quit"
+                        exit
+                        ;;
+                    (*)
+                        echo "$(style $OOPS)Huh?$(style normal)"
+                        ;;
+                esac
+            done
+            echo ""
+        done
 
-		echo "$(style $GOOD)Finished.$(style normal)"
-		echo "TODO: option to promote"
-	else
-		echo "No pending changes to review."
-	fi
+        commit
+
+        echo "$(style $GOOD)Finished.$(style normal)"
+        echo "TODO: option to promote"
+    else
+        echo "No pending changes to review."
+    fi
+
 }
 
 main "$@"
