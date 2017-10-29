@@ -5,7 +5,7 @@
 ###############################################################
 
 OS_ID=$(source /etc/os-release; echo $ID)
-if toe -a | grep -qs $TERM-256color
+if [ $TERM != linux ] && toe -a | grep -qs $TERM-256color
 then
    TERM=$TERM-256color
 fi
@@ -159,7 +159,6 @@ then
     plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 urltools)
     # Path to your oh-my-zsh configuration.
     ZSH_THEME="sm"
-    #MYBG=057
     MYBG=012
     source $ZSH/oh-my-zsh.sh
 else
