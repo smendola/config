@@ -164,6 +164,9 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+# This needs to be set after oh-my-zsh is loaded, or else
+# it gets unset
+bindkey '^L' cls ;# C-Shift-L
 
 # This needs to be set after oh-my-zsh is loaded, or else
 # it gets unset
