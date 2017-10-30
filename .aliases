@@ -131,39 +131,11 @@ function fixtty() {
     stty sane erase ^H
 }
 
-function jenkins() {
-    (title Jenkins "JENKINS on 9090"; cd $JENKINS_HOME; java -jar jenkins.war --httpPort=9090)
-}
 
 type stty > /dev/null 2>&1 || stty() {
     echo -n
 }
 
-function tomcat() {
-    shutdown.sh > /dev/null 2>&1
-    sleep 2
-    /bin/rm $CATALINA_BASE/logs/*
-    title Tomcat Tomcat
-    catalina.sh jpda run 2>&1 | sed -u '/^SLF4/ d' | tee $CATALINA_BASE/logs/CONSOLE_OUT
-}
-
-# Cause an annotation entry to show up in Fiddler
-function anno() {
-    anno=$(echo $* | tr ' ' '_')
-    curl -s --proxy http://localhost:8888 "http://localhost/anno?$anno" > /dev/null;
-}
-
-function clear-m2() {
-    if [[ $# > 0 ]]
-    then
-        for pkg in "$@"
-        do
-             command rm -rfv ~/.m2/repository/${pkg//.//}
-        done
-    else
-        command rm -rfv ~/.m2/repository/
-    fi
-}
 
 # these pertain to version management of this and other cygwin environment
 # files.  Git normally could not manage a dir such as ~, but wrapped this
@@ -183,10 +155,6 @@ function syncdots()
     echo push &&  dots push
 }
 
-alias ride='(python -c "from robotide import main; main()"&)'
-alias rebot='rebot.bat'
-# Use the whole width of the terminal for pybot output
-alias pybot='command pybot -W $(( $(tput cols) - 2 ))'
 
 # show all colors available with ansi escapes
 # show them both as BG and as FG
@@ -329,11 +297,15 @@ alias unvpn='sudo pkill -INT openconnect'
 
 alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
 
+alias yum='sudo yum'
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
 alias synaptic='sudo synaptic'
 alias service='sudo service'
+alias systemctl='sudo systemctl'
+alias sys='sudo systemctl'
 alias initctl='sudo initctl'
+alias journalctl='journalctl'
 alias bum='sudo bum'
 alias reboot='sudo reboot'
 alias halt='sudo halt'
@@ -344,7 +316,3 @@ alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
-
-alias npm-g='sudo npm -g'
-alias pnpm-g='sudo pnpm -g'
-
