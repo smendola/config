@@ -86,7 +86,15 @@ function skylogs () {
 }
 
 function skytun () {
-    ssh -fN skytun "$@"
+    if [[ $# = 0 ]]
+    then
+        local cfg=$(get-skytun-port.sh -v)
+        local port=${cfg%% *}
+        echo "Tunneling to $cfg"
+        ssh -fN -p "$port" "$@" skytun
+    else
+        ssh -fN "$@" skytun
+    fi
 }
 
 # Run a Java program in debug mode, so as to be attached in debugger
