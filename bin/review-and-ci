@@ -160,17 +160,20 @@ review () {
 }
 
 main () {
-    local f ans files=$(mods "$@")
+    local f ans files IFS
+    IFS=$'\n'
+    files=( $(mods "$@") )
+    unset IFS
 
     if [[ ! -z "$files" ]]; then
         echo -n $(style $BANNER)
         echo "$(style $BANNER)------------------------------------------------------$(style normal)"
         echo "$(style $BANNER)Reviewing:                                            $(style normal)"
         echo "$(style $BANNER)------------------------------------------------------$(style normal)"
-        for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
+        for f in "${files[@]}"; do echo "  - $(style $LISTING)${f}$(style normal)"; done
         echo ""
 
-        for f in $files; do
+        for f in "${files[@]}"; do
             echo '------------------------------------------------------'
             echo "$(style $CURRENT)${f#/./}$(style normal)"
             echo '------------------------------------------------------'
