@@ -86,6 +86,7 @@ function skylogs () {
 }
 
 function skytun () {
+    pkill -f skytun || true
     if [[ $# = 0 ]]
     then
         local cfg=$(get-skytun-port.sh -v)

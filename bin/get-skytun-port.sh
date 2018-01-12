@@ -40,11 +40,11 @@ cfg_url=$(skapi get "v2/configurations?scope=me&query=status:running" | xpath '/
 
 if [[ -z ${cfg_url} ]]
 then
-    echo "No running configurations"
+    echo "No running configurations" 1>&2
     exit 1
 fi
 
-HOSTNAME=apphost1
+HOSTNAME=amqhost
 if [[ $1 = -h ]]
 then
     shift; HOSTNAME=$1; shift;

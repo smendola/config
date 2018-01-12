@@ -9,9 +9,8 @@ alias cls='tput reset'
 # The above doesn't work on PuTTY (at least not with TERM=xterm or TERM=xterm-256color)
 # the following does work
 alias cls="clear; printf '\033[3J'"
-function bd () {
-    cd "$OLDPWD"
-}
+alias bd="cd -"
+alias cdp="cd -P"
 
 alias grep='grep --color=auto'
 alias rm='rm -i'
