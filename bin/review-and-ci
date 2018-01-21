@@ -75,7 +75,7 @@ commit () {
         else
             comment=$BATCH_COMMENT
         fi
-        echo ar keep -c "${comment}" "${TXN_KEEPS[@]}"
+        ar keep -c "${comment}" "${TXN_KEEPS[@]}"
     fi
 
     if [[ ${#LOOSE_KEEPS[*]} != 0 ]]
@@ -87,7 +87,7 @@ commit () {
             comment=${k#*:}
             echo "- $f"
             echo "  ($comment)"
-            echo ar keep -c "$comment" "$f"
+            ar keep -c "$comment" "$f"
         done
     fi
 }
