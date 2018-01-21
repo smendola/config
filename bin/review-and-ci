@@ -5,9 +5,8 @@ CURRENT="yellow bold"
 PROMPT="cyan bold"
 OOPS="red"
 GOOD=green
-#BANNER="reverse white bg-black dim"
 BANNER=normal
-COMMENT="BATCH"
+BATCH_COMMENT=""
 
 TXN_KEEPS=()
 LOOSE_KEEPS=()
@@ -26,7 +25,7 @@ run () {
 }
 
 mods () {
-    local opt els
+    local opt
     case "$1" in
         (-[ao]) opt=--outgoing
             shift ;;
@@ -51,9 +50,8 @@ prompt () {
 }
 
 keep1 () {
-    local comment=$(prompt -i "$COMMENT" "Comment")
-    #read -e -i "${COMMENT}" -p ">> Comment: " comment
-    if [[ $comment = $COMMENT ]]
+    local comment=$(prompt -i ""  "Comment [${BATCH_COMMENT:-ASK AT END}]")
+    if [[ -z $comment ]]
     then
         TXN_KEEPS+=( "$1" )
     else
@@ -66,25 +64,30 @@ commit () {
     if [[ ${#TXN_KEEPS[*]} != 0 ]]
     then
         echo "Batch commit"
-        for f in ${TXN_KEEPS[@]}
+        for f in "${TXN_KEEPS[@]}"
         do
             echo "- $f"
         done
-        #read -e -p ">> Batch comment: " comment
-        comment=$(prompt "Batch comment")
-        comment=${comment:-Batch of ${#TXN_KEEPS[@]} files}
-        ar keep -c "${comment}" "${TXN_KEEPS[@]}"
+
+        if [[ -z $BATCH_COMMENT ]]; then
+            comment=$(prompt "Batch comment")
+            comment=${comment:-Batch of ${#TXN_KEEPS[@]} files}
+        else
+            comment=$BATCH_COMMENT
+        fi
+        echo ar keep -c "${comment}" "${TXN_KEEPS[@]}"
     fi
 
     if [[ ${#LOOSE_KEEPS[*]} != 0 ]]
     then
+        # TODO: group these keeps into one txn per unique comment
         for k in "${LOOSE_KEEPS[@]}"
         do
             f=${k%:*}
             comment=${k#*:}
             echo "- $f"
             echo "  ($comment)"
-            ar keep -c "$comment" $f
+            echo ar keep -c "$comment" "$f"
         done
     fi
 }
@@ -161,11 +164,17 @@ review () {
 
 main () {
     local f ans files IFS
+
+    if [[ $1 = -c ]]; then
+        BATCH_COMMENT=$2
+        shift 2
+    fi
+
     IFS=$'\n'
     files=( $(mods "$@") )
     unset IFS
 
-    if [[ ! -z "$files" ]]; then
+    if [[ ${#files[@]} -ne 0 ]]; then
         echo -n $(style $BANNER)
         echo "$(style $BANNER)------------------------------------------------------$(style normal)"
         echo "$(style $BANNER)Reviewing:                                            $(style normal)"
