@@ -41,16 +41,28 @@ mods () {
 }
 
 prompt () {
+    local deflt opts
+
+    if [[ $1 = -o ]]; then
+        opts=" ($(style $PROMPT underline)$2$(style normal $PROMPT))"
+        shift 2
+    fi
+
+    if [[ $1 = -d ]]; then
+        deflt=" [$(style $PROMPT underline)$2$(style normal $PROMPT)]"
+        shift 2
+    fi
+
     local args=("$@")
     local prompt=${args[-1]}
     local response
     unset args[-1]
-    read -p "$(style $PROMPT)>> ${prompt}: $(style normal)" -e "${args[@]}" response
+    read -p "$(style $PROMPT)>> ${prompt}${opts}${deflt}: $(style normal)" -e "${args[@]}" response
     echo "$response"
 }
 
 keep1 () {
-    local comment=$(prompt -i ""  "Comment [${BATCH_COMMENT:-ASK AT END}]")
+    local comment=$(prompt -d "${BATCH_COMMENT:-ASK AT END}" -i ""  "Comment")
     if [[ -z $comment ]]
     then
         TXN_KEEPS+=( "$1" )
@@ -99,7 +111,7 @@ quit () {
         #read -n1 -p ">> Commit the keeps before exiting? (y/n) [n]: " yn
         while [[ $yn != y && $yn != n ]]
         do
-          yn=$(prompt -n1 "Commit the keeps before exiting? (y/n)")
+          yn=$(prompt -o "y/n" -n1 "Commit the keeps before exiting?")
         done
         if [[ $yn = y ]]
         then
@@ -112,11 +124,11 @@ quit () {
 
 review () {
     local ans yn f=$1
-    ar diff "$f" #2>/dev/null
+    ar diff -b "$f" #2>/dev/null
     while true; do
         #echo "|"
         #read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
-        ans=$(prompt -n1 "(k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q)")
+        ans=$(prompt -o "k/R/s/r/q" -n1 "(k)eep, (R)evert, (s)kip, (r)eview, or (q)uit")
         #echo ""
 
         case ${ans} in
@@ -126,7 +138,7 @@ review () {
                 ;;
             (R)
                 #echo "|"
-                yn=$(prompt -n1 "Really revert ${f##*/}? (y/n) [n]")
+                yn=$(prompt -o y/n -d n -n1 "Really revert ${f##*/}?")
                 #read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
                 #echo ""
 
@@ -188,13 +200,12 @@ main () {
             echo '------------------------------------------------------'
             while true; do
                 #echo "|"
-                #read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
-                ans=$(prompt -n1 "(r)eview, (s)kip, or (q)uit (r/s/q) [r]")
+                ans=$(prompt -o r/s/q -d "r" -n1 "(r)eview, (s)kip, or (q)uit")
                 #echo ""
 
                 case ${ans} in
                     (k)
-                        yn=$(prompt -n1 "Really keep without reviewing? (y/n) [n]")
+                        yn=$(prompt -o y/n -d n -n1 "Really keep without reviewing?")
                         if [[ $yn = y ]]
                         then
                             keep1 "$f"
