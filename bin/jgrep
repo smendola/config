@@ -1,0 +1,42 @@
+#!/bin/bash -e
+
+WHAT="$(echo "$1" | tr / .)"
+WHERE="${2:-.}"
+
+if [[ ! -e $WHERE ]]
+then
+    echo "$0: No such file or directory: $WHERE"
+    exit 1
+elif [ -d "$WHERE" ]
+then
+    #echo ">>Entering $WHERE"
+    find "$WHERE" \( -name '*.jar' -o -name '*.war' \) -exec sh -c "jgrep '$WHAT' '{}'" \;
+else
+    case "$WHERE" in
+    (*.jar)
+        #echo ">>Searching JAR $WHERE"
+        jar tf "$(cygpath -d "$WHERE")" | grep -q "$WHAT" &&
+            (
+                echo -n "$WHERE: ";
+                jar tf "$(cygpath -d "$WHERE")" | grep --color=auto "$WHAT"
+            )
+        ;;
+
+    (*.war)
+        #echo ">>Exctracting WAR $WHERE"
+        TD=/tmp/$WHERE/unpacked
+        mkdir -p "${TD}"
+        TD=$(realpath "$TD")
+        (   #set -x
+            unzip -q -d "${TD}" "${WHERE}";
+            jgrep "$WHAT" "${TD}";
+        )
+        rm -rf "${TD}"
+        ;;
+
+    (*.class)
+        #echo "Not supported"
+        ;;
+    esac
+fi
+
