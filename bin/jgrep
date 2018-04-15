@@ -1,5 +1,15 @@
 #!/bin/bash -e
 
+if [[ $# -lt 1 || $# -gt 2 ]]
+then
+    cat <<EOF 1>&2
+Usage: `basename $0` CLASSNAME [DIR]
+Find class CLASSNAME inside .jar/.war/.class files
+in and below directory DIR (default: .)
+EOF
+    exit 1
+fi
+
 WHAT="$(echo "$1" | tr / .)"
 WHERE="${2:-.}"
 
