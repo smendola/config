@@ -4,7 +4,7 @@ if [[ $# -lt 1 ]]
 then
     cat <<EOF 1>&2
 Usage: `basename $0` CLASSNAME [DIR]...
-Find class CLASSNAME inside .jar/.war/.class files
+Find class CLASSNAME inside .jar/.war files
 in and below directory/ies DIR (default: .)
 Note: for .war files, the filenamme that gets shown is funky
       because the WAR file is being extracted into /tmp
