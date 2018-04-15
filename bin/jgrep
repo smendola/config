@@ -1,17 +1,34 @@
 #!/bin/bash -e
 
-if [[ $# -lt 1 || $# -gt 2 ]]
+if [[ $# -lt 1 ]]
 then
     cat <<EOF 1>&2
-Usage: `basename $0` CLASSNAME [DIR]
+Usage: `basename $0` CLASSNAME [DIR]...
 Find class CLASSNAME inside .jar/.war/.class files
-in and below directory DIR (default: .)
+in and below directory/ies DIR (default: .)
+Note: for .war files, the filenamme that gets shown is funky
+      because the WAR file is being extracted into /tmp
 EOF
     exit 1
 fi
 
 WHAT="$(echo "$1" | tr / .)"
-WHERE="${2:-.}"
+shift
+WHERE=( "$@" )
+
+
+if [[ ${#WHERE} -eq 0 ]]
+then
+    WHERE=.
+elif [[ ${#WHERE[@]} -gt 1 ]]
+then
+    for d in "${WHERE[@]}"
+    do
+        echo ....$d....
+        $0 "$WHAT" "$d"
+    done
+    exit
+fi
 
 if [[ ! -e $WHERE ]]
 then
