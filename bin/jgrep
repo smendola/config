@@ -24,7 +24,6 @@ elif [[ ${#WHERE[@]} -gt 1 ]]
 then
     for d in "${WHERE[@]}"
     do
-        echo ....$d....
         $0 "$WHAT" "$d"
     done
     exit
