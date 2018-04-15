@@ -1,5 +1,5 @@
 #!/bin/bash
-read -s -p 'Password: ' pw
+read -r -s -p 'Password: ' pw
 echo ""
 snx -d >/dev/null 2>&1
 sleep 1
