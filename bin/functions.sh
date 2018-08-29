@@ -34,6 +34,7 @@ style () {
      for style
     do
       case $style in
+        */*) style ${style%/*} bg-${style#*/} ;;
         black) tput setaf 0;;
         red) tput setaf 1;;
         green) tput setaf 2;;

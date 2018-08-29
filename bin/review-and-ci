@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
+
 LISTING="green"
 CURRENT="yellow bold"
 PROMPT="cyan bold"
@@ -14,6 +16,17 @@ LOOSE_KEEPS=()
 export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
 
 source "${0%/*}/functions.sh"
+
+
+while [[ $1 = -* ]]
+do
+    case $1 in
+        (-c|--comment) shift; COMMENT=$1;;
+        (*) fail "Unknown option: $1" ;;
+    esac
+    shift
+done
+
 
 ar () {
     accurev "$@"
@@ -123,6 +136,7 @@ quit () {
 }
 
 review () {
+if false; then
     local ans yn f=$1
     ar diff -b "$f" #2>/dev/null
     while true; do
@@ -172,6 +186,56 @@ review () {
                 ;;
         esac
     done
+else
+	local ans yn f=$1
+	ar diff "$f" #2>/dev/null
+	while true; do
+		#echo "|"
+		read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q) [s]: " ans
+		echo ""
+
+		case ${ans} in
+			(k)
+			    if [[ -z $COMMENT ]]; then
+			    	ar keep $f;
+			    else
+			    	ar keep -c "${COMMENT}" $f;
+			    fi
+			    break
+			    ;;
+			(R)
+				#echo "|"
+				read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
+				echo ""
+
+				if [[ $yn = y* ]]; then
+					ar pop -O $f
+					break
+				fi
+			    ;;
+			(r|d)
+				review "$f"
+				break
+				;;
+
+			(s | "")
+			    echo "Skipped."
+			    return
+			    ;;
+
+			(q)
+			    exit
+			    ;;
+		    (!*)
+		        read ans
+		    	run "$f" ${ans#}
+		    	;;
+			(*)
+			    echo "$(style $OOPS)Huh?$(style normal)"
+			    ;;
+		esac
+	done
+fi
 }
 
 main () {
