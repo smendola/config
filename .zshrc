@@ -5,7 +5,7 @@
 ###############################################################
 
 OS_ID=$(source /etc/os-release; echo $ID)
-if [ $TERM != linux ] && toe -a | grep -qs $TERM-256color
+if grep -qs "^$TERM-256color" /etc/termcap
 then
    TERM=$TERM-256color
 fi
