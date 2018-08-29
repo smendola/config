@@ -1,5 +1,3 @@
-#!/bin/awk
-
 # Pipe the output of jstack through this script to show only
 # stack traces for PHT code in RUNNABLE threads
 
@@ -61,4 +59,3 @@ BEGIN {
    show = false;
    discard = true;
 }
-
