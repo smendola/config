@@ -77,6 +77,7 @@ export LESSOPEN='|lesspipe.sh %s'
 
 #export TOOLS_DIR=~/tools
 export AC_DIFF_CLI='meld %1 %2'
+export AC_MERGE_CLI='meld  %1%  %a%  %2%  --output=%o%  --auto-merge'
 
 ###############################################################
 ### PATH CONSTRUCTION

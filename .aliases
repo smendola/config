@@ -9,9 +9,8 @@ alias cls='tput reset'
 # The above doesn't work on PuTTY (at least not with TERM=xterm or TERM=xterm-256color)
 # the following does work
 alias cls="clear; printf '\033[3J'"
-function bd () {
-    cd "$OLDPWD"
-}
+alias bd="cd -"
+alias cdp="cd -P"
 
 alias grep='grep --color=auto'
 alias rm='rm -i'
@@ -221,6 +220,15 @@ ar()
 	accurev "$@"
 }
 
+pws()
+{
+    accurev info | grep Workspace | awk '{print $2}'
+}
+
+reparent()
+{
+    accurev chws -w `pws` -b "$1"
+}
 # mods    - show modified files in ws
 # mods -o - show all outgoing changes
 # mods -d - show "default group" (whatever that means; kept + and locally modified?)
@@ -238,7 +246,11 @@ mods()
     then
         set .
     fi
-    ar stat $opt -R -fl "${@}"
+    ar stat $opt -R -flr "${@}"
+}
+conflicts()
+{
+    ar stat -o -B -flr
 }
 
 list-ws()
@@ -295,7 +307,7 @@ alias start=xdg-open
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
 alias unvpn='sudo pkill -INT openconnect'
 
-alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
+alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p' | egrep -v '^docker|^tun|^lo '"
 
 alias yum='sudo yum'
 alias aptitude='sudo aptitude'
