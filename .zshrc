@@ -5,7 +5,7 @@
 ###############################################################
 
 OS_ID=$(source /etc/os-release; echo $ID)
-if [ $TERM != linux ] && toe -a | grep -qs $TERM-256color
+if grep -qs "^$TERM-256color" /etc/termcap
 then
    TERM=$TERM-256color
 fi
@@ -69,8 +69,6 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
 [ -f ~/.aliases.hz ] && . ~/.aliases.hz
-
-
 
 export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
@@ -193,14 +191,9 @@ PATH=${PATH%:}
 unset GREP_OPTIONS
 unset GREP_COLOR
 
-
 # do this last, it will error out if path elems do not exist
 
-
 export SUDO_EDITOR=vim
-
-# NG-specific settings
-[ -f ~/.zshrc.hz ] && . ~/.zshrc.hz
 
 # Here's everyone's chance to add custom stuff
 if [ -f $HOME/.custom.sh ]

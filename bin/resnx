@@ -1,0 +1,11 @@
+#!/bin/bash
+
+read -r -s -p 'Password: ' pw
+echo ""
+
+snx -d >/dev/null 2>&1
+sleep 1
+
+echo "$pw" | snx
+
+accurev login -n $NTLM_USERNAME $pw

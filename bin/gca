@@ -1,4 +1,27 @@
 #!/bin/bash
-google-chrome --user-data-dir=$HOME/lpdata --disable-web-security --app=${1:-http://localhost:3000}
+find-up ()
+(
+    while [ $PWD != "/" ]; do
+        if [ -e "$1" ]; then
+            echo "${PWD}/$1"
+            break
+        fi
+        cd ..
+    done
+)
+
+LPDATA=`find-up lpdata`
+
+if [[ -z $LPDATA && -d ~/lpdata ]]
+then
+    LPDATA=./lpdata
+    echo -n "Populating initial lpdata... " 2>&1
+    echo -n $(cp -av ~/lpdata . | wc -l) "files"  2>&1
+    echo " done." 2>&1
+fi
+
+DATA=$( realpath "$LPDATA" )
+google-chrome --auto-open-devtools-for-tabs --user-data-dir=${DATA} ${1:-http://localhost:3000}
+#google-chrome --user-data-dir=$HOME/lpdata --disable-web-security --app=${1:-http://localhost:3000}
 
 

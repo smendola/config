@@ -4,10 +4,16 @@ export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
 
 LISTING="green"
 CURRENT="yellow bold"
+PROMPT="cyan bold"
 OOPS="red"
 GOOD=green
-#BANNER="reverse white bg-black dim"
 BANNER=normal
+BATCH_COMMENT=""
+
+TXN_KEEPS=()
+LOOSE_KEEPS=()
+
+export AC_DIFF_CLI=${AC_DIFF_CLI:-meld %1 %2}
 
 source "${0%/*}/functions.sh"
 
@@ -16,6 +22,7 @@ while [[ $1 = -* ]]
 do
     case $1 in
         (-c|--comment) shift; COMMENT=$1;;
+        (-a|-o) ;;
         (*) fail "Unknown option: $1" ;;
     esac
     shift
@@ -23,32 +30,164 @@ done
 
 
 ar () {
-	accurev "$@"
+    accurev "$@"
 }
 
 run () {
-	local f=$1; shift
-	eval echo "$@"
+    local f=$1; shift
+    eval echo "$@"
 }
 
 mods () {
-	local opt
-	local els
-	case "$1" in
-		(-[ao]) opt=--outgoing
-			shift ;;
-		(-d) opt=-d
-			shift ;;
-		(*) opt=-m  ;;
-	esac
-	if [[ $# = 0 ]]
-	then
-		set .
-	fi
-	ar stat $opt -R -fl "${@}"
+    local opt
+    case "$1" in
+        (-[ao]) opt=--outgoing
+            shift ;;
+        (-d) opt=-d
+            shift ;;
+        (*) opt=-m  ;;
+    esac
+    if [[ $# = 0 ]]
+    then
+        set .
+    fi
+    ar stat $opt -R -fl "${@}"
+}
+
+prompt () {
+    local deflt opts
+
+    if [[ $1 = -o ]]; then
+        opts=" ($(style $PROMPT underline)$2$(style normal $PROMPT))"
+        shift 2
+    fi
+
+    if [[ $1 = -d ]]; then
+        deflt=" [$(style $PROMPT underline)$2$(style normal $PROMPT)]"
+        shift 2
+    fi
+
+    local args=("$@")
+    local prompt=${args[-1]}
+    local response
+    unset args[-1]
+    read -p "$(style $PROMPT)>> ${prompt}${opts}${deflt}: $(style normal)" -e "${args[@]}" response
+    echo "$response"
+}
+
+keep1 () {
+    local comment=$(prompt -d "${BATCH_COMMENT:-ASK AT END}" -i ""  "Comment")
+    if [[ -z $comment ]]
+    then
+        TXN_KEEPS+=( "$1" )
+    else
+        LOOSE_KEEPS+=("$1:$comment")
+    fi
+}
+
+commit () {
+    local f k comment
+    if [[ ${#TXN_KEEPS[*]} != 0 ]]
+    then
+        echo "Batch commit"
+        for f in "${TXN_KEEPS[@]}"
+        do
+            echo "- $f"
+        done
+
+        if [[ -z $BATCH_COMMENT ]]; then
+            comment=$(prompt "Batch comment")
+            comment=${comment:-Batch of ${#TXN_KEEPS[@]} files}
+        else
+            comment=$BATCH_COMMENT
+        fi
+        ar keep -c "${comment}" "${TXN_KEEPS[@]}"
+    fi
+
+    if [[ ${#LOOSE_KEEPS[*]} != 0 ]]
+    then
+        # TODO: group these keeps into one txn per unique comment
+        for k in "${LOOSE_KEEPS[@]}"
+        do
+            f=${k%:*}
+            comment=${k#*:}
+            echo "- $f"
+            echo "  ($comment)"
+            ar keep -c "$comment" "$f"
+        done
+    fi
+}
+
+quit () {
+    if [[ ${#TXN_KEEPS[*]} != 0 || ${#LOOSE_KEEPS[*]} != 0 ]]
+    then
+        local yn
+        #read -n1 -p ">> Commit the keeps before exiting? (y/n) [n]: " yn
+        while [[ $yn != y && $yn != n ]]
+        do
+          yn=$(prompt -o "y/n" -n1 "Commit the keeps before exiting?")
+        done
+        if [[ $yn = y ]]
+        then
+            commit
+        fi
+    fi
+    echo "Quit"
+    exit
 }
 
 review () {
+if true; then
+    local ans yn f=$1
+    ar diff -b "$f" #2>/dev/null
+    while true; do
+        #echo "|"
+        #read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
+        ans=$(prompt -o "k/R/s/r/q" -n1 "(k)eep, (R)evert, (s)kip, (r)eview, or (q)uit")
+        #echo ""
+
+        case ${ans} in
+            (k)
+                keep1 "$f";
+                break
+                ;;
+            (R)
+                #echo "|"
+                yn=$(prompt -o y/n -d n -n1 "Really revert ${f##*/}?")
+                #read -n1 -p ">> Really revert ${f##*/}? (y/n) [n]: " yn
+                #echo ""
+
+                if [[ $yn = y* ]]; then
+                    ar pop -O $f
+                    break
+                fi
+                ;;
+            (r|d)
+                review "$f"
+                break
+                ;;
+
+            (s)
+                echo "Skipped."
+                return
+                ;;
+
+            (q)
+                quit
+                ;;
+            (!*)
+                read ans
+                run "$f" ${ans#}
+                ;;
+            ("")
+                # There's no default action on this prompt
+                ;;
+            (*)
+                echo "$(style $OOPS)Huh?$(style normal)"
+                ;;
+        esac
+    done
+else
 	local ans yn f=$1
 	ar diff "$f" #2>/dev/null
 	while true; do
@@ -97,54 +236,74 @@ review () {
 			    ;;
 		esac
 	done
+fi
 }
 
 main () {
-	local f ans files=$(mods "$@")
+    local f ans files IFS
 
-	if [[ ! -z "$files" ]]; then
-		echo -n $(style $BANNER)
-		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
-		echo "$(style $BANNER)Reviewing:                                            $(style normal)"
-		echo "$(style $BANNER)------------------------------------------------------$(style normal)"
-		for f in $files; do echo "  - $(style $LISTING)${f}$(style normal)"; done
-		echo ""
+    if [[ $1 = -c ]]; then
+        BATCH_COMMENT=$2
+        shift 2
+    fi
 
-		for f in $files; do
-			echo '------------------------------------------------------'
-			echo "$(style $CURRENT)${f#/./}$(style normal)"
-			echo '------------------------------------------------------'
-			while true; do
-				#echo "|"
-				read -n1 -p ">> (r)eview, (s)kip, or (q)uit (r/s/q) [r]: " ans
-				echo ""
+    IFS=$'\n'
+    files=( $(mods "$@") )
+    unset IFS
 
-				case ${ans} in
-					(s)
-					    echo "Skipped";
-					    break
-					    ;;
-					(r|d|"")
-					    review "$f";
-					    break
-					    ;;
-					(q)
-					    echo "Quit"
-					    exit
-					    ;;
-					(*)
-			    		echo "$(style $OOPS)Huh?$(style normal)"
-					    ;;
-				esac
-			done
-			echo ""
-		done
+    if [[ ${#files[@]} -ne 0 ]]; then
+        echo -n $(style $BANNER)
+        echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+        echo "$(style $BANNER)Reviewing:                                            $(style normal)"
+        echo "$(style $BANNER)------------------------------------------------------$(style normal)"
+        for f in "${files[@]}"; do echo "  - $(style $LISTING)${f}$(style normal)"; done
+        echo ""
 
-		echo "$(style $GOOD)Finished.$(style normal)"
-		echo "TODO: option to promote"
-	else
-		echo "No pending changes to review."
-	fi
+        for f in "${files[@]}"; do
+            echo '------------------------------------------------------'
+            echo "$(style $CURRENT)${f#/./}$(style normal)"
+            echo '------------------------------------------------------'
+            while true; do
+                #echo "|"
+                ans=$(prompt -o r/s/q -d "r" -n1 "(r)eview, (s)kip, or (q)uit")
+                #echo ""
+
+                case ${ans} in
+                    (k)
+                        yn=$(prompt -o y/n -d n -n1 "Really keep without reviewing?")
+                        if [[ $yn = y ]]
+                        then
+                            keep1 "$f"
+                            break;
+                        fi
+                        ;;
+                    (s)
+                        echo "Skipped";
+                        break
+                        ;;
+                    (r|d|"")
+                        review "$f";
+                        break
+                        ;;
+                    (q)
+                        quit
+                        ;;
+                    (*)
+                        echo "$(style $OOPS)Huh?$(style normal)"
+                        ;;
+                esac
+            done
+            echo ""
+        done
+
+        commit
+
+        echo "$(style $GOOD)Finished.$(style normal)"
+        echo "TODO: option to promote"
+    else
+        echo "No pending changes to review."
+    fi
+
 }
 
 main "$@"

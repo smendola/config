@@ -1,21 +1,62 @@
 #!/bin/bash
 
-excl () {
-  echo "--exclude-dir" $1 | sed 's/,/ --exclude-dir /g'
+echo THIS DOESNT WORK
+exit 1
+
+if [[ $# = 0 ]]
+then
+    cat << \
+---
+Usage: rg [-d] [-c] [-x EXCLUDE] <PATTERN> [EXCL] [.EXCL_EXT]
+Description:
+        Recursively grep for PATTERN in files in current dir and below.
+        If optional EXT or .EXT patterns are given, only search files
+        with those extensions.
+        By default, only show names of files with matches.
+        With -d also show the matching lines.
+        With -c show count of matches per file.
+        Files can be excluded from search with -x EXCLUDE (may be repeated)
+Examples:
+        Search for \"Hashmap\" in all java files, and display the matches, not just the matching files
+        $ rg -d Hashmap .java
+
+        Search for \"TODO\" in all files, but excluding *.class, *.jar, and build.xml
+        $ rg -x .class -x .jar -x build.xml TODO
+---
+    exit 1;
+fi
+
+# TODO I have a better impl of join in hz-dev VM
+function joinx() {
+    local PRE=$1 SEP=$2 POST=$3
+    shift 3;
+    if [[ $# = 0 ]]; then return; fi
+    local IFS
+    local res
+    IFS=":"
+    res="$*"
+    echo "$PRE${res//:/$SEP}$POST"
 }
 
-SHOW=-l
+function prefix-options() {
+    local opt=$1
+    shift
+    joinx "$opt " " $opt " "" "$@"
+}
+
+SHOW=--files-with-matches
+INCLUDE=()
+EXCLUDE=()
+GREPOPT=()
 
 # Process the options
 while getopts :x:dc! OPTNAME
 do
     case $OPTNAME in
-    \?)  GREPOPT="$GREPOPT -$OPTARG" ;;
-    # Regular options:
-    x)    EXCLUDE="$EXCLUDE $(excl $OPTARG)" ;;
-    d)    SHOW= ;;
-    c)    SHOW=-c ;;
-    *)    choke
+        \?)   GREPOPT+=(-$OPTARG) ;;
+        x)    EXCLUDE+=($OPTARG) ;;
+        d)    SHOW=;;
+        c)    SHOW=--count ;;
     esac
 done
 shift $(( $OPTIND - 1 ))
@@ -23,10 +64,18 @@ shift $(( $OPTIND - 1 ))
 # Treat .foo as *.foo
 # X prefix required because () not allowed as case label
 case "X${2}" in
-    (X)    INCLUDE= ;;
-    (X.*)  INCLUDE="--include *${2}" ;;
-    (X*)   INCLUDE="--include ${2}" ;;
+    (X)    ;;
+    (X.*)  INCLUDE+=("*${2}");;
+    (X*)   INCLUDE+=("${2}");;
 esac
 
+incl=$(prefix-options --include "${INCLUDE[@]}")
+excl=$(prefix-options --exclude "${EXCLUDE[@]}")
+echo "INCL: <$incl>"
+echo "EXCL: <$excl>"
 set -x
-/usr/bin/rgrep $GREPOPT --color=AUTO $EXCLUDE $INCLUDE "$1" $SHOW .
+/usr/bin/rgrep --color=AUTO $SHOW \
+        ${GREPOPT[*]} \
+        ${incl} \
+        ${excl} \
+        "$1" .

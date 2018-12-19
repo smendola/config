@@ -1,4 +1,3 @@
-###############################################################
 ### ALIASES AND FUNCTIONS FOR INTERACTIVE USE
 ###############################################################
 
@@ -16,6 +15,18 @@ alias grep='grep --color=auto'
 alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
+
+declare DIR_HIST
+function cd ()
+{
+    builtin cd "$@"
+    DIR_HIST+=( $(pwd) )
+}
+
+function dh ()
+{
+    (for dir in "${DIR_HIST[@]}"; do echo "$dir"; done) | tac
+}
 
 
 # This implementation replaces an older one that used while/cd..
@@ -109,7 +120,6 @@ function 1,000 ()
     sed -e ': start' -e 's/\( \?\)\( \?\)\([0-9]\{1,\}\)\([0-9]\{3\}\)/\1\3,\4/g' -e 't start'
 }
 
-
 function check_x()
 {
     if [ -z "$DISPLAY" ]
@@ -125,16 +135,13 @@ function check_x()
     fi
 }
 
-
 function fixtty() {
     stty sane erase ^H
 }
 
-
 type stty > /dev/null 2>&1 || stty() {
     echo -n
 }
-
 
 # these pertain to version management of this and other cygwin environment
 # files.  Git normally could not manage a dir such as ~, but wrapped this
@@ -153,7 +160,6 @@ function syncdots()
     echo pull &&  dots pull origin master &&
     echo push &&  dots push
 }
-
 
 # show all colors available with ansi escapes
 # show them both as BG and as FG
@@ -229,6 +235,7 @@ reparent()
 {
     accurev chws -w `pws` -b "$1"
 }
+
 # mods    - show modified files in ws
 # mods -o - show all outgoing changes
 # mods -d - show "default group" (whatever that means; kept + and locally modified?)
@@ -236,7 +243,6 @@ reparent()
 mods()
 {
     local opt;
-    local els;
     case "$1" in
       -[ao]) opt=--outgoing; shift;;
       -d) opt=-d; shift;;
@@ -246,12 +252,39 @@ mods()
     then
         set .
     fi
-    ar stat $opt -R -flr "${@}"
+    ar stat ${opt} -R -flr "${@}"
 }
+
+
+lmods()
+{
+    local opt;
+    case "$1" in
+      -[ao]) opt=--outgoing; shift;;
+      -d) opt=-d; shift;;
+      *)  opt=-m;;
+    esac
+    if [[ $# = 0 ]]
+    then
+        set .
+    fi
+
+    ar stat ${opt} -R -frx "$@"  |
+        xmlstarlet sel -t -m //element -v @location -o " " -v @status -n |
+        awk '{printf "%s\t%s\n", toupper(gensub("[(]([a-z])[a-z)]*[)]", "\\1", "g", $2)), $1}' |
+        column -t
+}
+
 conflicts()
 {
     ar stat -o -B -flr
 }
+
+conflicts()
+{
+    ar stat -o -B -flr
+}
+
 
 list-ws()
 {
@@ -302,6 +335,18 @@ function gc()
 	detach google-chrome "$@"
 }
 
+find-up ()
+(
+    while [ $PWD != "/" ]; do
+        if [ -e "$1" ]; then
+            echo "${PWD}/$1"
+            break
+        fi
+        cd ..
+    done
+)
+
+
 alias start=xdg-open
 
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
@@ -328,3 +373,5 @@ alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
+
+alias fitw='cut -c 1-$COLUMNS'
