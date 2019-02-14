@@ -127,8 +127,8 @@ review () {
     ar diff -b "$f" #2>/dev/null
     while true; do
         #echo "|"
-        #read -n1 -p ">> (k)eep, (R)evert, (s)kip, (r)eview, or (q)uit (k/R/s/r/q): " ans
-        ans=$(prompt -o "k/R/s/r/q" -n1 "(k)eep, (R)evert, (s)kip, (r)eview, or (q)uit")
+        #read -n1 -p ">> (k)eep, (R)evert, (s)kip, (d)iff, or (q)uit (k/R/s/d/q): " ans
+        ans=$(prompt -o "k/R/s/d/q" -n1 "(k)eep, (R)evert, (s)kip, (d)iff, or (q)uit")
         #echo ""
 
         case ${ans} in
@@ -147,7 +147,7 @@ review () {
                     break
                 fi
                 ;;
-            (r|d)
+            (d)
                 review "$f"
                 break
                 ;;
@@ -200,7 +200,7 @@ main () {
             echo '------------------------------------------------------'
             while true; do
                 #echo "|"
-                ans=$(prompt -o r/s/q -d "r" -n1 "(r)eview, (s)kip, or (q)uit")
+                ans=$(prompt -o d/s/q -d "d" -n1 "(d)iff, (s)kip, or (q)uit")
                 #echo ""
 
                 case ${ans} in
@@ -216,7 +216,7 @@ main () {
                         echo "Skipped";
                         break
                         ;;
-                    (r|d|"")
+                    (d|"")
                         review "$f";
                         break
                         ;;

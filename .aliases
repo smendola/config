@@ -39,14 +39,14 @@ function upto()
     fi
 }
 
-alias pp='echo $PATH | tr : \\12'
+alias pp='tr : \\12 <<< $PATH'
 
 function ,() {
     eval "$@" | 1,000
 }
 
 # E.g. = 2+2
-= () { echo "$@" | bc -l; }
+= () { bc -l <<< "$@"; }
 
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
@@ -75,8 +75,6 @@ function tp () {
 function lth () {
     ls -lt "$@" | head
 }
-
-alias pp='echo $PATH | tr : \\12'
 
 function y () {
     echo "Nothing else to remove.  Pay attention!"
