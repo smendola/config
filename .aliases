@@ -299,6 +299,7 @@ function gc()
 	detach google-chrome "$@"
 }
 
+alias lsa="ls -x --group-directories-first"
 alias start=xdg-open
 
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'

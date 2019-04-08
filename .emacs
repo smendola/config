@@ -9,7 +9,6 @@
  '(custom-safe-themes
    (quote
 	("ba86d681a1619773dbdfdeb70424a1bc0091b53c86bd2239ad0a9bf9f10beb78" default)))
-; '(font-use-system-font t)
  '(modeline-3d-p nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
@@ -20,7 +19,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "microsoft" :slant normal :weight normal :height 100 :width normal)))))
+ '(default ((t (:family "Meslo LG S" :foundry "PfEd" :slant normal :weight normal :height 98 :width normal)))))
 
 ;;; uncomment this line to disable loading of "default.el" at startup
 ;; (setq inhibit-default-init t)
