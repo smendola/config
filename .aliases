@@ -244,6 +244,22 @@ mods()
     ar stat $opt -R -flr "${@}"
 }
 
+lmods () {
+	local opt
+	case "$1" in
+		(-[ao]) opt=--outgoing
+			shift ;;
+		(-d) opt=-d
+			shift ;;
+		(*) opt=-m  ;;
+	esac
+	if [[ $# = 0 ]]
+	then
+		set .
+	fi
+	ar stat ${opt} -R -frx "$@" | xmlstarlet sel -t -m //element -v @location -o " " -v @status -n | awk '{printf "%s\t%s\n", toupper(gensub("[(]([a-z])[a-z)]*[)]", "\\1", "g", $2)), $1}' | column -t
+}
+
 conflicts()
 {
     ar stat -o -B -flr
