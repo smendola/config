@@ -216,32 +216,6 @@ ar()
 	accurev "$@"
 }
 
-# mods    - show modified files in ws
-# mods -o - show all outgoing changes
-# mods -d - show "default group" (whatever that means; kept + and locally modified?)
-# Additional args, if any, are dirs to stat; default is .
-mods()
-{
-    local opt;
-    local els;
-    case "$1" in
-      -[ao]) opt=--outgoing; shift;;
-      -d) opt=-d; shift;;
-      *)  opt=-m;;
-    esac
-    if [[ $# = 0 ]]
-    then
-        set .
-    fi
-    ar stat $opt -R -fl "${@}"
-}
-
-list-ws()
-{
-    where=${1:-.}
-    find $where -maxdepth 1 -type d -name \*.git -prune -o -exec test -f {}/super/pom.xml \; -print -prune
-}
-
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
@@ -257,7 +231,7 @@ detach()
 
 tt()
 {
-	check_x && detach roxterm "$@"
+	check_x && detach terminator "$@"
 }
 
 backup-settings()
@@ -285,16 +259,19 @@ function gc()
 	detach google-chrome "$@"
 }
 
+alias mods='git status'
 alias start=xdg-open
 
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
 alias unvpn='sudo pkill -INT openconnect'
 
-alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p'"
+alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p' | egrep -v '^lo|^docker'"
 
 alias yum='sudo yum'
 alias aptitude='sudo aptitude'
 alias apt-get='sudo apt-get'
+alias apt='sudo apt'
+alias snap='sudo snap'
 alias synaptic='sudo synaptic'
 alias service='sudo service'
 alias systemctl='sudo systemctl'
@@ -311,3 +288,8 @@ alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
+alias netscript='sudo netscript'
+
+fix-net() {
+	sudo netscript restart
+}

@@ -75,7 +75,6 @@ export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
 
 #export TOOLS_DIR=~/tools
-export AC_DIFF_CLI='meld %1 %2'
 
 ###############################################################
 ### PATH CONSTRUCTION
@@ -104,6 +103,7 @@ export AC_DIFF_CLI='meld %1 %2'
 # done
 
 PATH=$PATH:/opt/AccuRev/bin
+PATH=$PATH:/snap/bin
 
 ###############################################################
 ### Stuff...
@@ -196,3 +196,4 @@ then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh
 fi
+
