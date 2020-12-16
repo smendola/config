@@ -1,6 +1,6 @@
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
-### if just getting started with cygwin. You will have to
+### if just are getting started with zsh. You will have to
 ### customize the ENVIRONMENT VARIABLES.
 ###############################################################
 
@@ -197,3 +197,8 @@ then
   source $HOME/.custom.sh
 fi
 
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/dev/.sdkman"
+[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"

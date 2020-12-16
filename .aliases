@@ -259,6 +259,7 @@ function gc()
 	detach google-chrome "$@"
 }
 
+alias gpr='git pull --rebase'
 alias mods='git status'
 alias start=xdg-open
 

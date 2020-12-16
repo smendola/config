@@ -2,6 +2,8 @@
   enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   geometry_hinting = True
   inactive_color_offset = 0.708333333333
+  putty_paste_style = True
+  suppress_multiple_term_dialog = True
   title_hide_sizetext = True
   title_inactive_bg_color = "#d3d7cf"
   title_inactive_fg_color = "#2e3436"
@@ -14,17 +16,51 @@
 [layouts]
   [[default]]
     [[[child1]]]
+      command = ""
+      directory = ""
       parent = window0
       type = Terminal
     [[[window0]]]
       parent = ""
       type = Window
+  [[srv]]
+    [[[Puma]]]
+      command = puma -C config/puma.rb
+      directory = /home/dev/aurora
+      order = 1
+      parent = child1
+      profile = puma
+      type = Terminal
+      uuid = 62bbfe43-d50f-4ab0-87d3-9f158f77a659
+    [[[Webpacker]]]
+      command = ./bin/webpack-dev-server
+      directory = /home/dev/aurora
+      order = 0
+      parent = child1
+      profile = webpacker
+      type = Terminal
+      uuid = 0a3dd1e1-fc64-493e-af35-e2f7a3bd1f8a
+    [[[child0]]]
+      fullscreen = False
+      last_active_term = 0a3dd1e1-fc64-493e-af35-e2f7a3bd1f8a
+      last_active_window = True
+      maximised = False
+      order = 0
+      parent = ""
+      title = sm-dev: ~
+      type = Window
+    [[[child1]]]
+      order = 0
+      parent = child0
+      ratio = 0.501182033097
+      type = VPaned
 [plugins]
 [profiles]
   [[default]]
     active_encodings = ANSI_X3.4-1968, UTF-8, ISO-8859-1
     background_color = "#2c2c2c"
     backspace_binding = automatic
+    copy_on_selection = True
     cursor_color = "#ff0000"
     delete_binding = automatic
     font = Monospace 10
@@ -34,3 +70,18 @@
     urgent_bell = True
     use_system_font = False
     visible_bell = True
+  [[production]]
+    background_color = "#ffffff"
+    cursor_color = "#aaaaaa"
+    font = Monospace 11
+    foreground_color = "#000000"
+    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
+    use_system_font = False
+  [[puma]]
+    copy_on_selection = True
+    cursor_color = "#aaaaaa"
+    use_theme_colors = True
+  [[webpacker]]
+    cursor_color = "#aaaaaa"
+    font = DejaVu Sans Mono 8
+    use_system_font = False
