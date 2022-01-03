@@ -4,9 +4,9 @@ set -e
 
 cd $HOME
 
-rm -rf config
+#rm -rf config
 git config --global --add core.autocrlf false
-git clone https://smendola@bitbucket.org/smendola/config.git
+#git clone https://smendola@bitbucket.org/smendola/config.git
 
 rm -rf .config.git
 git init --separate-git-dir .config.git
