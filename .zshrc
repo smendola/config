@@ -10,10 +10,17 @@ then
    TERM=$TERM-256color
 fi
 
+# for WSL2
+export LIBGL_ALWAYS_INDIRECT=1
+
+#export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+
 if [[ -z $DISPLAY ]]; then
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
+    _REMOTE_IP=${_REMOTE_IP:=127.0.0.1}
+
     # the nc -w1 avoids long delay if X11 is not running
     if [[ ! -z $SSH_CLIENT ]] &&
        nc -w1 $_REMOTE_IP 6000 < /dev/null &&
@@ -21,7 +28,7 @@ if [[ -z $DISPLAY ]]; then
     then
       export DISPLAY=$_REMOTE_IP:0
     else
-      export DISPLAY=${DISPLAY:-:0}
+      export DISPLAY=${DISPLAY:-127.0.0.1:0}
     fi
 fi
 xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
