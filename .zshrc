@@ -21,7 +21,8 @@ if [[ -z $DISPLAY ]]; then
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
-    _REMOTE_IP=${_REMOTE_IP:=localhost}
+    _REMOTE_IP=${_REMOTE_IP:=127.0.0.1}
+
     # the nc -w1 avoids long delay if X11 is not running
     if [[ ! -z $SSH_CLIENT ]] &&
        nc -w1 $_REMOTE_IP 6000 < /dev/null &&
@@ -29,7 +30,9 @@ if [[ -z $DISPLAY ]]; then
     then
       export DISPLAY=$_REMOTE_IP:0
     else
-      export DISPLAY=${DISPLAY:-:0}
+      # for WSL2
+      export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+      # export DISPLAY=${DISPLAY:-127.0.0.1:0}
     fi
 fi
 nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
@@ -204,3 +207,11 @@ then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh
 fi
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/dev/.sdkman"
+[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
