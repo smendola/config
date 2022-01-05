@@ -1,3 +1,6 @@
+MYBG=056
+export EDITOR=vim
+
 # NVM setup
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -10,13 +13,10 @@ export SDKMAN_DIR="/home/dev/.sdkman"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
-#################################################################################################
-
-MYBG=056
-export EDITOR=vim
-
 # heroku autocomplete setup
 HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH;
+
+#rvm use 2.5.7
 
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
@@ -337,4 +337,4 @@ alias xsl='xmlstarlet val'
 alias go='rails runner `pwd`/go.rb'
 
 alias gatling=/opt/gatling/bin/gatling.sh
-#export DATABASE_URL='postgres://dev:dev@192.168.1.191/reachire-web_development?pool=5'
+#export DATABASE_URL='postgres://dev:dev@sm-dev/reachire-web_development?pool=5'
