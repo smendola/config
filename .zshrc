@@ -10,10 +10,18 @@ then
    TERM=$TERM-256color
 fi
 
+if [[ ! -z $WSLENV ]]; then
+    # for WSL2
+    export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+    export LIBGL_ALWAYS_INDIRECT=1
+fi
+
 if [[ -z $DISPLAY ]]; then
+
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
+    _REMOTE_IP=${_REMOTE_IP:=localhost}
     # the nc -w1 avoids long delay if X11 is not running
     if [[ ! -z $SSH_CLIENT ]] &&
        nc -w1 $_REMOTE_IP 6000 < /dev/null &&
@@ -24,7 +32,7 @@ if [[ -z $DISPLAY ]]; then
       export DISPLAY=${DISPLAY:-:0}
     fi
 fi
-xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
@@ -196,9 +204,3 @@ then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh
 fi
-
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/dev/.sdkman"
-[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
