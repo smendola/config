@@ -20,11 +20,11 @@ HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test 
 
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
+path+=(~/aurora/bin)
 ide() {
   pkill -ABRT -f RubyMine
-  # Using 'detach' causes Rubymine to no longer respond to ^C
-  # detach rubymine.sh
-  rubymine.sh > /tmp/rubymine.out 2>&1 &
+  # &! "disowns" the process
+  rubymine.sh > /tmp/rubymine.out 2>&1 &!
 }
 
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
@@ -41,6 +41,12 @@ fix-net() {
 
 kserv() {( cd ~/aurora; bin/ksrv)} 
 ksrv() {( cd ~/aurora; bin/ksrv)} 
+krc() { 
+  pkill -f rails_console
+  sleep 2
+  pkill -9 -f rails_console 2>/dev/null && echo "Force killed"
+  rails console 
+}
 
 build_test_db() {
   rails db:drop db:create db:migrate RAILS_ENV=test
@@ -69,6 +75,7 @@ down() {
 }
 
 c() {
+  rails r nil 2>/dev/null
   rails c
 }
 
@@ -132,15 +139,14 @@ debug-rails() {
   rdebug-ide --host 0.0.0.0 --port 1234 --dispatcher-port 26162 -- /home/dev/aurora/bin/rails console
 }
 
-export EXPO_APP_SERVER=http://sm-dev:3000
 
-export ANDROID_SDK_ROOT=~/AndroidSDK
+export ANDROID_SDK_ROOT=~/Android/Sdk
 export ANDROID_HOME=$ANDROID_SDK_ROOT
 path+=(
-  $ANDROID_HOME/platform-tools 
+  $ANDROID_HOME/emulator
   $ANDROID_HOME/tools 
   $ANDROID_HOME/tools/bin 
-  $ANDROID_HOME/emulator
+  $ANDROID_HOME/platform-tools 
 )
 
 
@@ -149,22 +155,36 @@ clone-prod() {
   (set -x; 
     heroku pg:copy aurora-production::HEROKU_POSTGRESQL_SILVER_URL DATABASE --app aurora-stage --confirm aurora-stage
   )
+
   echo "** Copying s3 bucket"
   (set -x;
     aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
   )
+
+  echo "** Migrating database"
+  (set -x;
+    heroku run -a aurora-stage rails db:migrate
+  )
+
   echo "** Resetting push and chat accounts"
   (set -x;
     # Note: add aurora:anonymize here if desired
     heroku run -a aurora-stage rails stream:reset onesignal:delete_all_players
   )
+
   echo "** Seeding QA data"
   (set -x;
     heroku run -a aurora-stage rails db:seed:qa_teams
   )
+
   echo "** Anonymizing"
   (set -x;
    heroku run -a aurora-stage rails aurora:anonymize
+  )
+
+  echo "** Seeding QA data"
+  (set -x;
+   heroku run -a aurora-stage rails db:seed:qa_teams
   )
 }
 
@@ -243,8 +263,7 @@ apilog() {
 
 alias top=htop
 
-stty sane erase $'\010'
-export FEATURE_FLAG_WEB_CHAT=true
+stty sane erase '^?'
 
 
 
@@ -336,5 +355,15 @@ alias xsl='xmlstarlet val'
 
 alias go='rails runner `pwd`/go.rb'
 
-alias gatling=/opt/gatling/bin/gatling.sh
+path+=(~/gatling/bin)
 #export DATABASE_URL='postgres://dev:dev@sm-dev/reachire-web_development?pool=5'
+
+function hk() {
+  heroku "$@" -a aurora-stage
+}
+
+function h() {
+  heroku "$@" -a aurora-stage
+}
+
+
