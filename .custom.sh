@@ -265,8 +265,6 @@ alias top=htop
 
 stty sane erase '^?'
 
-
-
 wip-pr()
 {
   local title=${1:-`git branch --show-current | tr '-' ' '`}
