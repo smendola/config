@@ -116,11 +116,11 @@ function check_x()
     then
       echo "DISPLAY needs to be set"
       return 1
-    elif xset q > /dev/null
+    elif nc -w1 ${DISPLAY/:*/} 6000 && xset q > /dev/null
     then
         return 0
     else
-      echo "Problem with display?" 2>&1
+      echo "Problem with display? ($DISPLAY)" 2>&1
       return 1
     fi
 }
@@ -267,6 +267,7 @@ alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.ph
 alias unvpn='sudo pkill -INT openconnect'
 
 alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p' | egrep -v '^lo|^docker'"
+alias newest='ls -t | head -1'
 
 alias yum='sudo yum'
 alias aptitude='sudo aptitude'

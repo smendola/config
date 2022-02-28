@@ -367,3 +367,4 @@ function h() {
 }
 
 
+alias pg='service postgresql start'
