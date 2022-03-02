@@ -259,6 +259,17 @@ function gc()
 	detach google-chrome "$@"
 }
 
+function tit()
+{
+  if [[ $1 = pull ]]
+  then
+    echo "Ouch! :-("
+  else
+    git "$@"
+  fi
+}
+
+
 alias gpr='git pull --rebase'
 alias mods='git status'
 alias start=xdg-open
