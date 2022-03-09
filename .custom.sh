@@ -370,10 +370,10 @@ export FEATURE_FLAG_TMCW=true
 export FEATURE_FLAG_ONBOARDING=true
 
 apk() {
- yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Desktop
+ yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Desktop/APK/
 }
 
 debugApk() {
- (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Desktop)
+ (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Desktop/APK/)
 }
 
