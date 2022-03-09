@@ -42,9 +42,9 @@ fix-net() {
 kserv() {( cd ~/aurora; bin/ksrv)} 
 ksrv() {( cd ~/aurora; bin/ksrv)} 
 krc() { 
-  pkill -f rails_console
+  pkill -f rails
   sleep 2
-  pkill -9 -f rails_console 2>/dev/null && echo "Force killed"
+  pkill -9 -f rails 2>/dev/null && echo "Force killed"
   rails console 
 }
 
@@ -366,3 +366,10 @@ function h() {
 
 
 alias pg='service postgresql start'
+export FEATURE_FLAG_TMCW=true
+export FEATURE_FLAG_ONBOARDING=true
+
+apk() {
+ yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Desktop
+}
+
