@@ -377,3 +377,6 @@ debugApk() {
  (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Desktop/APK/)
 }
 
+apks() {
+ (cd ~/aurora-mobile/android; ./gradlew assembleRelease assembleDebug && cp ./app/build/outputs/apk/*/app-*.apk ~/win-home/Desktop/APK/)
+}
