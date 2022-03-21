@@ -23,6 +23,6 @@ rm -rf ~/.oh-my-zsh
 git clone https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
 
 
-sudo apt-install zsh
+sudo apt-get install -y zsh
 chsh $USER -s /usr/bin/zsh
 exec zsh --login
