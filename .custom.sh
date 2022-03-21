@@ -16,7 +16,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # heroku autocomplete setup
 HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH;
 
-#rvm use 2.5.7
+source ~/.rvm/scripts/rvm
 
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
