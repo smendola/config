@@ -52,6 +52,10 @@ build_test_db() {
   rails db:drop db:create db:migrate RAILS_ENV=test
 }
 
+reset_test() {
+  rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
+}
+
 reset() { 
   pkill ruby # needed for db:drop
 
@@ -62,6 +66,9 @@ reset() {
   rails db:migrate &&
   rails db:seed &&
   rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
+
+  # imagemagick identify process get stuck on certain files, consume CPU
+  pkill identify || true
 }
 
 up() {
@@ -255,10 +262,11 @@ apilog() {
   else
     local env=${1:-production}
     heroku logs -a aurora-${env} --tail | 
-        sed -urn 's!.*method=([^ ]+).* path="(/?/api/v1[^"]+).* service=([^ ]+).* status=([^ ]+) .*!\1 \2 \t\t\3 \4!igp' 
-
+        sed -urn 's!.*method=([^ ]+).* path="(/?/api/v1[^"]+).* service=([^ ]+).* status=([^ ]+) .*!\1 \2 \t\t\3 \4!igp' |
+        sed -e "s/\(^.*[2][0-9][0-9]\)$/[32m\1[0m/g" \
+            -e "s/\(^.*[3][0-9][0-9]\)$/[33m\1[0m/g" \
+            -e "s/\(^.*[45][0-9][0-9]\)$/[31m\1[0m/g"
   fi
-   # | sed -ur 's!(^.*[45][0-9][0-9]$)![31m\1[0m!g'
 }
 
 alias top=htop
