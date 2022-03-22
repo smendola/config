@@ -175,18 +175,18 @@ clone-prod() {
 
   echo "** Resetting push and chat accounts"
   (set -x;
-    # Note: add aurora:anonymize here if desired
-    heroku run -a aurora-stage rails stream:reset onesignal:delete_all_players
+    heroku run -a aurora-stage onesignal:delete_all_players
+    heroku run -a aurora-stage rails stream:reset 
   )
 
   echo "** Anonymizing"
   (set -x;
-   heroku run -a aurora-stage rails aurora:anonymize
+    heroku run -a aurora-stage rails aurora:anonymize
   )
 
   echo "** Seeding QA data"
   (set -x;
-   heroku run -a aurora-stage rails db:seed:qa_teams
+    heroku run -a aurora-stage rails db:seed:qa_teams
   )
 }
 
