@@ -179,11 +179,6 @@ clone-prod() {
     heroku run -a aurora-stage rails stream:reset onesignal:delete_all_players
   )
 
-  echo "** Seeding QA data"
-  (set -x;
-    heroku run -a aurora-stage rails db:seed:qa_teams
-  )
-
   echo "** Anonymizing"
   (set -x;
    heroku run -a aurora-stage rails aurora:anonymize
