@@ -160,7 +160,7 @@ path+=(
 clone-prod() {
   echo "** copying database"
   (set -x; 
-    heroku pg:copy aurora-production::HEROKU_POSTGRESQL_SILVER_URL DATABASE --app aurora-stage --confirm aurora-stage
+    heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
   )
 
   echo "** Copying s3 bucket"
