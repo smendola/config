@@ -73,12 +73,12 @@ reset() {
 
 up() {
   truncate -s0 ~/aurora/log/development.log
-  rails db:migrate "$@"
+  rails db:migrate "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
 down() {
   truncate -s0 ~/aurora/log/development.log
-  rails db:rollback "$@"
+  rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
 c() {
@@ -165,6 +165,7 @@ clone-prod() {
 
   echo "** Copying s3 bucket"
   (set -x;
+    aws configure set default.s3.max_concurrent_requests 200
     aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
   )
 
@@ -175,7 +176,7 @@ clone-prod() {
 
   echo "** Resetting push and chat accounts"
   (set -x;
-    heroku run -a aurora-stage onesignal:delete_all_players
+    heroku run -a aurora-stage rails onesignal:delete_all_players
     heroku run -a aurora-stage rails stream:reset 
   )
 
@@ -373,13 +374,15 @@ export FEATURE_FLAG_TMCW=true
 export FEATURE_FLAG_ONBOARDING=true
 
 apk() {
- yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Desktop/APK/
+ yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
 }
 
 debugApk() {
- (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Desktop/APK/)
+ (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
 }
 
 apks() {
- (cd ~/aurora-mobile/android; ./gradlew assembleRelease assembleDebug && cp ./app/build/outputs/apk/*/app-*.apk ~/win-home/Desktop/APK/)
+ (cd ~/aurora-mobile/android; ./gradlew assembleRelease assembleDebug && cp ./app/build/outputs/apk/*/app-*.apk ~/win-home/Documents/APK/)
 }
+
+service postgresql status 2>&1 > /dev/null || service postgresql start
