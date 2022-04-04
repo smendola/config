@@ -319,9 +319,15 @@ send()
   echo '# Paste all that follows this into a TTY window on the target machine     #'
   echo '###########################################################################'
   echo -e '\e[0m'
-  echo '(base64 -d | tar Jxf -) << EOF'
+  echo ' (base64 -d | tar Jxf -) << EOF'
   tar Jcf - "$@" | base64
   echo EOF
+}
+
+send-mods()
+{
+	declare -a mods=( $(git status -s | sed -e 's/^.* //g') )
+    send "${mods[@]}"
 }
 
 receive()
@@ -385,4 +391,23 @@ apks() {
  (cd ~/aurora-mobile/android; ./gradlew assembleRelease assembleDebug && cp ./app/build/outputs/apk/*/app-*.apk ~/win-home/Documents/APK/)
 }
 
+c-p() {
+  echo "** copying database"
+  (set -x; 
+    heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
+  )
+
+  echo "** Copying s3 bucket"
+  (set -x;
+    aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
+  )
+
+  echo "** Seeding QA data"
+  (set -x;
+    heroku run -a aurora-stage rails db:seed:qa_teams
+  )
+
+}
+
 service postgresql status 2>&1 > /dev/null || service postgresql start
+

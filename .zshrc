@@ -120,6 +120,7 @@ PATH=$PATH:/snap/bin
 ### Stuff...
 ###############################################################
 
+setopt HIST_IGNORE_SPACE
 setopt extended_glob
 
 # Set name of the theme to load.
