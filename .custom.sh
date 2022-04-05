@@ -269,10 +269,10 @@ alias top=htop
 
 stty sane erase '^?'
 
-wip-pr()
+draft-pr()
 {
   local title=${1:-`git branch --show-current | tr '-' ' '`}
-  gh pr create --title "$title" --body '' --label work-in-progress --base develop
+  gh pr create --draft --title "$title" --body '' --base develop
 }
 
 hkr()
