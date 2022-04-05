@@ -319,7 +319,7 @@ send()
   echo '# Paste all that follows this into a TTY window on the target machine     #'
   echo '###########################################################################'
   echo -e '\e[0m'
-  echo ' (base64 -d | tar Jxf -) << EOF'
+  echo ' (base64 -d | tar Jxpf -) << EOF'
   tar Jcf - "$@" | base64
   echo EOF
 }
@@ -376,6 +376,7 @@ function h() {
 
 
 alias pg='service postgresql start'
+export MAIL_SERVICE=mailtrap
 export FEATURE_FLAG_TMCW=true
 export FEATURE_FLAG_ONBOARDING=true
 
