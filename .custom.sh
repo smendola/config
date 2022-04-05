@@ -271,8 +271,8 @@ stty sane erase '^?'
 
 draft-pr()
 {
-  local title=${1:-`git branch --show-current | tr '-' ' '`}
-  gh pr create --draft --title "$title" --body '' --base develop
+  read  "title?PR name (Paste in the name of relevant Asana task): "
+  gh pr create --title "$title" --body '' --base develop --label "work-in-progress"
 }
 
 hkr()
