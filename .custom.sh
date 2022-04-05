@@ -381,11 +381,14 @@ export FEATURE_FLAG_TMCW=true
 export FEATURE_FLAG_ONBOARDING=true
 
 apk() {
- yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
+ (
+   cd ~/aurora-mobile
+   yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
+ )
 }
 
 debugApk() {
- (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
+ (cd ~/aurora-mobile/android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
 }
 
 apks() {
