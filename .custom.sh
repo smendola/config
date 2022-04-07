@@ -430,7 +430,7 @@ c-p() {
 service postgresql status 2>&1 > /dev/null || service postgresql start
 
 # set heroku feature_flags in heroku
-# Use like: ff onboarding=true -a aurora-stage
+# Use like: ff stage onboarding=true
 function ff() {
   local app=aurora-${1/aurora-//}
   local lhs=${2/=*/}
