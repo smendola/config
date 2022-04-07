@@ -429,13 +429,19 @@ c-p() {
 
 service postgresql status 2>&1 > /dev/null || service postgresql start
 
-# set heroku feature_flags in heroku
-# Use like: ff stage onboarding=true
+# Set/Show feature flags in Heroku
+#   ff stage   # show feature flags from aurora-stage
+#   ff stage tmcw=1 # set feature flag TMCW on aurora-stage
 function ff() {
   local app=aurora-${1/aurora-//}
-  local lhs=${2/=*/}
-  local rhs=${2/*=/}
-  local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
+  if [[ $# -gt 1 ]]
+  then
+    local lhs=${2/=*/}
+    local rhs=${2/*=/}
+    local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
 
-  heroku config:set "FEATURE_FLAG_$feature=$rhs" -a $app
+    echo heroku config:set "FEATURE_FLAG_$feature=$rhs" -a $app
+  else
+    heroku config -a $app | grep '^FEATURE_FLAG_[^: ]*'
+  fi
 }
