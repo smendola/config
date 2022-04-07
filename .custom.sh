@@ -429,11 +429,13 @@ c-p() {
 
 service postgresql status 2>&1 > /dev/null || service postgresql start
 
+# set heroku feature_flags in heroku
+# Use like: ff onboarding=true -a aurora-stage
 function ff() {
   local lhs=${1/=*/}
   local rhs=${1/*=/}
   shift
-  
+
   local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
   heroku config:set "FEATURE_FLAG_$feature=$rhs" "$@"
 }
