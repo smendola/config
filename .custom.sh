@@ -440,7 +440,7 @@ function ff() {
     local rhs=${2/*=/}
     local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
 
-    echo heroku config:set "FEATURE_FLAG_$feature=$rhs" -a $app
+    heroku config:set "FEATURE_FLAG_$feature=$rhs" -a $app
   else
     heroku config -a $app | grep '^FEATURE_FLAG_[^: ]*'
   fi
