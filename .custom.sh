@@ -158,9 +158,16 @@ path+=(
 
 
 clone-prod() {
-  echo "** copying database"
-  (set -x; 
+  echo "** Entering maintenance mode" 
+  (set -x;
+    heroku maintenance:on -a aurora-stage
+  )
+
+  echo "** Copying database"
+  (set -x;
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
+    heroku ps:restart -a aurora-stage
+    heroku maintenance:off -a aurora-stage
   )
 
   echo "** Copying s3 bucket"
@@ -172,6 +179,11 @@ clone-prod() {
   echo "** Migrating database"
   (set -x;
     heroku run -a aurora-stage rails db:migrate
+  )
+
+  echo "** Exiting maintenance mode" 
+  (set -x;
+    heroku maintenance:off -a aurora-stage
   )
 
   echo "** Resetting push and chat accounts"
@@ -272,7 +284,7 @@ stty sane erase '^?'
 draft-pr()
 {
   local title=${1:-`git branch --show-current | tr '-' ' '`}
-  gh pr create --draft --title "$title" --body '' --base develop
+  gh pr create --label work-in-progress --title "$title" --body '' --base develop
 }
 
 hkr()
@@ -396,9 +408,10 @@ apks() {
 }
 
 c-p() {
-  echo "** copying database"
+  echo "** Copying database"
   (set -x; 
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
+    heroku ps:restart -a aurora-stage
   )
 
   echo "** Copying s3 bucket"
@@ -406,12 +419,21 @@ c-p() {
     aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
   )
 
+
   echo "** Seeding QA data"
   (set -x;
-    heroku run -a aurora-stage rails db:seed:qa_teams
+    heroku run -a aurora-stage rails db:migrate db:seed:qa_teams
   )
 
 }
 
 service postgresql status 2>&1 > /dev/null || service postgresql start
 
+function ff() {
+  local lhs=${1/=*/}
+  local rhs=${1/*=/}
+  shift
+  
+  local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
+  heroku config:set "FEATURE_FLAG_$feature=$rhs" "$@"
+}
