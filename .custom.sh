@@ -158,9 +158,16 @@ path+=(
 
 
 clone-prod() {
-  echo "** copying database"
-  (set -x; 
+  echo "** Entering maintenance mode" 
+  (set -x;
+    heroku maintenance:on -a aurora-stage
+  )
+
+  echo "** Copying database"
+  (set -x;
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
+    heroku ps:restart -a aurora-stage
+    heroku maintenance:off -a aurora-stage
   )
 
   echo "** Copying s3 bucket"
@@ -172,6 +179,11 @@ clone-prod() {
   echo "** Migrating database"
   (set -x;
     heroku run -a aurora-stage rails db:migrate
+  )
+
+  echo "** Exiting maintenance mode" 
+  (set -x;
+    heroku maintenance:off -a aurora-stage
   )
 
   echo "** Resetting push and chat accounts"
@@ -381,11 +393,14 @@ export FEATURE_FLAG_TMCW=true
 export FEATURE_FLAG_ONBOARDING=true
 
 apk() {
- yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
+ (
+   cd ~/aurora-mobile
+   yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
+ )
 }
 
 debugApk() {
- (cd android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
+ (cd ~/aurora-mobile/android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
 }
 
 apks() {
@@ -393,9 +408,10 @@ apks() {
 }
 
 c-p() {
-  echo "** copying database"
+  echo "** Copying database"
   (set -x; 
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
+    heroku ps:restart -a aurora-stage
   )
 
   echo "** Copying s3 bucket"
@@ -403,12 +419,29 @@ c-p() {
     aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
   )
 
+
   echo "** Seeding QA data"
   (set -x;
-    heroku run -a aurora-stage rails db:seed:qa_teams
+    heroku run -a aurora-stage rails db:migrate db:seed:qa_teams
   )
 
 }
 
 service postgresql status 2>&1 > /dev/null || service postgresql start
 
+# Set/Show feature flags in Heroku
+#   ff stage   # show feature flags from aurora-stage
+#   ff stage tmcw=1 # set feature flag TMCW on aurora-stage
+function ff() {
+  local app=aurora-${1/aurora-//}
+  if [[ $# -gt 1 ]]
+  then
+    local lhs=${2/=*/}
+    local rhs=${2/*=/}
+    local feature=$(echo -n $lhs | tr '[:lower:]' '[:upper:]')
+
+    heroku config:set "FEATURE_FLAG_$feature=$rhs" -a $app
+  else
+    heroku config -a $app | grep '^FEATURE_FLAG_[^: ]*'
+  fi
+}
