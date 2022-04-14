@@ -337,7 +337,12 @@ function send() {
     return
   fi
 
-  local url=$(tar Jcf - "$@" | gpg -ac -o- | curl -s -X PUT -T "-" https://transfer.sh/send.gpg)
+  local url=$(tar Jcf - "$@" | gpg -ac -o- | 
+   curl -s -X PUT -T - \
+        -H "Max-Downloads: 1" \
+        -H "Max-Days: 5" \
+        https://transfer.sh/send.gpg
+  )
   local receive_cmd="curl -s '$url' | gpg -d -o- | tar Jxfvv -"
   echo $receive_cmd
   echo "$receive_cmd" | xsel -i -b | echo 'Sent to clipboard' || echo '(No clipboard)'
@@ -481,3 +486,4 @@ function shutdown() {
   wsl.exe --shutdown
 }
 
+transfer(){ if [ $# -eq 0 ];then echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>">&2;return 1;fi;if tty -s;then file="$1";file_name=$(basename "$file");if [ ! -e "$file" ];then echo "$file: No such file or directory">&2;return 1;fi;if [ -d "$file" ];then file_name="$file_name.zip" ,;(cd "$file"&&zip -r -q - .)|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null,;else cat "$file"|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;else file_name=$1;curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;}
