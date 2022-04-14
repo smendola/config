@@ -283,8 +283,8 @@ stty sane erase '^?'
 
 draft-pr()
 {
-  local title=${1:-`git branch --show-current | tr '-' ' '`}
-  gh pr create --label work-in-progress --title "$title" --body '' --base develop
+  read  "title?PR name (Paste in the name of relevant Asana task): "
+  gh pr create --title "$title" --body '' --base develop --label "work-in-progress"
 }
 
 hkr()
@@ -474,5 +474,10 @@ function ff() {
 
 function recd() {
   cd /; cd -
+}
+
+unalias shutdown
+function shutdown() {
+  wsl.exe --shutdown
 }
 
