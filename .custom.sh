@@ -317,8 +317,46 @@ hke()
 
 
 
-send()
+# Send files via transfer.sh service
+# Uses encryption in transit
+
+# Usage:
+#  send PATH ...
+#  send mods
+#  Can send mix of files and dirs
+#  If PATH is exactly 'mods' it will instead send
+#  files that are modified in git
+# The output of this command includes the command
+# to be used on the receiving end to receive the files.
+# If possible, the command is also sent to the clipboard.
+function send() {
+  if [[ $1 == "mods" ]]
+  then
+    declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
+    send "${mods[@]}"
+    return
+  fi
+
+  local url=$(tar Jcf - "$@" | gpg -ac -o- | curl -s -X PUT -T "-" https://transfer.sh/send.gpg)
+  local receive_cmd="curl -s '$url' | gpg -d -o- | tar Jxfvv -"
+  echo $receive_cmd
+  echo "$receive_cmd" | xsel -i -b | echo 'Sent to clipboard' || echo '(No clipboard)'
+}
+
+
+function receive() {
+   curl -s "$1" | gpg -d -o- | tar Jxfvv -
+}
+
+ttysend()
 {
+  if [[ $1 == "mods" ]]
+  then
+	declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
+    ttysend "${mods[@]}"
+    return
+  fi
+
   if [[ ! -e "$1" ]]
   then
 	echo "No such file: $1" 1>&2
@@ -335,18 +373,6 @@ send()
   tar Jcf - "$@" | base64
   echo EOF
 }
-
-send-mods()
-{
-	declare -a mods=( $(git status -s | sed -e 's/^.* //g') )
-    send "${mods[@]}"
-}
-
-receive()
-{
-  base64 -d \<\<EOF | tar Jxf -
-}
-
 
 clean()
 {
@@ -449,3 +475,4 @@ function ff() {
 function recd() {
   cd /; cd -
 }
+
