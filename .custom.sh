@@ -449,3 +449,9 @@ function ff() {
 function recd() {
   cd /; cd -
 }
+
+unalias shutdown
+function shutdown() {
+  wsl.exe --shutdown
+}
+
