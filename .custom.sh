@@ -338,8 +338,8 @@ function send() {
   fi
 
   local url=$(tar Jcf - "$@" | gpg -ac -o- | 
+   # -H "Max-Downloads: 1" \
    curl -s -X PUT -T - \
-        -H "Max-Downloads: 1" \
         -H "Max-Days: 1" \
         https://transfer.sh/send.gpg
   )

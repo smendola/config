@@ -26,3 +26,4 @@ experimental
 /.ssh/id_*
 !/bin
 !/bin.personal
+!.gnupg/gpg.conf
