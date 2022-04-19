@@ -344,8 +344,12 @@ function send() {
         https://transfer.sh/send.gpg
   )
   local receive_cmd="curl -s '$url' | gpg -d -o- | tar Jxfvv -"
+  echo -n -e '\e[32m'
+  echo "To receive the file, use the following command:"
+  echo -e '\e[m'
   echo $receive_cmd
-  echo "$receive_cmd" | xsel -i -b | echo 'Sent to clipboard' || echo '(No clipboard)'
+  echo ""
+  echo "$receive_cmd" | xsel -i -b | echo -e '\e[32m(Sent to clipboard)\e[m' || echo '(No clipboard)'
 }
 
 

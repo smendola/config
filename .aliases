@@ -269,6 +269,9 @@ function tit()
   fi
 }
 
+function gcp() {
+  git cherry-pick "$@"
+}
 
 alias gpr='git pull --rebase'
 alias mods='git status'
