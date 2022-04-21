@@ -351,7 +351,7 @@ function send() {
   echo -e '\e[m'
   echo $receive_cmd
   echo ""
-  echo "$receive_cmd" | xsel -i -b | echo -e '\e[32m(Sent to clipboard)\e[m' || echo '(No clipboard)'
+  (echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || (echo '(No clipboard)')
 }
 
 
