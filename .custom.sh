@@ -101,21 +101,22 @@ heroku-app() {
 }
 
 # Usage:
-# deploy [BRANCH [APP]]
+# deploy [APP] [BRANCH]
 # BRANCH defaults to current branch
 # APP defaults to develop, meaning remote 'heroku-develop'
 # e.g.
 # $ deploy
-#    deploys local develop branch to heroku-develop
-# $ deploy mybranch
-#    deploys local mybranch branch to heroku-develop
-# $ deploy develop stage
-#    deploys local develop branch to heroku-stage
+#    deploys current branch to aurora-develop
+# $ deploy stage
+#    deploys current branch to aurora-stage
+# $ deploy production hotfixes
+#    deploys branch hotfixes to aurora-production
 #
 deploy() {
-  local branch=${1:-$(git branch --show)}
-  local env=${2:-develop}
+  local env=${1:-develop}
+  local branch=${2:-$(git branch --show)}
     
+  heroku git:remote -r heroku-$env -a aurora-$env
   git push heroku-$env ${branch}:master
 }
 
