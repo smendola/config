@@ -1,5 +1,6 @@
 MYBG=056
-export EDITOR=vim
+export EDITOR=micro
+export SUDO_EDITOR=micro
 
 # NVM setup
 export NVM_DIR="$HOME/.nvm"
@@ -491,3 +492,12 @@ unalias shutdown
 function shutdown() {
   wsl.exe --shutdown
 }
+
+
+# Start Docker daemon automatically when logging in if not running.
+RUNNING=`ps aux | grep dockerd | grep -v grep`
+if [ -z "$RUNNING" ]; then
+    sudo dockerd > /dev/null 2>&1 &
+    disown
+fi
+
