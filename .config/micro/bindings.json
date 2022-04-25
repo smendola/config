@@ -1,4 +1,5 @@
 {
     "Alt-/": "lua:comment.comment",
-    "CtrlH": "command-edit:help "
+    "CtrlH": "command-edit:help ",
+    "AltCtrlT": "command-edit:setlocal filetype "
 }
