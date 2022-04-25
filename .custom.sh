@@ -501,3 +501,10 @@ if [ -z "$RUNNING" ]; then
     disown
 fi
 
+alias e=micro
+vi () {
+  echo '** Use micro instead **'
+  sleep 1
+  micro "$@"
+}
+
