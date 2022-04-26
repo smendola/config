@@ -1,5 +1,7 @@
 {
     "Alt-/": "lua:comment.comment",
-    "CtrlH": "command-edit:help ",
-    "AltCtrlT": "command-edit:setlocal filetype "
+    "AltCtrlT": "command-edit:setlocal filetype ",
+    "Ctrl-d": "Delete",
+    "Ctrl-k": "SelectToEndOfLine\u0026Cut",
+    "CtrlH": "command-edit:help "
 }
