@@ -40,13 +40,15 @@ fix-net() {
   # netscript restart
 }
 
-kserv() {( cd ~/aurora; bin/ksrv)} 
-ksrv() {( cd ~/aurora; bin/ksrv)} 
-krc() { 
-  pkill -f rails
+kserv() {( cd ~/aurora; bin/ksrv)}
+ksrv() {( cd ~/aurora; bin/ksrv)}
+krc() {
+  pkill -f spring
+  pkill -f 'rails c'
   sleep 2
-  pkill -9 -f rails 2>/dev/null && echo "Force killed"
-  rails console 
+  pkill -9 -f 'rails c' 2>/dev/null && echo "Force killed rails c"
+  pkill -9 -f 'spring' 2>/dev/null && echo "Force killed spring"
+  rails console
 }
 
 build_test_db() {
@@ -57,7 +59,7 @@ reset_test() {
   rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
 }
 
-reset() { 
+reset() {
   pkill ruby # needed for db:drop
 
   # I've found thact combining multiple targets in one go gives wrong behavior
@@ -116,7 +118,7 @@ heroku-app() {
 deploy() {
   local env=${1:-develop}
   local branch=${2:-$(git branch --show)}
-    
+
   heroku git:remote -r heroku-$env -a aurora-$env
   git push heroku-$env ${branch}:master
 }
@@ -154,14 +156,14 @@ export ANDROID_SDK_ROOT=~/Android/Sdk
 export ANDROID_HOME=$ANDROID_SDK_ROOT
 path+=(
   $ANDROID_HOME/emulator
-  $ANDROID_HOME/tools 
-  $ANDROID_HOME/tools/bin 
-  $ANDROID_HOME/platform-tools 
+  $ANDROID_HOME/tools
+  $ANDROID_HOME/tools/bin
+  $ANDROID_HOME/platform-tools
 )
 
 
 clone-prod() {
-  echo "** Entering maintenance mode" 
+  echo "** Entering maintenance mode"
   (set -x;
     heroku maintenance:on -a aurora-stage
   )
@@ -184,7 +186,7 @@ clone-prod() {
     heroku run -a aurora-stage rails db:migrate
   )
 
-  echo "** Exiting maintenance mode" 
+  echo "** Exiting maintenance mode"
   (set -x;
     heroku maintenance:off -a aurora-stage
   )
@@ -192,7 +194,7 @@ clone-prod() {
   echo "** Resetting push and chat accounts"
   (set -x;
     heroku run -a aurora-stage rails onesignal:delete_all_players
-    heroku run -a aurora-stage rails stream:reset 
+    heroku run -a aurora-stage rails stream:reset
   )
 
   echo "** Anonymizing"
@@ -245,34 +247,34 @@ ya() {(
   then
     echo 'No device plugged in'
     while ! adb devices | command grep -sq '[0-9]'
-    do 
+    do
       echo -n .; sleep 1
     done
   fi
 
-  yarn install && 
+  yarn install &&
   yarn android
 )}
 
 
 promote() {
   local from=develop
-  local to=master 
+  local to=master
   git stash &&
     git fetch &&
-    git rebase ${from} ${to} && 
-    git push && 
+    git rebase ${from} ${to} &&
+    git push &&
     git co ${from}
 }
 
 apilog() {
   if [[ -z $1 ]]
   then
-    tail -f ~/aurora/log/development.log | 
-        sed -urn 's!.*method=([^ ]+).* path=(/?/api/v1/[^ ]+).* status=([^ ]+).* duration=([^ ]+) .*!\1 \2 \t\t\3  \4ms!igp' 
+    tail -f ~/aurora/log/development.log |
+        sed -urn 's!.*method=([^ ]+).* path=(/?/api/v1/[^ ]+).* status=([^ ]+).* duration=([^ ]+) .*!\1 \2 \t\t\3  \4ms!igp'
   else
     local env=${1:-production}
-    heroku logs -a aurora-${env} --tail | 
+    heroku logs -a aurora-${env} --tail |
         sed -urn 's!.*method=([^ ]+).* path="(/?/api/v1[^"]+).* service=([^ ]+).* status=([^ ]+) .*!\1 \2 \t\t\3 \4!igp' |
         sed -e "s/\(^.*[2][0-9][0-9]\)$/[32m\1[0m/g" \
             -e "s/\(^.*[3][0-9][0-9]\)$/[33m\1[0m/g" \
@@ -340,7 +342,7 @@ function send() {
     return
   fi
 
-  local url=$(tar Jcf - "$@" | gpg -ac -o- | 
+  local url=$(tar Jcf - "$@" | gpg -ac -o- |
    # -H "Max-Downloads: 1" \
    curl -s -X PUT -T - \
         -H "Max-Days: 1" \
@@ -352,7 +354,7 @@ function send() {
   echo -e '\e[m'
   echo $receive_cmd
   echo ""
-  echo "$receive_cmd" | xsel -i -b | echo -e '\e[32m(Sent to clipboard)\e[m' || echo '(No clipboard)'
+  (echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
 
 
@@ -447,7 +449,7 @@ apks() {
 
 c-p() {
   echo "** Copying database"
-  (set -x; 
+  (set -x;
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
     heroku ps:restart -a aurora-stage
   )
@@ -493,18 +495,21 @@ function shutdown() {
   wsl.exe --shutdown
 }
 
-
-# Start Docker daemon automatically when logging in if not running.
-RUNNING=`ps aux | grep dockerd | grep -v grep`
-if [ -z "$RUNNING" ]; then
-    sudo dockerd > /dev/null 2>&1 &
-    disown
-fi
+sudo pkill -0 dockerd || (sudo dockerd 2> /dev/null&)
 
 alias e=micro
 vi () {
   echo '** Use micro instead **'
   sleep 1
   micro "$@"
+}
+
+proxy() {
+  if ! nc -w0 localhost 8080
+  then
+    echo "Error: Proxy server not reachable on localhost:8080" >&2
+    return
+  fi
+  http_proxy=http://localhost:8080 HTTP_PROXY=http://localhost:8080 "$@"
 }
 
