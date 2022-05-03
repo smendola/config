@@ -504,6 +504,11 @@ vi () {
   micro "$@"
 }
 
+micro () {
+	command micro "$@"
+	rm -f log.txt
+}
+
 proxy() {
   if ! nc -w0 localhost 8080
   then
