@@ -197,10 +197,10 @@ clone-prod() {
     heroku run -a aurora-stage rails stream:reset
   )
 
-  echo "** Anonymizing"
-  (set -x;
-    heroku run -a aurora-stage rails aurora:anonymize
-  )
+  echo "*******  NOT Anonymizing *********"
+  #(set -x;
+  #  heroku run -a aurora-stage rails aurora:anonymize
+  #)
 
   echo "** Seeding QA data"
   (set -x;
