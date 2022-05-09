@@ -496,6 +496,8 @@ function shutdown() {
 }
 
 sudo pkill -0 dockerd || (sudo dockerd 2> /dev/null&)
+export DOCKER_BUILDKIT=1
+alias dirt='docker run -it'
 
 alias e=micro
 vi () {
@@ -518,3 +520,4 @@ proxy() {
   http_proxy=http://localhost:8080 HTTP_PROXY=http://localhost:8080 "$@"
 }
 
+eval "$(direnv hook zsh)"
