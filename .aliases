@@ -309,3 +309,7 @@ alias netscript='sudo netscript'
 fix-net() {
 	sudo netscript restart
 }
+
+usage() {
+	du -ha -d 1 | sort -hr
+}

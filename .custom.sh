@@ -42,10 +42,9 @@ fix-net() {
 
 kserv() {( cd ~/aurora; bin/ksrv)}
 ksrv() {( cd ~/aurora; bin/ksrv)}
-krc() {
-  pkill -f spring
-  pkill -f 'rails c'
-  sleep 2
+kc() {
+  spring stop && sleep 2 && pkill -f spring
+  pkill -f 'rails c' && sleep 3
   pkill -9 -f 'rails c' 2>/dev/null && echo "Force killed rails c"
   pkill -9 -f 'spring' 2>/dev/null && echo "Force killed spring"
   rails console
@@ -119,6 +118,9 @@ deploy() {
   local env=${1:-develop}
   local branch=${2:-$(git branch --show)}
 
+  echo "** Deploying branch $branch to aurora-$env **"
+  echo "Interrupting this process after any 'remote:' output will not stop the build"
+  echo ""
   heroku git:remote -r heroku-$env -a aurora-$env
   git push heroku-$env ${branch}:master
 }
@@ -173,6 +175,7 @@ clone-prod() {
     heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
     heroku ps:restart -a aurora-stage
     heroku maintenance:off -a aurora-stage
+    heroku psql -a aurora-stage -c "update active_storage_blobs set service_name = 'amazon_staging' where service_name = 'amazon_production'"
   )
 
   echo "** Copying s3 bucket"
