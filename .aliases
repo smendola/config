@@ -311,5 +311,5 @@ fix-net() {
 }
 
 usage() {
-	du -ha -d 1 | sort -hr
+	du -ha -d 3 "$@" | sort -hr | head -20
 }
