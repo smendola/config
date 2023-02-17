@@ -17,7 +17,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # heroku autocomplete setup
 HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH;
 
-source ~/.rvm/scripts/rvm
+test -d ~/.rvm/scripts/rvm && source ~/.rvm/scripts/rvm
 
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
@@ -33,6 +33,7 @@ export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
 export PORT=3000
 export FOREST_ENV_SECRET=660b9fc6b96f476f5fc0d8e9b4da85e15f6732c4c6e6df26d13ef9c583b5bc9c
 export LOGRAGE_ENABLED=true
+export STREAM_APP_NAME=reachire-developer-sal
 
 alias pga='ping www.google.com'
 fix-net() {
@@ -84,47 +85,23 @@ down() {
 }
 
 c() {
-  rails r nil 2>/dev/null
   rails c
 }
 
 
 # Usage:
 #  heroku-app HEROKU_APP_NAME [GIT_REMOTE_ALIAS]
-#  GIT_REMOTE_ALIAS defaults to heroku-HEROKU_APP_NAME with the substring "aurora-" removed
 #  e.g.
 #  $ heroku-app aurora-develop
 #      creates git remote "heroku-develop"
+#  can be shortened as:
+#  $ heroku-app develop
 heroku-app() {
-  app=${1?App name is required (e.g. aurora-develop)}
-  git_remote=heroku-${app/aurora-/}
+  app=${1?App name is required (e.g. aurora-pr-987 or simply pr-987)}
+  git_remote=aurora-${app/aurora-/}
   git_remote=${2:-${git_remote}}
-  heroku git:remote -a ${app} -r ${git_remote}
+  heroku git:remote -a aurora-${app} -r ${git_remote}
 }
-
-# Usage:
-# deploy [APP] [BRANCH]
-# BRANCH defaults to current branch
-# APP defaults to develop, meaning remote 'heroku-develop'
-# e.g.
-# $ deploy
-#    deploys current branch to aurora-develop
-# $ deploy stage
-#    deploys current branch to aurora-stage
-# $ deploy production hotfixes
-#    deploys branch hotfixes to aurora-production
-#
-deploy() {
-  local env=${1:-develop}
-  local branch=${2:-$(git branch --show)}
-
-  echo "** Deploying branch $branch to aurora-$env **"
-  echo "Interrupting this process after any 'remote:' output will not stop the build"
-  echo ""
-  heroku git:remote -r heroku-$env -a aurora-$env
-  git push heroku-$env ${branch}:master
-}
-
 
 production-shell() {
 	terminator -p production -x heroku run -a aurora-production bash
@@ -138,12 +115,6 @@ ro-console() {
     env=${1:-production}
 	heroku run -a aurora-$env rails c --sandbox
 }
-
-# only works on production, as that pg server is only attached to production
-ro-psql() {
-  heroku pg:psql postgresql-silhouetted-48232 --credential sal-readonly --app aurora-$1
-}
-
 
 debug-puma() {
   rdebug-ide --host 0.0.0.0 --port 1234 --dispatcher-port 26162 -- `which puma` -C config/puma.rb
@@ -161,55 +132,8 @@ path+=(
   $ANDROID_HOME/tools
   $ANDROID_HOME/tools/bin
   $ANDROID_HOME/platform-tools
+  ~/android-studio/bin
 )
-
-
-clone-prod() {
-  echo "** Entering maintenance mode"
-  (set -x;
-    heroku maintenance:on -a aurora-stage
-  )
-
-  echo "** Copying database"
-  (set -x;
-    heroku pg:copy aurora-production::DATABASE DATABASE --app aurora-stage --confirm aurora-stage
-    heroku ps:restart -a aurora-stage
-    heroku maintenance:off -a aurora-stage
-    heroku psql -a aurora-stage -c "update active_storage_blobs set service_name = 'amazon_staging' where service_name = 'amazon_production'"
-  )
-
-  echo "** Copying s3 bucket"
-  (set -x;
-    aws configure set default.s3.max_concurrent_requests 200
-    aws s3 sync s3://reachire-active-storage-production s3://reachire-active-storage-staging
-  )
-
-  echo "** Migrating database"
-  (set -x;
-    heroku run -a aurora-stage rails db:migrate
-  )
-
-  echo "** Exiting maintenance mode"
-  (set -x;
-    heroku maintenance:off -a aurora-stage
-  )
-
-  echo "** Resetting push and chat accounts"
-  (set -x;
-    heroku run -a aurora-stage rails onesignal:delete_all_players
-    heroku run -a aurora-stage rails stream:reset
-  )
-
-  echo "*******  NOT Anonymizing *********"
-  #(set -x;
-  #  heroku run -a aurora-stage rails aurora:anonymize
-  #)
-
-  echo "** Seeding QA data"
-  (set -x;
-    heroku run -a aurora-stage rails db:seed:qa_teams
-  )
-}
 
 
 gitdt() {
@@ -419,7 +343,6 @@ alias xsl='xmlstarlet val'
 alias go='rails runner `pwd`/go.rb'
 
 path+=(~/gatling/bin)
-#export DATABASE_URL='postgres://dev:dev@sm-dev/reachire-web_development?pool=5'
 
 function hk() {
   heroku "$@" -a aurora-stage
@@ -432,18 +355,24 @@ function h() {
 
 alias pg='service postgresql start'
 export MAIL_SERVICE=mailtrap
-export FEATURE_FLAG_TMCW=true
-export FEATURE_FLAG_ONBOARDING=true
+export FEATURE_FLAG_UNIVERSAL_FEED=true
 
 apk() {
  (
    cd ~/aurora-mobile
-   yarn apk && cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/
+   yarn apk && bin/install-apk release
+     # cp ./android/app/build/outputs/apk/release/app-release.apk ~/win-home/Documents/APK/ &&
+     # wslview ./android/app/build/outputs/apk/release/app-release.apk
  )
 }
 
 debugApk() {
- (cd ~/aurora-mobile/android; ./gradlew assembleDebug && cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/)
+ (
+   cd ~/aurora-mobile/android; 
+   ./gradlew assembleDebug && ../bin/install-apk debug
+   #  cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/ &&
+   # wslview ./app/build/outputs/apk/debug/app-debug.apk
+ )
 }
 
 apks() {
@@ -470,7 +399,7 @@ c-p() {
 
 }
 
-service postgresql status 2>&1 > /dev/null || service postgresql start
+# service postgresql status 2>&1 > /dev/null || service postgresql start
 
 # Set/Show feature flags in Heroku
 #   ff stage   # show feature flags from aurora-stage
@@ -524,3 +453,61 @@ proxy() {
 }
 
 eval "$(direnv hook zsh)"
+
+export GIT_MERGE_AUTOEDIT=no
+#export AURORA_DEMO_ACCOUNT=devparticipant@reachire.com
+
+_top() {
+  # TODO? make it walk up to root of whatever project I'm in 
+  cd ~/aurora
+}
+
+gpp() {
+  (
+    echo "Synching core"
+    cd app/webpacker/aurora-client-core &&
+      git pull && git push &&
+    bd &&
+      echo "Synching top level"
+      git co -- .idea; 
+      git pull && git push; 
+  )
+}
+
+co-d() {
+  (_top; git co develop && cd app/webpacker/aurora-client-core && git co develop)
+}
+
+co-s() {
+  (_top; git co -- .idea; git co staging && cd app/webpacker/aurora-client-core && git co staging)
+}
+
+co-m() {
+  (_top; git co .idea; git co master && cd app/webpacker/aurora-client-core && git co master)
+}
+
+gp() {
+  (git co .idea; git pull ; cd app/webpacker/aurora-client-core; git pull)
+}
+
+show-stash() {
+  local n=${1:-0}
+  git difftool -y "stash@{$n}~" "stash@{$n}"
+}
+
+rails() {
+  spring stop
+  command rails "$@"
+}
+
+core=./app/webpacker/aurora-client-core
+
+export DONT_PROMPT_WSL_INSTALL=true
+
+# TODO: fix this hack
+SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
+
+# This runs the WINDOWS installed version of adb
+function adb() {
+  $SDK/platform-tools/adb.exe "$@"
+}

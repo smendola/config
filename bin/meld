@@ -1,0 +1,5 @@
+#!/bin/bash
+# newer version of meld spews lots of error messages; 
+# and exits with non-zero status. But it works.
+# this sript hides all that
+ (/usr/bin/meld "$@" || true) > /dev/null 2>&1 

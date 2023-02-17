@@ -3,5 +3,6 @@
     "AltCtrlT": "command-edit:setlocal filetype ",
     "Ctrl-d": "Delete",
     "Ctrl-k": "SelectToEndOfLine&Cut",
-    "CtrlH": "command-edit:help "
+    "CtrlH": "command-edit:help ",
+    "CtrlUnderscore": "lua:comment.comment"
 }

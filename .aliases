@@ -280,7 +280,13 @@ alias start=xdg-open
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
 alias unvpn='sudo pkill -INT openconnect'
 
-alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p' | egrep -v '^lo|^docker'"
+# In WSL, this is the IP address (or addresses) of of the internal ethernet device
+#alias ipaddr="ip address | sed -nr 's/.*inet.([0-9.]+).* (\w+)/\2 \1/p' | egrep -v '^lo|^docker' | cut -d ' ' -f 2"
+alias ipaddr="ifconfig eth0 | awk '/inet[^6]/ { print \$2 }'"
+
+# In WSL, this is the IP address of the Windows host; this is where e.g. VcXsrv would be
+alias host-ip="cat /etc/resolv.conf | tail -n1 | cut -d ' ' -f 2"
+
 alias newest='ls -t | head -1'
 
 alias yum='sudo yum'
@@ -312,4 +318,13 @@ fix-net() {
 
 usage() {
 	du -ha -d 3 "$@" | sort -hr | head -20
+}
+
+k%() {
+	kill % && sleep 2 && kill -9 %
+}
+
+public-ip() {
+  curl https://ipinfo.io/ip
+  echo ''
 }
