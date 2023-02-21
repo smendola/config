@@ -128,7 +128,8 @@ debug-rails() {
 export ANDROID_SDK_ROOT=~/Android/Sdk
 export ANDROID_HOME=$ANDROID_SDK_ROOT
 path+=(
-  $ANDROID_HOME/emulator
+  $ANDROID_HOME/cmdline-tools/latest/bin # must come first
+  #$ANDROID_HOME/emulator
   $ANDROID_HOME/tools
   $ANDROID_HOME/tools/bin
   $ANDROID_HOME/platform-tools
