@@ -128,8 +128,7 @@ debug-rails() {
 export ANDROID_SDK_ROOT=~/Android/Sdk
 export ANDROID_HOME=$ANDROID_SDK_ROOT
 path+=(
-  $ANDROID_HOME/cmdline-tools/latest/bin # must come first
-  #$ANDROID_HOME/emulator
+  $ANDROID_HOME/emulator
   $ANDROID_HOME/tools
   $ANDROID_HOME/tools/bin
   $ANDROID_HOME/platform-tools
@@ -504,3 +503,17 @@ rails() {
 core=./app/webpacker/aurora-client-core
 
 export DONT_PROMPT_WSL_INSTALL=true
+
+# TODO: fix this hack
+# SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
+
+# # This runs the WINDOWS installed version of adb
+# function adb() {
+  # $SDK/platform-tools/adb.exe "$@"
+# }
+
+path+=(
+  $ANDROID_HOME/cmdline-tools/latest 
+  $ANDROID_HOME/cmdline-tools/latest/bin
+  $ANDROID_HOME/platform-tools
+)
