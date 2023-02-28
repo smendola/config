@@ -1,0 +1,65 @@
+#!/bin/bash -exv
+
+apt-get() {
+	sudo apt-get "$@"
+}
+
+install() {
+	sudo apt-get install -y "$@"
+}
+
+echo "INSTALLING WGET, CURL, XSEL"
+install wget curl xsel
+
+# NOTE: Organized like this so as to only do apt-get update once
+
+echo "REGISTERING SOME REPOS"
+
+# google chrone repo
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+
+# SublimeText repo
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+
+sudo apt-get update
+
+echo "INSTALLING SOME UTILITIES"
+install wslu zip unzip dos2unix
+
+echo "INSTALLING CHROME BROWSER"
+install google-chrome-stable
+
+echo "INSTALLING JAVA"
+install openjdk-11-jdk
+
+echo "INSTALLING SUBLIME TEXT"
+install sublime-text
+
+echo "FETCHING MESLO FONTS"
+test ! -d Meslo-Font && git clone https://github.com/andreberg/Meslo-Font.git
+# TODO: Install the fonts now
+
+echo "INSTALLING HEROKU CLI"
+curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+
+echo "INSTALLING GITHUB CLI"
+install gh
+
+echo "INSTALLING AWS CLI"
+(cd /tmp
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+)
+
+echo "INSTALLING PGADMIN 4"
+curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+sudo apt-get install -y pgadmin4
+sudo /usr/pgadmin4/bin/setup-web.sh
+
+
+echo "INSTALLING MISC STUFF"
+install usbutils net-tools
