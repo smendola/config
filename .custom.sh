@@ -368,6 +368,13 @@ apk() {
 
 debugApk() {
  (
+   if ! curl -s http://localhost:8081 2>&1 > /dev/null
+   then
+     echo ""
+     echo "** Don't forget to start Metro server (in another window) **"
+     echo ""
+   fi
+     
    cd ~/aurora-mobile/android; 
    ./gradlew assembleDebug && ../bin/install-apk debug
    #  cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/ &&
