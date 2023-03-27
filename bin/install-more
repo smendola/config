@@ -47,18 +47,21 @@ curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 echo "INSTALLING GITHUB CLI"
 install gh
 
+if ! aws --version 2>&1 > /dev/null
+then
 echo "INSTALLING AWS CLI"
 (cd /tmp
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   unzip awscliv2.zip
   sudo ./aws/install
 )
+fi
 
-echo "INSTALLING PGADMIN 4"
-curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
-sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
-sudo apt-get install -y pgadmin4
-sudo /usr/pgadmin4/bin/setup-web.sh
+# echo "INSTALLING PGADMIN 4"
+# curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
+# sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+# sudo apt-get install -y pgadmin4
+# sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 echo "INSTALLING MISC STUFF"
