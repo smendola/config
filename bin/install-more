@@ -48,12 +48,15 @@ heroku plugins:install heroku-builds
 echo "INSTALLING GITHUB CLI"
 install gh
 
+if ! aws --version 2>&1 > /dev/null
+then
 echo "INSTALLING AWS CLI"
 (cd /tmp
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   unzip awscliv2.zip
   sudo ./aws/install
 )
+fi
 
 # Maybe run this on Windows host instead?
 # echo "INSTALLING PGADMIN 4"
