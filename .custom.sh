@@ -34,6 +34,7 @@ export PORT=3000
 export FOREST_ENV_SECRET=660b9fc6b96f476f5fc0d8e9b4da85e15f6732c4c6e6df26d13ef9c583b5bc9c
 export LOGRAGE_ENABLED=true
 export STREAM_APP_NAME=reachire-developer-sal
+export ACTIVE_RECORD_LOG_LEVEL=info
 
 alias pga='ping www.google.com'
 fix-net() {
@@ -374,8 +375,8 @@ debugApk() {
      echo "** Don't forget to start Metro server (in another window) **"
      echo ""
    fi
-     
-   cd ~/aurora-mobile/android; 
+
+   cd ~/aurora-mobile/android;
    ./gradlew assembleDebug && ../bin/install-apk debug
    #  cp ./app/build/outputs/apk/debug/app-debug.apk ~/win-home/Documents/APK/ &&
    # wslview ./app/build/outputs/apk/debug/app-debug.apk
@@ -465,7 +466,7 @@ export GIT_MERGE_AUTOEDIT=no
 #export AURORA_DEMO_ACCOUNT=devparticipant@reachire.com
 
 _top() {
-  # TODO? make it walk up to root of whatever project I'm in 
+  # TODO? make it walk up to root of whatever project I'm in
   cd ~/aurora
 }
 
@@ -476,8 +477,8 @@ gpp() {
       git pull && git push &&
     bd &&
       echo "Synching top level"
-      git co -- .idea; 
-      git pull && git push; 
+      git co -- .idea;
+      git pull && git push;
   )
 }
 
@@ -520,7 +521,14 @@ export DONT_PROMPT_WSL_INSTALL=true
 # }
 
 path+=(
-  $ANDROID_HOME/cmdline-tools/latest 
+  $ANDROID_HOME/cmdline-tools/latest
   $ANDROID_HOME/cmdline-tools/latest/bin
   $ANDROID_HOME/platform-tools
 )
+
+alias rnd='react-native-debugger --no-sandbox'
+
+path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
+
+alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
+alias restore="psql -q -d postgres < develop.dump"

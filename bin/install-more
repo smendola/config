@@ -43,6 +43,7 @@ test ! -d Meslo-Font && git clone https://github.com/andreberg/Meslo-Font.git
 
 echo "INSTALLING HEROKU CLI"
 curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+heroku plugins:install heroku-builds
 
 echo "INSTALLING GITHUB CLI"
 install gh
@@ -54,12 +55,13 @@ echo "INSTALLING AWS CLI"
   sudo ./aws/install
 )
 
-echo "INSTALLING PGADMIN 4"
-curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
-sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
-sudo apt-get install -y pgadmin4
-sudo /usr/pgadmin4/bin/setup-web.sh
+# Maybe run this on Windows host instead?
+# echo "INSTALLING PGADMIN 4"
+# curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
+# sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+# sudo apt-get install -y pgadmin4
+# sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 echo "INSTALLING MISC STUFF"
-install usbutils net-tools
+install usbutils net-tools apt-file dnsutils bind9-host
