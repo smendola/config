@@ -324,16 +324,6 @@ clean()
 }
 
 
-push-core() {
-  test -f package.json || fail
-  local need_stash=$(git status -uno -s)
-  if [[ $need_stash ]]; then git stash save -m 'doing push-core'; fi
-  yarn zip-core
-  echo git commit -m 'zip-core'
-  echo git push
-  if [[ $need_stash ]]; then git stash pop; fi
-}
-
 submodules() {
   git submodule update --init --recursive
 }
@@ -473,7 +463,7 @@ _top() {
 gpp() {
   (
     echo "Synching core"
-    cd app/webpacker/aurora-client-core &&
+    cdc &&
       git pull && git push &&
     bd &&
       echo "Synching top level"
@@ -482,20 +472,29 @@ gpp() {
   )
 }
 
+cdc() {
+  if [[ -d app/webpacker/aurora-client-core ]]
+  then
+    cd app/webpacker/aurora-client-core
+  else
+    cd src/core
+  fi
+}
+
 co-d() {
-  (_top; git co develop && cd app/webpacker/aurora-client-core && git co develop)
+  (_top; git co develop && cdc && git co develop)
 }
 
 co-s() {
-  (_top; git co -- .idea; git co staging && cd app/webpacker/aurora-client-core && git co staging)
+  (_top; git co -- .idea; git co staging && cdc && git co staging)
 }
 
 co-m() {
-  (_top; git co .idea; git co master && cd app/webpacker/aurora-client-core && git co master)
+  (_top; git co .idea; git co master && cdc && git co master)
 }
 
 gp() {
-  (git co .idea; git pull ; cd app/webpacker/aurora-client-core; git pull)
+  (git co .idea; git pull ; cdc; git pull)
 }
 
 show-stash() {
@@ -508,7 +507,6 @@ rails() {
   command rails "$@"
 }
 
-core=./app/webpacker/aurora-client-core
 
 export DONT_PROMPT_WSL_INSTALL=true
 
