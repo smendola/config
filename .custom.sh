@@ -456,8 +456,10 @@ export GIT_MERGE_AUTOEDIT=no
 #export AURORA_DEMO_ACCOUNT=devparticipant@reachire.com
 
 _top() {
-  # TODO? make it walk up to root of whatever project I'm in
-  cd ~/aurora
+  while [[ ! -d .git ]]
+  do
+    cd ..
+  done
 }
 
 gpp() {
@@ -486,11 +488,11 @@ co-d() {
 }
 
 co-s() {
-  (_top; git co -- .idea; git co staging && cdc && git co staging)
+  (_top; test -d .idea && git co -- .idea; git co staging && cdc && git co staging)
 }
 
 co-m() {
-  (_top; git co .idea; git co master && cdc && git co master)
+  (_top; test -d .idea && git co -- .idea; git co master && cdc && git co master)
 }
 
 gp() {
@@ -511,7 +513,7 @@ rails() {
 export DONT_PROMPT_WSL_INSTALL=true
 
 # TODO: fix this hack
-# SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
+SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
 
 # # This runs the WINDOWS installed version of adb
 # function adb() {
@@ -526,7 +528,7 @@ path+=(
 
 alias rnd='react-native-debugger --no-sandbox'
 
-path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
+# path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
 
 alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
 alias restore="psql -q -d postgres < develop.dump"
