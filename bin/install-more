@@ -67,4 +67,5 @@ fi
 
 
 echo "INSTALLING MISC STUFF"
+install meld direnv
 install usbutils net-tools apt-file dnsutils bind9-host
