@@ -54,7 +54,7 @@ DISPLAY=%F{$_x_status}${DISPLAY//\%/%%}%f"
 PS4='+%{%F{green}%}%N%{%}:%{%F{yellow}%}%i%{%f%}> '
 
 # These need to be up here, for now; cygpath is in ~/bin
-PATH=~/bin:$PATH
+PATH=~/bin:~/.local/bin:$PATH
 
 ###############################################################
 ### SHELL SETTINGS
@@ -241,4 +241,5 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 fi
 
+export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
