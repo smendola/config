@@ -2,11 +2,6 @@ MYBG=056
 export EDITOR=micro
 export SUDO_EDITOR=micro
 
-# NVM setup
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/dev/.sdkman"
 [[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
@@ -513,7 +508,10 @@ rails() {
 export DONT_PROMPT_WSL_INSTALL=true
 
 # TODO: fix this hack
+if [[ -d /mnt/c/Users/*/AppData/Local/android/Sdk ]]
+then
 SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
+fi
 
 # # This runs the WINDOWS installed version of adb
 # function adb() {

@@ -1,4 +1,0 @@
-#!/bin/bash
-google-chrome --user-data-dir=$HOME/lpdata --disable-web-security --app=${1:-http://localhost:3000}
-
-
