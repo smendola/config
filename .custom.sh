@@ -340,8 +340,6 @@ function h() {
 
 
 alias pg='service postgresql start'
-export MAIL_SERVICE=mailtrap
-export FEATURE_FLAG_UNIVERSAL_FEED=true
 
 apk() {
  (
@@ -530,3 +528,5 @@ alias rnd='react-native-debugger --no-sandbox'
 
 alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
 alias restore="psql -q -d postgres < develop.dump"
+
+alias rrspec="rails RAILS_ENV=test db:schema:load db:migrate db:seed:audit_event_types && rspec"
