@@ -18,7 +18,6 @@ then
   exec send "${mods[@]}"
 fi
 
-set -xv
 tar Jcf - "$@" | gpg -ac -o $fname
 json=$(curl -F "file=@${fname}" https://file.io/)
 rm -f $fname

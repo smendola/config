@@ -245,46 +245,9 @@ hke()
 )}
 
 
-
-# Send files via transfer.sh service
-# Uses encryption in transit
-
-# Usage:
-#  send PATH ...
-#  send mods
-#  Can send mix of files and dirs
-#  If PATH is exactly 'mods' it will instead send
-#  files that are modified in git
-# The output of this command includes the command
-# to be used on the receiving end to receive the files.
-# If possible, the command is also sent to the clipboard.
-function send() {
-  if [[ $1 == "mods" ]]
-  then
-    declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
-    send "${mods[@]}"
-    return
-  fi
-
-  local url=$(tar Jcf - "$@" | gpg -ac -o- |
-   # -H "Max-Downloads: 1" \
-   curl -s -X PUT -T - \
-        -H "Max-Days: 1" \
-        https://transfer.sh/send.gpg
-  )
-  local receive_cmd="curl -s '$url' | gpg -d -o- | tar Jxfvv -"
-  echo -n -e '\e[32m'
-  echo "To receive the file, use the following command:"
-  echo -e '\e[m'
-  echo $receive_cmd
-  echo ""
-  (echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
-}
-
-
-function receive() {
-   curl -s "$1" | gpg -d -o- | tar Jxfvv -
-}
+#function receive() {
+#   curl -s "$1" | gpg -d -o- | tar Jxfvv -
+#}
 
 ttysend()
 {
