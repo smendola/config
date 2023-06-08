@@ -63,7 +63,8 @@ reset() {
   rails db:create &&
   rails db:environment:set RAILS_ENV=development &&
   rails db:migrate &&
-  rails db:seed &&
+  rails db:seed
+  
   rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
 
   # imagemagick identify process get stuck on certain files, consume CPU
@@ -497,10 +498,10 @@ show-stash() {
   git difftool -y "stash@{$n}~" "stash@{$n}"
 }
 
-rails() {
-  spring stop
-  command rails "$@"
-}
+# rails() {
+  # spring stop
+  # command rails "$@"
+# }
 
 
 export DONT_PROMPT_WSL_INSTALL=true
@@ -529,4 +530,4 @@ alias rnd='react-native-debugger --no-sandbox'
 alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
 alias restore="psql -q -d postgres < develop.dump"
 
-alias rrspec="rails RAILS_ENV=test db:schema:load db:migrate db:seed:audit_event_types && rspec"
+alias rrspec="rails db:schema:load db:migrate db:seed:audit_event_types RAILS_ENV=test && rspec"
