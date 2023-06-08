@@ -245,36 +245,6 @@ hke()
 )}
 
 
-#function receive() {
-#   curl -s "$1" | gpg -d -o- | tar Jxfvv -
-#}
-
-ttysend()
-{
-  if [[ $1 == "mods" ]]
-  then
-	declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
-    ttysend "${mods[@]}"
-    return
-  fi
-
-  if [[ ! -e "$1" ]]
-  then
-	echo "No such file: $1" 1>&2
-    return
-  fi
-
-  clear
-  echo -n -e '\e[32m'
-  echo '###########################################################################'
-  echo '# Paste all that follows this into a TTY window on the target machine     #'
-  echo '###########################################################################'
-  echo -e '\e[0m'
-  echo ' (base64 -d | tar Jxpf -) << EOF'
-  tar Jcf - "$@" | base64
-  echo EOF
-}
-
 clean()
 {
  rm -rf node_modules
