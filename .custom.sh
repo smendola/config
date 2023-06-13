@@ -531,3 +531,5 @@ alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
 alias restore="psql -q -d postgres < develop.dump"
 
 alias rrspec="rails db:schema:load db:migrate db:seed:audit_event_types RAILS_ENV=test && rspec"
+
+alias ntp='sudo ntpdate pool.ntp.org'
