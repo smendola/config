@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Usage:
+#  send PATH ...
+#  send mods
+#  Can send mix of files and dirs
+#  If PATH is exactly 'mods' it will instead send
+#  files that are modified in git
+# The output of this command includes the command
+# to be used on the receiving end to receive the files.
+# If possible, the command is also sent to the clipboard.
+
+
+fname=send.$$.tar.xz
+if [[ $1 == "mods" ]]
+then
+  declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
+  exec send "${mods[@]}"
+fi
+
+tar Jcf - "$@" | gpg -ac -o $fname
+json=$(curl -F "file=@${fname}" https://file.io/)
+rm -f $fname
+link=$(echo "$json" | jq .link | tr -d '"')
+
+if [[ -z $link ]]  
+then
+  echo "$json" >&2
+  exit 1
+fi
+
+receive_cmd="curl -s '$link' | gpg -d -o- | tar Jxfvv -"
+echo -n -e '\e[32m'
+echo "To receive the file, use the following command:"
+echo -e '\e[m'
+echo $receive_cmd
+echo ""
+(echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
