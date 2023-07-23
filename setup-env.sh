@@ -18,4 +18,11 @@ dots submodule update --init
 
 sudo apt-get install -y zsh
 chsh $USER -s /usr/bin/zsh
+
+
+# install Meslo fonts
+mkdir -p ~/.local/share/fonts
+cp ~/Meslo_LG_1.2.1/*ttf ~/.local/share/fonts/
+fc-cache -f
+
 exec zsh --login
