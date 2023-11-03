@@ -411,19 +411,20 @@ cdc() {
 }
 
 co-d() {
-  (_top; git co develop && cdc && git co develop)
+  (_top; git co develop --recurse-submodules)
 }
 
 co-s() {
-  (_top; test -d .idea && git co -- .idea; git co staging && cdc && git co staging)
+  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules)
 }
 
 co-m() {
-  (_top; test -d .idea && git co -- .idea; git co master && cdc && git co master)
+  (_top; test -d .idea && git co -- .idea; git co master --recurse-submodules)
 }
 
 gp() {
-  (git co .idea; git pull ; cdc; git pull)
+  git co .idea
+  git pull --recurse-submodules
 }
 
 show-stash() {
@@ -466,3 +467,11 @@ alias restore="psql -q -d postgres < develop.dump"
 alias rrspec="rails db:schema:load db:migrate db:seed:audit_event_types RAILS_ENV=test && rspec"
 
 alias ntp='sudo ntpdate pool.ntp.org'
+
+function use-core() {
+  local branch=$1
+  git config -f .gitmodules submodule.app/webpacker/aurora-client-core.branch $branch
+  git submodule update --remote
+}
+
+export FEATURE_FLAG_WEB_CHAT=false
