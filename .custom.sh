@@ -485,9 +485,13 @@ notify () {
 }
 
 hbo () {
-  heroku builds:output -a aurora-${1:-develop} 2>&1 | ansi2txt |  yad --text-info --listen --title aurora-${1:-develop} --tail --geometry 500x300 --button 'Close'
+  heroku builds:output -a aurora-${1:-develop} 2>&1 | ansi2txt |  yad --text-info --listen --title aurora-${1:-develop} --tail --geometry 500x300 --button 'Close:0'
 }
 
 hbp () {
-  heroku builds:output -a aurora-${1:-develop} 2>&1 | yad --progress --pulsate --title aurora-${1:-develop} --fontname 'helvetica 15' --button 'Close'
+  heroku builds:output -a aurora-${1:-develop} 2>&1 | yad --progress --pulsate --title aurora-${1:-develop} --fontname 'helvetica 15' --button 'Close:0'
+}
+
+yad () {
+  command yad "$@" 2> /dev/null
 }
