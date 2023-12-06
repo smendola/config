@@ -26,10 +26,15 @@ ide() {
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
 export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
 export PORT=3000
-export FOREST_ENV_SECRET=660b9fc6b96f476f5fc0d8e9b4da85e15f6732c4c6e6df26d13ef9c583b5bc9c
-export LOGRAGE_ENABLED=true
 export STREAM_APP_NAME=reachire-developer-sal
-export ACTIVE_RECORD_LOG_LEVEL=info
+
+
+export LOGRAGE_ENABLED=true
+export TRACE_STREAM_CALLS=true
+export ACTIVE_RECORD_LOG_LEVEL=debug
+export FEATURE_FLAG_WEB_CHAT=enabled
+
+export NODE_OPTIONS="--max-old-space-size=8192"
 
 alias pga='ping www.google.com'
 fix-net() {
@@ -474,4 +479,15 @@ function use-core() {
   git submodule update --remote
 }
 
-export FEATURE_FLAG_WEB_CHAT=false
+
+notify () {
+  echo "$2" | yad --text-info --title "$1" --button='Got it' --fontname 'helvetica normal 14' --geometry 300x100-300-200
+}
+
+hbo () {
+  heroku builds:output -a aurora-${1:-develop} 2>&1 | ansi2txt |  yad --text-info --listen --title aurora-${1:-develop} --tail --geometry 500x300 --button 'Close'
+}
+
+hbp () {
+  heroku builds:output -a aurora-${1:-develop} 2>&1 | yad --progress --pulsate --title aurora-${1:-develop} --fontname 'helvetica 15' --button 'Close'
+}
