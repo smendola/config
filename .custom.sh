@@ -481,7 +481,9 @@ function use-core() {
 
 
 notify () {
-  echo "$2" | yad --text-info --title "$1" --button='Got it' --fontname 'Sans normal 14' --geometry 300x100-300-200
+  local title=${1:-Notification}
+  local text='If something deserving your attention were to have happened, which it may or may not have at this time, you would have been notified with a message very much like this; possibly, but not definitely, containing useful information about what actually happened; or perhaps instead with some generic, vague and non-committal verbiage.'
+  echo "$text" | yad --text-info --title "$title" --button='Got it' --wrap --fontname 'Sans normal 14' --geometry 500x300-300-200
 }
 
 hbo () {
