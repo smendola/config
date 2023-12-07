@@ -481,21 +481,22 @@ function use-core() {
 
 
 notify () {
-  echo "$2" | yad --text-info --title "$1" --button='Got it' --fontname 'helvetica normal 14' --geometry 300x100-300-200
+  echo "$2" | yad --text-info --title "$1" --button='Got it' --fontname 'Sans normal 14' --geometry 300x100-300-200
 }
 
 hbo () {
   local env=${1:-develop}
   local app=aurora-$env
   title "hbo $env"
-  heroku builds:output -a "$app" 2>&1 | ansi2txt |  yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0'
+  (heroku builds:output -a "$app" 2>&1 | ansi2txt |  yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
 }
 
 hbp () {
   local env=${1:-develop}
   local app=aurora-$env
   title "hbp $env"
-  heroku builds:output -a "$app" 2>&1 | yad --progress --pulsate --title "$app" --fontname 'helvetica 15' --button 'Close:0'
+  (heroku builds:output -a "$app" 2>&1 | yad --progress --pulsate --title "$app" --fontname 'helvetica 15' --button 'Close:0' --auto-close  --auto-kill --kill-parent HUP)
+  true
 }
 
 yad () {
