@@ -69,7 +69,7 @@ reset() {
   rails db:environment:set RAILS_ENV=development &&
   rails db:migrate &&
   rails db:seed
-  
+
   rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
 
   # imagemagick identify process get stuck on certain files, consume CPU
@@ -480,6 +480,11 @@ function use-core() {
 }
 
 
+ready () {
+  echo "Finished with status: $?" |
+  yad --text-info --title "Ready" --button='Got it' --wrap --fontname 'Sans normal 14' --width 300
+}
+
 notify () {
   local title=${1:-Notification}
   local text='If something deserving your attention were to have happened, which it may or may not have at this time, you would have been notified with a message very much like this; possibly, but not definitely, containing useful information about what actually happened; or perhaps instead with some generic, vague and non-committal verbiage.'
@@ -490,8 +495,18 @@ hbo () {
   local env=${1:-develop}
   local app=aurora-$env
   title "hbo $env"
-  (heroku builds:output -a "$app" 2>&1 | ansi2txt |  yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
+  (heroku builds:output -a "$app" 2>&1 | yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
+  true
 }
+
+hro () {
+  local env=${1:-develop}
+  local app=aurora-$env
+  title "hbo $env"
+  (heroku releases:output -a "$app" 2>&1 | yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
+  true
+}
+
 
 hbp () {
   local env=${1:-develop}
@@ -503,4 +518,25 @@ hbp () {
 
 yad () {
   command yad "$@" 2> /dev/null
+}
+
+precompile () {
+  rails assets:clobber assets:clean; yarn; time (rails assets:precompile 2>&1 | cut -c1-300 | grep -v INFO); ready
+}
+
+function hotfix () {
+  tag-live-commit
+
+  local hf_name=${1:-cumulative}
+  local date=$(date +%Y-%m-%d)
+  local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
+  local branch_name="hotfix/$date-$hf_name"
+
+  git checkout -B "${branch_name}" ${commit}
+  git push -u origin "${branch_name}"
+}
+
+tag-live-commit () {
+  local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
+  git tag -f live-in-production ${commit}
 }
