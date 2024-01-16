@@ -31,7 +31,7 @@ export STREAM_APP_NAME=reachire-developer-sal
 
 export LOGRAGE_ENABLED=true
 export TRACE_STREAM_CALLS=true
-export ACTIVE_RECORD_LOG_LEVEL=debug
+export ACTIVE_RECORD_LOG_LEVEL=info
 export FEATURE_FLAG_WEB_CHAT=enabled
 
 export NODE_OPTIONS="--max-old-space-size=8192"
@@ -352,7 +352,7 @@ function recd() {
   cd /; cd -
 }
 
-unalias shutdown
+unalias shutdown || true
 function shutdown() {
   wsl.exe --shutdown
 }
@@ -539,4 +539,8 @@ function hotfix () {
 tag-live-commit () {
   local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
   git tag -f live-in-production ${commit}
+}
+
+aurora () {
+  rails aurora:"$@"
 }

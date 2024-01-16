@@ -1,18 +1,52 @@
 [global_config]
-  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   geometry_hinting = True
-  inactive_color_offset = 0.708333333333
-  putty_paste_style = True
-  suppress_multiple_term_dialog = True
   title_hide_sizetext = True
-  title_inactive_bg_color = "#d3d7cf"
-  title_inactive_fg_color = "#2e3436"
-  title_transmit_bg_color = "#729fcf"
   title_transmit_fg_color = "#f3f3f3"
+  title_transmit_bg_color = "#729fcf"
+  title_inactive_fg_color = "#2e3436"
+  title_inactive_bg_color = "#d3d7cf"
+  inactive_color_offset = 0.708333333333
+  enabled_plugins = CustomCommandsMenu, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler
+  suppress_multiple_term_dialog = True
+  title_use_system_font = False
+  title_font = Sans 13
+  putty_paste_style = True
+  putty_paste_style_source_clipboard = True
 [keybindings]
+  toggle_zoom = <Primary>Return
   full_screen = <Alt>Return
   new_window = <Alt>F2
-  toggle_zoom = <Primary>Return
+[profiles]
+  [[default]]
+    allow_bold = False
+    visible_bell = True
+    urgent_bell = True
+    background_color = "#282C34"
+    backspace_binding = automatic
+    delete_binding = automatic
+    cursor_color = "#ff0000"
+    font = Monospace 14
+    foreground_color = "#eeeeee"
+    scrollback_lines = 5000
+    palette = "#181a1f:#e06c75:#98c379:#e5c07b:#3f9ae4:#c678dd:#56b6c2:#dcdfe4:#5a6374:#ff7b85:#bdf296:#fce94f:#67bbff:#e48aff:#34e2e2:#f6f9ff"
+    word_chars = ''' \()"':;<>!@#$%^&*|+=[]{}?│`,'''
+    use_system_font = False
+    bold_is_bright = True
+    active_encodings = ANSI_X3.4-1968, UTF-8, ISO-8859-1
+    copy_on_selection = True
+  [[production]]
+    cursor_color = "#aaaaaa"
+    font = Monospace 11
+    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
+    use_system_font = False
+  [[puma]]
+    cursor_color = "#aaaaaa"
+    use_theme_colors = True
+    copy_on_selection = True
+  [[webpacker]]
+    cursor_color = "#aaaaaa"
+    font = DejaVu Sans Mono 8
+    use_system_font = False
 [layouts]
   [[default]]
     [[[child1]]]
@@ -20,6 +54,7 @@
       directory = ""
       parent = window0
       type = Terminal
+      profile = default
     [[[window0]]]
       parent = ""
       type = Window
@@ -55,33 +90,3 @@
       ratio = 0.501182033097
       type = VPaned
 [plugins]
-[profiles]
-  [[default]]
-    active_encodings = ANSI_X3.4-1968, UTF-8, ISO-8859-1
-    background_color = "#2c2c2c"
-    backspace_binding = automatic
-    copy_on_selection = True
-    cursor_color = "#ff0000"
-    delete_binding = automatic
-    font = Monospace 10
-    foreground_color = "#eeeeee"
-    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
-    scrollback_lines = 5000
-    urgent_bell = True
-    use_system_font = False
-    visible_bell = True
-  [[production]]
-    background_color = "#ffffff"
-    cursor_color = "#aaaaaa"
-    font = Monospace 11
-    foreground_color = "#000000"
-    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
-    use_system_font = False
-  [[puma]]
-    copy_on_selection = True
-    cursor_color = "#aaaaaa"
-    use_theme_colors = True
-  [[webpacker]]
-    cursor_color = "#aaaaaa"
-    font = DejaVu Sans Mono 8
-    use_system_font = False
