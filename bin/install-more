@@ -44,6 +44,8 @@ test ! -d Meslo-Font && git clone https://github.com/andreberg/Meslo-Font.git
 echo "INSTALLING HEROKU CLI"
 curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 heroku plugins:install heroku-builds
+heroku plugins:install heroku-slugs
+heroku plugins:install crazyantlabs/heroku-cli-plugin-cron
 
 echo "INSTALLING GITHUB CLI"
 install gh
@@ -66,6 +68,9 @@ fi
 # sudo /usr/pgadmin4/bin/setup-web.sh
 
 
+echo "INSTALLING TILIX"
+install tilix
+
 echo "INSTALLING MISC STUFF"
 install meld direnv apt-file xdg-utils desktop-file-utils
 install usbutils net-tools apt-file dnsutils bind9-host
@@ -78,7 +83,7 @@ curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trust
     sudo apt update && \
     sudo apt install ngrok
 
-echo "INSTALLING OOKLA SPEEDTEST"
-curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-install speedtest
+#echo "INSTALLING OOKLA SPEEDTEST"
+#curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+#install speedtest
 
