@@ -41,12 +41,6 @@ echo "FETCHING MESLO FONTS"
 test ! -d Meslo-Font && git clone https://github.com/andreberg/Meslo-Font.git
 # TODO: Install the fonts now
 
-echo "INSTALLING HEROKU CLI"
-curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-heroku plugins:install heroku-builds
-heroku plugins:install heroku-slugs
-heroku plugins:install crazyantlabs/heroku-cli-plugin-cron
-
 echo "INSTALLING GITHUB CLI"
 install gh
 
