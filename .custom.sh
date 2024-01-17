@@ -525,20 +525,12 @@ precompile () {
 }
 
 function hotfix () {
-  tag-live-commit
-
   local hf_name=${1:-cumulative}
   local date=$(date +%Y-%m-%d)
-  local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
   local branch_name="hotfix/$date-$hf_name"
 
-  git checkout -B "${branch_name}" ${commit}
+  git checkout -B "${branch_name}" "live-in-production"
   git push -u origin "${branch_name}"
-}
-
-tag-live-commit () {
-  local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
-  git tag -f live-in-production ${commit}
 }
 
 aurora () {
