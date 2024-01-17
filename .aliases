@@ -231,7 +231,7 @@ detach()
 
 tt()
 {
-	check_x && detach terminator "$@"
+	check_x && detach tilix "$@"
 }
 
 backup-settings()
