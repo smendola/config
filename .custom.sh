@@ -529,6 +529,7 @@ function hotfix () {
   local date=$(date +%Y-%m-%d)
   local branch_name="hotfix/$date-$hf_name"
 
+  git pull --tags
   git checkout -B "${branch_name}" "live-in-production"
   git push -u origin "${branch_name}"
 }
