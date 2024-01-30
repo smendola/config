@@ -531,6 +531,7 @@ function hotfix () {
   local branch_name="hotfix/$date-$hf_name"
 
   git checkout -B "${branch_name}" ${live_commit}
+  git pull origin "${branch_name}" || true
   git push -u origin "${branch_name}"
 }
 
