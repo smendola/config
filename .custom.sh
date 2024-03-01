@@ -1,6 +1,7 @@
 MYBG=056
 export EDITOR=micro
 export SUDO_EDITOR=micro
+WIN_PROFILE_DIR="$(wslpath -u $(cd /mnt/c; cmd.exe /c 'echo %USERPROFILE%' | dos2unix))"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/dev/.sdkman"
