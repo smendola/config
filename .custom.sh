@@ -265,7 +265,20 @@ submodules() {
 alias xml=xmlstarlet
 alias xsl='xmlstarlet val'
 
-alias go='rails runner `pwd`/go.rb'
+function go()
+{
+  (
+  cat <<EOF
+    def go(*params, **opts)
+      @params = params
+      @opts = opts
+      load('go.rb')
+      @res
+    end
+    go "$@"
+EOF
+  ) | rails runner -
+}
 
 path+=(~/gatling/bin)
 
