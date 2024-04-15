@@ -83,6 +83,11 @@ up() {
 }
 
 down() {
+  if [[ $1 =~ ^[0-9]+ ]]
+  then
+    argv[1]=STEP=$1
+  fi
+
   truncate -s0 ~/aurora/log/development.log
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
