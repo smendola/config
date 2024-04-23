@@ -92,6 +92,16 @@ down() {
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
+reup() { ( 
+  set -e
+  git stash
+  down
+  git co db/schema.rb
+  git stash pop
+  up
+	
+) }
+
 c() {
   rails c
 }
