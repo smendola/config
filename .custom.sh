@@ -94,12 +94,11 @@ down() {
 
 reup() { ( 
   set -e
-  git stash
+  git stash push -m ++REUP++$$
   down
   git co db/schema.rb
-  git stash pop
-  up
-	
+  git stash list | grep -F ++REUP++$$ && git stash pop
+  up	
 ) }
 
 c() {
