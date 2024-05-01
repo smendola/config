@@ -33,7 +33,7 @@ export STREAM_APP_NAME=reachire-developer-sal
 export LOGRAGE_ENABLED=true
 export TRACE_STREAM_CALLS=true
 export ACTIVE_RECORD_LOG_LEVEL=info
-export FEATURE_FLAG_WEB_CHAT=enabled
+export FEATURE_FLAG_WEB_CHAT=off
 
 export NODE_OPTIONS="--max-old-space-size=8192"
 
@@ -101,9 +101,10 @@ reup() { (
   up	
 ) }
 
-c() {
+c() {(
+  cd ~/aurora
   rails c
-}
+)}
 
 
 # Usage:
@@ -571,4 +572,12 @@ tag-live-commit () {
 
 aurora () {
   rails aurora:"$@"
+}
+
+
+# cancel all pending builds in a heroku env
+hbc () {
+  local env=${1:-develop}
+  local app=aurora-${env/aurora-//}
+  heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
 }
