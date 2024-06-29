@@ -69,9 +69,9 @@ reset() {
   rails db:create &&
   rails db:environment:set RAILS_ENV=development &&
   rails db:migrate &&
-  rails db:seed
+  rails db:seed &&
 
-  rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
+  rails db:schema:load db:seed:audit_event_types RAILS_ENV=test &&
 
   # imagemagick identify process get stuck on certain files, consume CPU
   pkill identify || true
@@ -92,13 +92,13 @@ down() {
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
-reup() { ( 
+reup() { (
   set -e
   git stash push -m ++REUP++$$
   down
   git co db/schema.rb
   git stash list | grep -F ++REUP++$$ && git stash pop
-  up	
+  up
 ) }
 
 c() {(
@@ -557,11 +557,14 @@ function hotfix () {
   local hf_name=${1:-cumulative}
   local date=$(date +%Y-%m-%d)
   local live_commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
-  local branch_name="hotfix/$date-$hf_name"
+  local branch_name="hf/$date-$hf_name"
 
   git checkout -B "${branch_name}" ${live_commit}
   git pull origin "${branch_name}" || true
   git push -u origin "${branch_name}"
+
+  git branch -f hotfix "${branch_name}"
+  git push origin hotfix -f
 }
 
 # It should not be necessaryy to use this, as this should happen in heroku in deploy.sh
