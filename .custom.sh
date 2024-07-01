@@ -53,12 +53,11 @@ kc() {
   rails console
 }
 
-build_test_db() {
-  rails db:drop db:create db:migrate RAILS_ENV=test
-}
-
 reset_test() {
-  rails db:schema:load db:seed:audit_event_types RAILS_ENV=test
+  # to NOT combine those two into one rails command, it fails to save AET's
+  rails db:drop db:create db:migrate RAILS_ENV=test &&
+  git co db/schema.rb &&
+  rails db:seed:audit_event_types RAILS_ENV=test
 }
 
 reset() {
@@ -71,7 +70,7 @@ reset() {
   rails db:migrate &&
   rails db:seed &&
 
-  rails db:schema:load db:seed:audit_event_types RAILS_ENV=test &&
+  reset_test &&
 
   # imagemagick identify process get stuck on certain files, consume CPU
   pkill identify || true
@@ -498,7 +497,7 @@ alias rnd='react-native-debugger --no-sandbox'
 alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
 alias restore="pkill -9 ruby; psql -q -d postgres < develop.dump"
 
-alias rrspec="rails db:schema:load db:migrate db:seed:audit_event_types RAILS_ENV=test && rspec"
+alias rrspec="reset_test && rspec"
 
 alias ntp='sudo ntpdate pool.ntp.org'
 
@@ -567,10 +566,15 @@ function hotfix () {
   git push origin hotfix -f
 }
 
-# It should not be necessaryy to use this, as this should happen in heroku in deploy.sh
+# It should not be necessary to use this, as this should happen in heroku in deploy.sh
 tag-live-commit () {
   local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
   git tag -f live-in-production ${commit}
+}
+
+fetch-tags () {
+  git tag -d aurora-develop aurora-stage aurora-production live-in-production
+  git fetch --tags
 }
 
 aurora () {
