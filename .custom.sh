@@ -554,10 +554,10 @@ precompile () {
 
 function hotfix () {
   fetch-tags
-  local date=$(date +%Y-%m-%d)
 
   git branch -f hotfix 'live-in-production'
   git push origin hotfix -f
+  git co hotfix
 }
 
 # It should not be necessary to use this, as this should happen in heroku in deploy.sh
@@ -567,8 +567,8 @@ tag-live-commit () {
 }
 
 fetch-tags () {
-  git tag -d aurora-develop aurora-stage aurora-production live-in-production
-  git fetch --tags
+  # git tag -d aurora-develop aurora-stage aurora-production live-in-production
+  git fetch --tags -f
 }
 
 aurora () {
