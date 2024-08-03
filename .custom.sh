@@ -582,3 +582,8 @@ hbc () {
   local app=aurora-${env/aurora-//}
   heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
 }
+
+ad () {
+	taskkill.exe -f -im AltDrag.exe > /dev/null 2>&1
+	( $(wslpath -u 'C:\Users\smend\AppData\Roaming\AltDrag\AltDrag.exe') &)
+}
