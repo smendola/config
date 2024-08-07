@@ -587,3 +587,9 @@ ad () {
 	taskkill.exe -f -im AltDrag.exe > /dev/null 2>&1
 	( $(wslpath -u 'C:\Users\smend\AppData\Roaming\AltDrag\AltDrag.exe') &)
 }
+
+wp () {
+  local wp=$(wslpath -aw "$1" | sed 's/\\/\\\\/g')
+  echo -e "\e[1m$wp\e[m"
+	(echo "$wp" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
+}
