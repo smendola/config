@@ -435,9 +435,9 @@ gpp() {
 }
 
 cdc() {
-  if [[ -d app/webpacker/aurora-client-core ]]
+  if [[ -d app/frontend/aurora-client-core ]]
   then
-    cd app/webpacker/aurora-client-core
+    cd app/frontend/aurora-client-core
   else
     cd src/core
   fi
@@ -503,7 +503,7 @@ alias ntp='sudo ntpdate pool.ntp.org'
 
 function use-core() {
   local branch=$1
-  git config -f .gitmodules submodule.app/webpacker/aurora-client-core.branch $branch
+  git config -f .gitmodules submodule.app/frontend/aurora-client-core.branch $branch
   git submodule update --remote
 }
 
@@ -583,7 +583,7 @@ hbc () {
   heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
 }
 
-ad () {
+alt-drag () {
 	taskkill.exe -f -im AltDrag.exe > /dev/null 2>&1
 	( $(wslpath -u 'C:\Users\smend\AppData\Roaming\AltDrag\AltDrag.exe') &)
 }
@@ -593,3 +593,63 @@ wp () {
   echo -e "\e[1m$wp\e[m"
 	(echo "$wp" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
+
+git-whoami () { (set -xv
+	# Get the remote URL of the repository
+  local remote_url=$(git config --get remote.origin.url)
+
+  # If the remote URL uses SSH, we need to extract the repository path from it
+  if [[ $remote_url == git@github.com:* ]]; then
+    remote_url=$(echo $remote_url | sed -e 's/git@github.com://; s/.git$//')
+  else
+    remote_url=$(echo $remote_url | sed -e 's/https:\/\/github.com\///; s/.git$//')
+  fi
+
+echo $remote_url
+  # Use the GitHub API to get the current authenticated user
+  local auth_token=$(awk -F '[:@]' '/github.com/{print $3}' ~/.git-credentials | head -n 1)
+  local auth_header="Authorization: token ${auth_token}"
+
+  # Get the GitHub username from the API
+  local github_username=$(
+    curl -s -H "$auth_header" 'https://api.github.com/user' |
+    grep '"login":' |
+    awk -F '"' '{print $4}'
+  )
+
+  echo $github_username
+  )
+}
+
+heroku-build () {
+  local env=${1:-develop}
+  local app=aurora-${env/aurora-//}
+  local branch=${2:-develop}
+
+  github_username=$(git-whoami)
+
+  if [ -z "$github_username" ]; then
+    echo "GitHub username not found via GitHub API"
+    return 1
+  fi
+
+  # Extract the token corresponding to the specified GitHub username
+  local token=$(grep "//${github_username}:" ~/.git-credentials | awk -F '[:@]' '{print $3}')
+
+  if [ -z "$token" ]; then
+    echo "GitHub token for user ${github_username} not found in ~/.git-credentials"
+    return 1
+  fi
+
+  heroku builds:create -a ${app} --source-url https://${token}@github.com/${remote_url}/tarball/${branch}
+}
+
+whois () {
+   (
+     echo '\\t'; 
+     echo "select email from users where id = '$1';"
+   ) |
+     heroku psql DATABASE -a aurora-production 2>/dev/null |
+   grep --color=never '@'
+}
+
