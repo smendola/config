@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Usage:
 #  send PATH ...
@@ -18,12 +18,25 @@ then
   exec send "${mods[@]}"
 fi
 
-tar Jcf - "$@" | gpg -ac -o $fname
-json=$(curl -F "file=@${fname}" https://file.io/)
-rm -f $fname
-link=$(echo "$json" | jq .link | tr -d '"')
+read -sp "Passphrase for encryption, empty for unencrypted: " password
+echo
 
-if [[ -z $link ]]  
+# Check if the password is blank
+if [[ -z "$password" ]];
+then
+  echo "Unencrypted"
+  tar Jcf - "$@" | gpg --store -a -o "$fname"
+else
+  tar Jcf - "$@" |
+  gpg --batch --passphrase-fd 3 -ac -o "$fname" 3<<<"$password"
+
+fi
+
+json=$(curl -F "file=@${fname}" https://file.io)
+rm -f $fname
+link=$(echo "$json" | jq -r .link )
+expiry=$(echo "$json" | jq -r .expiry )
+if [[ -z $link ]]
 then
   echo "$json" >&2
   exit 1
@@ -36,3 +49,5 @@ echo -e '\e[m'
 echo $receive_cmd
 echo ""
 (echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
+
+echo "Expiry: $expiry"
