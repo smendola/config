@@ -24,18 +24,20 @@ echo
 # Check if the password is blank
 if [[ -z "$password" ]];
 then
-  echo "Unencrypted"
+  echo -e '\e[31mSending unencrypted\e[m'
   tar Jcf - "$@" | gpg --store -a -o "$fname"
 else
   tar Jcf - "$@" |
   gpg --batch --passphrase-fd 3 -ac -o "$fname" 3<<<"$password"
-
 fi
 
 json=$(curl -F "file=@${fname}" https://file.io)
+# echo "$json" | jq
 rm -f $fname
 link=$(echo "$json" | jq -r .link )
-expiry=$(echo "$json" | jq -r .expiry )
+expires=$(echo "$json" | jq -r .expires )
+
+
 if [[ -z $link ]]
 then
   echo "$json" >&2
@@ -50,4 +52,4 @@ echo $receive_cmd
 echo ""
 (echo "$receive_cmd" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 
-echo "Expiry: $expiry"
+#echo "Expires: $expires"
