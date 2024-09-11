@@ -438,21 +438,24 @@ cdc() {
   if [[ -d app/frontend/aurora-client-core ]]
   then
     cd app/frontend/aurora-client-core
+  elif [[ -d app/webpacker/aurora-client-core ]]
+  then
+    cd app/webpacker/aurora-client-core
   else
     cd src/core
   fi
 }
 
 co-d() {
-  (_top; git co develop --recurse-submodules)
+  (_top; git co develop --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
 }
 
 co-s() {
-  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules)
+  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
 }
 
 co-m() {
-  (_top; test -d .idea && git co -- .idea; git co master --recurse-submodules)
+  (_top; test -d .idea && git co -- .idea; git co master --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
 }
 
 gp() {
@@ -495,7 +498,11 @@ alias rnd='react-native-debugger --no-sandbox'
 # path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
 
 alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
-alias restore="pkill -9 ruby; psql -q -d postgres < develop.dump"
+restore() {
+  local env=${1:-develop}
+  local dump=${env/.dump/}.dump
+  pkill -9 ruby; psql -q -d postgres < $dump
+}
 
 alias rrspec="reset_test && rspec"
 
@@ -645,11 +652,21 @@ heroku-build () {
 }
 
 whois () {
+  local env=${2:-production}
+  local app=aurora-${env/aurora-//}
    (
-     echo '\\t'; 
+     echo '\\t';
      echo "select email from users where id = '$1';"
    ) |
-     heroku psql DATABASE -a aurora-production 2>/dev/null |
+     heroku psql DATABASE -a $app 2>/dev/null |
    grep --color=never '@'
 }
 
+pr () {
+  if [[ -z $1 ]]
+  then
+    gh pr create --title "$1" --body ''
+  else
+    gh pr create --body ''
+  fi
+}
