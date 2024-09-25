@@ -66,7 +66,7 @@ echo "INSTALLING TILIX"
 install tilix
 
 echo "INSTALLING MISC STUFF"
-install meld direnv apt-file xdg-utils desktop-file-utils
+install micro meld direnv apt-file xdg-utils desktop-file-utils
 install usbutils net-tools apt-file dnsutils bind9-host
 
 install jq
