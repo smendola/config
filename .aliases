@@ -328,3 +328,7 @@ public-ip() {
   curl https://ipinfo.io/ip
   echo ''
 }
+
+penv() {
+	env "$@" | sed 's/^\([^=]*\)=\(.*\)$/\x1b[32m\1\x1b[0m=\x1b[34m\2\x1b[0m/'
+}
