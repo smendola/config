@@ -448,17 +448,29 @@ reify() {
     fi
 }
 
-co() {
-  (_top; git co $1 --recurse-submodules; cdc; git co $1 || echo "No branch $1 in core")
-}
+co() {(
+  set -e
+  _top
+  git co $1 --recurse-submodules
+  cdc
+  git co $1 || echo "No branch $1 in core"
+)}
 
-co-d() {
-  (_top; git co develop --recurse-submodules; cdc; git co develop-web)
-}
+co-d() {(
+  set -e
+   _top
+   git co develop --recurse-submodules
+   cdc; git co develop-web
+)}
 
-co-s() {
-  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules; cdc; git co release-web)
-}
+co-s() {(
+  set -e
+  _top
+  test -d .idea && git co -- .idea
+  git co staging --recurse-submodules
+  cdc
+  git co release-web
+)}
 
 gp() {
   git co .idea
