@@ -422,18 +422,6 @@ _top() {
   done
 }
 
-gpp() {
-  (
-    echo "Synching core"
-    cdc &&
-      git pull && git push &&
-    bd &&
-      echo "Synching top level"
-      git co -- .idea;
-      git pull && git push;
-  )
-}
-
 cdc() {
   if [[ -d app/frontend/aurora-client-core ]]
   then
@@ -446,16 +434,30 @@ cdc() {
   fi
 }
 
+reify() {
+    # Get the branch that contains the current commit, excluding 'detached' info
+    local branch=$(git branch --contains HEAD | grep -v "detached" | sed 's/^[* ]*//')
+
+    # If no branch is found, print an error
+    if [ -z "$branch" ]; then
+        echo "No branch found containing the current commit."
+    else
+        # Checkout the branch
+        git checkout "$branch"
+        echo "Switched to branch: $branch"
+    fi
+}
+
+co() {
+  (_top; git co $1 --recurse-submodules; cdc; git co $1 || echo "No branch $1 in core")
+}
+
 co-d() {
-  (_top; git co develop --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
+  (_top; git co develop --recurse-submodules; cdc; git co develop-web)
 }
 
 co-s() {
-  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
-}
-
-co-m() {
-  (_top; test -d .idea && git co -- .idea; git co master --recurse-submodules; cdc; git co $(git name-rev --name-only HEAD))
+  (_top; test -d .idea && git co -- .idea; git co staging --recurse-submodules; cdc; git co release-web)
 }
 
 gp() {
@@ -463,23 +465,25 @@ gp() {
   git pull --recurse-submodules
 }
 
+gpp() {
+    echo "Synching core"
+    (cdc && trace git pull && trace git push) &&
+    echo "Synching top level"
+    trace git co -- .idea;
+    trace git pull && trace git push;
+}
+
 show-stash() {
   local n=${1:-0}
   git difftool -y "stash@{$n}~" "stash@{$n}"
 }
-
-# rails() {
-  # spring stop
-  # command rails "$@"
-# }
-
 
 export DONT_PROMPT_WSL_INSTALL=true
 
 # TODO: fix this hack
 if [[ -d /mnt/c/Users/*/AppData/Local/android/Sdk ]]
 then
-SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
+ SDK=$(echo /mnt/c/Users/*/AppData/Local/android/Sdk)
 fi
 
 # # This runs the WINDOWS installed version of adb

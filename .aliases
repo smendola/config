@@ -18,6 +18,7 @@ alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
 
+trace() ( set -x; "$@" )
 
 # This implementation replaces an older one that used while/cd..
 function upto()
