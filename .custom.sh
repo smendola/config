@@ -576,6 +576,7 @@ precompile () {
 }
 
 function hotfix () {
+  tag-live-commit
   fetch-tags
 
   git branch -f hotfix 'live-in-production'
