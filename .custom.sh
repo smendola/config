@@ -453,7 +453,7 @@ co() {(
   _top
   git co $1 --recurse-submodules
   cdc
-  git co $1 || echo "No branch $1 in core"
+  git co $1 && echo "Found matching branch $1 in core" || echo "No matching branch $1 in core"
 )}
 
 co-d() {(
@@ -587,6 +587,7 @@ function hotfix () {
 tag-live-commit () {
   local commit=$(heroku config:get HEROKU_SLUG_COMMIT -a aurora-production)
   git tag -f live-in-production ${commit}
+  git push -f --tags
 }
 
 fetch-tags () {
