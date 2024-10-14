@@ -1,5 +1,6 @@
 # Reset
-Escape=$(echo -e '\033')
+Escape=$(echo -e '\e')
+ESC=$Escape
 
 Color_Off="${Escape}[0m"       # Text Reset
 
