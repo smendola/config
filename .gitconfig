@@ -60,7 +60,7 @@
 [url "https://"]
 	insteadOf = git://
 [push]
-	default = simple
+	default = current
 	autoSetupRemote = true
 [credential]
 	helper = store

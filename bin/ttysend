@@ -18,6 +18,8 @@ echo '##########################################################################
 echo '# Paste all that follows this into a TTY window on the target machine     #'
 echo '###########################################################################'
 echo -e '\e[0m'
+(
 echo ' (base64 -d | tar Jxpf -) << EOF'
 tar Jcf - "$@" | base64
 echo EOF
+) | tee /dev/tty | (xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
