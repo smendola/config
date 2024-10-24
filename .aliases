@@ -143,7 +143,12 @@ type stty > /dev/null 2>&1 || stty() {
 #  dots commit -a -m "whatever"
 #  dots push origin master
 # you get the gist.
-alias dots='git --git-dir=$HOME/.config.git/ --work-tree=$HOME'
+function dots () {
+  (
+    cd $HOME
+    git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
+  )
+}
 
 function syncdots()
 {
