@@ -423,14 +423,13 @@ _top() {
 }
 
 cdc() {
-  if [[ -d app/frontend/aurora-client-core ]]
-  then
+  if [[ -d app/frontend/aurora-client-core ]]; then
     cd app/frontend/aurora-client-core
-  elif [[ -d app/webpacker/aurora-client-core ]]
-  then
-    cd app/webpacker/aurora-client-core
-  else
+  elif [[ -d src/core ]]; then
     cd src/core
+  else
+    echo "Can't find core" >&2
+    false
   fi
 }
 
@@ -613,12 +612,6 @@ alt-drag () {
 	( $(wslpath -u 'C:\Users\smend\AppData\Roaming\AltDrag\AltDrag.exe') &)
 }
 
-wp () {
-  local wp=$(wslpath -aw "$1" | sed 's/\\/\\\\/g')
-  echo -e "\e[1m$wp\e[m"
-	(echo "$wp" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
-}
-
 git-whoami () { (set -xv
 	# Get the remote URL of the repository
   local remote_url=$(git config --get remote.origin.url)
@@ -688,3 +681,4 @@ pr () {
     gh pr create --body ''
   fi
 }
+
