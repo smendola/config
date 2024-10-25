@@ -339,9 +339,11 @@ penv() {
 	env "$@" | sed 's/^\([^=]*\)=\(.*\)$/\x1b[32m\1\x1b[0m=\x1b[34m\2\x1b[0m/'
 }
 
-win-path() {
+wp() {
   local u_path=${1-.}
   local w_path=$(wslpath -aw "$u_path" | sed 's|\\|\\\\|g')
-  echo "$w_path"
+  echo ''
+  echo -e "\e[1m${w_path}\e[m"
+  echo ''
   (echo "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
