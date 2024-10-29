@@ -247,3 +247,5 @@ fi
 
 export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
+
+eval "$(direnv hook zsh)"
