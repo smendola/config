@@ -12,7 +12,7 @@
     "diff": true,
     "diffgutter": false,
     "encoding": "utf-8",
-    "eofnewline": false,
+    "eofnewline": true,
     "fastdirty": true,
     "fileformat": "unix",
     "filetype": "unknown",
