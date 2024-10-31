@@ -18,6 +18,7 @@ test -d ~/.rvm/scripts/rvm && source ~/.rvm/scripts/rvm
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
 path+=(~/aurora/bin)
+alias mine=rubymine.sh
 ide() {
   pkill -ABRT -f RubyMine
   # &! "disowns" the process
