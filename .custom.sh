@@ -107,31 +107,12 @@ c() {(
 )}
 
 
-# Usage:
-#  heroku-app HEROKU_APP_NAME [GIT_REMOTE_ALIAS]
-#  e.g.
-#  $ heroku-app aurora-develop
-#      creates git remote "heroku-develop"
-#  can be shortened as:
-#  $ heroku-app develop
-heroku-app() {
-  app=${1?App name is required (e.g. aurora-pr-987 or simply pr-987)}
-  git_remote=aurora-${app/aurora-/}
-  git_remote=${2:-${git_remote}}
-  heroku git:remote -a aurora-${app} -r ${git_remote}
-}
-
 production-shell() {
 	terminator -p production -x heroku run -a aurora-production bash
 }
 
 production-console() {
 	terminator -p production -x heroku run -a aurora-production rails c
-}
-
-ro-console() {
-    env=${1:-production}
-	heroku run -a aurora-$env rails c --sandbox
 }
 
 debug-puma() {
@@ -218,8 +199,7 @@ apilog() {
     tail -f ~/aurora/log/development.log |
         sed -urn 's!.*method=([^ ]+).* path=(/?/api/v1/[^ ]+).* status=([^ ]+).* duration=([^ ]+) .*!\1 \2 \t\t\3  \4ms!igp'
   else
-    local env=${1:-production}
-    heroku logs -a aurora-${env} --tail |
+    heroku logs -a $(expand-env ${1:-production}) --tail |
         sed -urn 's!.*method=([^ ]+).* path="(/?/api/v1[^"]+).* service=([^ ]+).* status=([^ ]+) .*!\1 \2 \t\t\3 \4!igp' |
         sed -e "s/\(^.*[2][0-9][0-9]\)$/[32m\1[0m/g" \
             -e "s/\(^.*[3][0-9][0-9]\)$/[32;3m\1[0m/g" \
@@ -240,28 +220,26 @@ draft-pr()
 hkr()
 {(
   #set -x
-  local app=${1?App name is required (e.g. aurora-develop, or just develop)}
+  local app=$(expand-env $1)
   shift
   local cmd=bash
   if [[ $# > 0 ]]
   then
 	  cmd="$@"
   fi
-  app=aurora-${app/aurora-/}
   heroku run -a $app $cmd
 )}
 
 hke()
 {(
   #set -x
-  local app=${1?App name is required (e.g. aurora-develop, or just develop)}
+  local app=$(expand-env ${1:-production})
   shift
   local cmd=bash
   if [[ $# > 0 ]]
   then
 	  cmd="$@"
   fi
-  app=aurora-${app/aurora-/}
   heroku ps:exec -a $app $cmd
 )}
 
@@ -364,7 +342,7 @@ c-p() {
 #   ff stage   # show feature flags from aurora-stage
 #   ff stage tmcw true # set feature flag TMCW on aurora-stage
 function ff() {
-  local app=aurora-${1/aurora-//}
+  local app=$(expand-env $1)
   if [[ $# -gt 1 ]]
   then
     local lhs=${2}
@@ -543,16 +521,14 @@ notify () {
 }
 
 hbo () {
-  local env=${1:-develop}
-  local app=aurora-$env
+  local app=$(expand-env ${1:-develop})
   title "hbo $env"
   (heroku builds:output -a "$app" 2>&1 | yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
   true
 }
 
 hro () {
-  local env=${1:-develop}
-  local app=aurora-$env
+  local app=$(expand-env ${1:-develop})
   title "hbo $env"
   (heroku releases:output -a "$app" 2>&1 | yad --text-info --listen --title "$app" --tail --geometry 800x300 --button 'Close:0' --auto-kill --kill-parent HUP)
   true
@@ -560,8 +536,7 @@ hro () {
 
 
 hbp () {
-  local env=${1:-develop}
-  local app=aurora-$env
+  local app=$(expand-env ${1:-develop})
   title "hbp $env"
   (heroku builds:output -a "$app" 2>&1 | yad --progress --pulsate --title "$app" --fontname 'helvetica 15' --button 'Close:0' --auto-close  --auto-kill --kill-parent HUP)
   true
@@ -603,8 +578,7 @@ aurora () {
 
 # cancel all pending builds in a heroku env
 hbc () {
-  local env=${1:-develop}
-  local app=aurora-${env/aurora-//}
+  local app=$(expand-env ${1:-develop})
   heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
 }
 
@@ -641,8 +615,7 @@ echo $remote_url
 }
 
 heroku-build () {
-  local env=${1:-develop}
-  local app=aurora-${env/aurora-//}
+  local app=$(expand-env ${1:-develop})
   local branch=${2:-develop}
 
   github_username=$(git-whoami)
@@ -664,8 +637,7 @@ heroku-build () {
 }
 
 whois () {
-  local env=${2:-production}
-  local app=aurora-${env/aurora-//}
+  local app=$(expand-env ${1:-production})
    (
      echo '\\t';
      echo "select email from users where id = '$1';"
@@ -683,3 +655,15 @@ pr () {
   fi
 }
 
+expand-env ()
+{
+  local app
+  case $1 in
+    d) echo 'aurora-develop' ;;
+    s) echo 'aurora-stage' ;;
+    p) echo 'aurora-production' ;;
+    [0-9]*) echo "aurora-pr-$1" ;;
+    *) app=${1?App name is required (e.g. develop, or pr-456); shortcuts d, s, p are allowed}
+       echo "aurora-${app/aurora-//}"
+  esac
+}
