@@ -345,5 +345,5 @@ wp() {
   echo ''
   echo -e "\e[1m${w_path}\e[m"
   echo ''
-  (echo "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
+  (echo -n "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
