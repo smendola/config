@@ -44,8 +44,8 @@ then
   exit 1
 fi
 
-n=$RANDOM
-receive_cmd="(T=/tmp/receive.$n; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar Jxfvv - && /bin/rm -f \$T)"
+n=${link##*/}
+receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar Jxfvv - && /bin/rm -f \$T)"
 echo -n -e '\e[32m'
 echo "To receive the file, use the following command:"
 echo -e '\e[m'
