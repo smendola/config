@@ -10,8 +10,15 @@
 # to be used on the receiving end to receive the files.
 # If possible, the command is also sent to the clipboard.
 
+TMP_FILE=send.$$.tar
 
-fname=send.$$.tar.xz
+Z=6
+if [[ $1 =~ ^-[0-9]$ ]]
+then
+  Z=${1#-}
+  shift
+fi
+  
 if [[ $1 == "mods" ]]
 then
   declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
@@ -25,15 +32,15 @@ echo
 if [[ -z "$password" ]];
 then
   echo -e '\e[31mSending unencrypted\e[m'
-  tar Jcf - "$@" | gpg --store -a -o "$fname"
+  (set -x; tar cf - "$@" | gpg --store -z $Z -a -o "$TMP_FILE")
 else
-  tar Jcf - "$@" |
-  gpg --batch --passphrase-fd 3 -ac -o "$fname" 3<<<"$password"
+  tar cf - "$@" |
+  (set -x; gpg --batch --passphrase-fd 3 -ac -z $Z -o "$TMP_FILE" 3<<<"$password")
 fi
 
-json=$(curl -F "file=@${fname}" https://file.io)
+json=$(curl -F "file=@${TMP_FILE}" https://file.io)
 # echo "$json" | jq
-rm -f $fname
+rm -f $TMP_FILE
 link=$(echo "$json" | jq -r .link )
 expires=$(echo "$json" | jq -r .expires )
 
@@ -45,7 +52,7 @@ then
 fi
 
 n=${link##*/}
-receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar Jxfvv - && /bin/rm -f \$T)"
+receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar xfvv - && /bin/rm -f \$T)"
 echo -n -e '\e[32m'
 echo "To receive the file, use the following command:"
 echo -e '\e[m'
