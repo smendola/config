@@ -12,13 +12,15 @@
 
 TMP_FILE=send.$$.tar
 
+trap "rm -f $TMP_FILE" EXIT
+
 Z=6
 if [[ $1 =~ ^-[0-9]$ ]]
 then
   Z=${1#-}
   shift
 fi
-  
+
 if [[ $1 == "mods" ]]
 then
   declare -a mods=( $(git status -s -uno | sed -e 's/^.* //g') )
@@ -31,17 +33,17 @@ echo
 # Check if the password is blank
 if [[ -z "$password" ]];
 then
-  echo -e '\e[31mSending unencrypted\e[m'
+  echo -e '\e[31m*** Sending unencrypted ***\e[m'
   (set -x; tar cf - "$@" | gpg --store -z $Z -a -o "$TMP_FILE")
 else
   tar cf - "$@" |
   (set -x; gpg --batch --passphrase-fd 3 -ac -z $Z -o "$TMP_FILE" 3<<<"$password")
 fi
 
-json=$(curl -F "file=@${TMP_FILE}" https://file.io)
+json=$(set -x ; curl -F "files[]=@${TMP_FILE}" https://uguu.se/upload.php)
 # echo "$json" | jq
-rm -f $TMP_FILE
-link=$(echo "$json" | jq -r .link )
+
+link=$(echo "$json" | jq -r '.files[0].url' )
 expires=$(echo "$json" | jq -r .expires )
 
 
