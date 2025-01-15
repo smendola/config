@@ -14,6 +14,7 @@ function bd () {
 }
 
 alias grep='grep --color=auto'
+alias igrep='grep --color=auto -i'
 alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
