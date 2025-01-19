@@ -26,33 +26,30 @@ echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sou
 sudo apt-get update
 
 echo "INSTALLING SOME UTILITIES"
-install wslu zip unzip dos2unix
+install wslu zip unzip dos2unix direnv htop
 
 echo "INSTALLING CHROME BROWSER"
 install google-chrome-stable
 
-echo "INSTALLING JAVA"
-install openjdk-11-jdk
-
-echo "INSTALLING SUBLIME TEXT"
-install sublime-text
+#echo "INSTALLING JAVA"
+#install openjdk-11-jdk
 
 echo "FETCHING MESLO FONTS"
 test ! -d Meslo-Font && git clone https://github.com/andreberg/Meslo-Font.git
 # TODO: Install the fonts now
 
-echo "INSTALLING GITHUB CLI"
-install gh
+#echo "INSTALLING GITHUB CLI"
+#install gh
 
-if ! aws --version 2>&1 > /dev/null
-then
-echo "INSTALLING AWS CLI"
-(cd /tmp
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  unzip awscliv2.zip
-  sudo ./aws/install
-)
-fi
+#if ! aws --version 2>&1 > /dev/null
+#then
+#echo "INSTALLING AWS CLI"
+#(cd /tmp
+#  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#  unzip awscliv2.zip
+#  sudo ./aws/install
+#)
+#fi
 
 # Maybe run this on Windows host instead?
 # echo "INSTALLING PGADMIN 4"
