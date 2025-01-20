@@ -12,11 +12,11 @@ fi
 
 function hostip() { ipconfig.exe | grep -A 10 "WSL (Hyper-V firewall)" | grep "IPv4 Address" | awk '{print $NF}' | tr -d '\r' }
 
-sudo sed -i "s/nameserver .*/nameserver $(hostip)/" /etc/resolv.conf
+#sudo sed -i "s/nameserver .*/nameserver $(hostip)/" /etc/resolv.conf
 
 if [[ ! -z $WSLENV ]]; then
     # for WSL2
-    export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+    export DISPLAY=$(hostip):0
     export LIBGL_ALWAYS_INDIRECT=1
 fi
 
@@ -249,3 +249,4 @@ export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
+
