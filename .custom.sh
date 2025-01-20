@@ -34,7 +34,7 @@ export STREAM_APP_NAME=reachire-developer-sal
 export LOGRAGE_ENABLED=true
 export TRACE_STREAM_CALLS=true
 export ACTIVE_RECORD_LOG_LEVEL=info
-export FEATURE_FLAG_WEB_CHAT=off
+export FEATURE_FLAG_WEB_CHAT=on
 
 export NODE_OPTIONS="--max-old-space-size=8192"
 
@@ -490,13 +490,6 @@ path+=(
 alias rnd='react-native-debugger --no-sandbox'
 
 # path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
-
-alias snapshot="pg_dump -f develop.dump -c -C reachire-web_development"
-restore() {
-  local env=${1:-develop}
-  local dump=${env/.dump/}.dump
-  pkill -9 ruby; psql -q -d postgres < $dump
-}
 
 alias rrspec="reset_test && rspec"
 
