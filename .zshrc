@@ -10,9 +10,7 @@ then
    TERM=$TERM-256color
 fi
 
-function hostip() { ipconfig.exe | grep -A 10 "WSL (Hyper-V firewall)" | grep "IPv4 Address" | awk '{print $NF}' | tr -d '\r' }
-
-#sudo sed -i "s/nameserver .*/nameserver $(hostip)/" /etc/resolv.conf
+function hostip() { echo localhost }
 
 if [[ ! -z $WSLENV ]]; then
     # for WSL2
