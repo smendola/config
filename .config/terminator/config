@@ -25,7 +25,7 @@
     backspace_binding = automatic
     delete_binding = automatic
     cursor_color = "#ff0000"
-    font = Monospace 14
+    font = "Meslo LG S 12"
     foreground_color = "#eeeeee"
     scrollback_lines = 5000
     palette = "#181a1f:#e06c75:#98c379:#e5c07b:#3f9ae4:#c678dd:#56b6c2:#dcdfe4:#5a6374:#ff7b85:#bdf296:#fce94f:#67bbff:#e48aff:#34e2e2:#f6f9ff"
