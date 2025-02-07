@@ -19,7 +19,6 @@ if [[ ! -z $WSLENV ]]; then
 fi
 
 if [[ -z $DISPLAY ]]; then
-
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
@@ -37,7 +36,12 @@ if [[ -z $DISPLAY ]]; then
       # export DISPLAY=${DISPLAY:-127.0.0.1:0}
     fi
 fi
-nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+
+if [[ $DISPLAY == "?*:*" ]]; then
+  nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+else
+                                xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
@@ -204,12 +208,6 @@ export NO_AT_BRIDGE=1 ; # https://unix.stackexchange.com/a/230442
 export SUDO_EDITOR=vim
 
 # Here's everyone's chance to add custom stuff
-if [ -f $HOME/.custom.sh ]
-then
-  echo "Now sourcing $HOME/.custom.sh"
-  source $HOME/.custom.sh
-fi
-
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/dev/.sdkman"
 [[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
@@ -249,5 +247,28 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 eval "$(direnv hook zsh)"
 
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-        source /etc/profile.d/vte.sh
+  echo "vte init for tilix"
+  source /etc/profile.d/vte.sh
 fi
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/sal/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/sal/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/sal/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/sal/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+if [ -f $HOME/.custom.sh ]
+then
+  echo "Now sourcing $HOME/.custom.sh"
+  source $HOME/.custom.sh
+fi
+
