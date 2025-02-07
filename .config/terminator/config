@@ -17,7 +17,7 @@
     background_color = "#282C34"
     backspace_binding = automatic
     delete_binding = automatic
-    font = Meslo LG S 11
+    font = Meslo LG S 10
     foreground_color = "#eeeeee"
     scrollback_lines = 5000
     palette = "#181a1f:#e06c75:#98c379:#e5c07b:#5584d6:#c678dd:#56b6c2:#dcdfe4:#5a6374:#ff7b85:#bdf296:#fce94f:#4294ff:#e48aff:#34e2e2:#f6f9ff"
@@ -25,6 +25,7 @@
     use_system_font = False
     bold_is_bright = True
     copy_on_selection = True
+    title_transmit_bg_color = "#62a0ea"
   [[production]]
     font = Monospace 11
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
