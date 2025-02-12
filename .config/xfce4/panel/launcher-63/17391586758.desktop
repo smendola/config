@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=System Monitor
+Comment=View current processes and monitor system state
+TryExec=gnome-system-monitor
+Exec=gnome-system-monitor
+Icon=org.gnome.SystemMonitor
+Terminal=false
+Type=Application
+StartupNotify=true
+StartupWMClass=gnome-system-monitor
+Categories=GNOME;GTK;System;Monitor;
+NotShowIn=KDE;
+Keywords=Monitor;System;Process;CPU;Memory;Network;History;Usage;Performance;Task;Manager;Activity;
+X-Ubuntu-Gettext-Domain=gnome-system-monitor
+X-XFCE-Source=file:///usr/share/applications/org.gnome.SystemMonitor.desktop

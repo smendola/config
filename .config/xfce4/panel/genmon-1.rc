@@ -1,0 +1,6 @@
+Command=ping www.google.com
+UseLabel=1
+Text=
+UpdatePeriod=5000
+Font=Noto Sans 9
+
