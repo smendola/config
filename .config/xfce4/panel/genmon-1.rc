@@ -1,6 +1,6 @@
-Command=ping www.google.com
-UseLabel=1
-Text=
+Command=sh -c "nc -w1 www.google.com 80 && echo 🌐 || echo 🚫"
+UseLabel=0
+Text=🌐
 UpdatePeriod=5000
-Font=Noto Sans 9
+Font=Noto Sans 11
 

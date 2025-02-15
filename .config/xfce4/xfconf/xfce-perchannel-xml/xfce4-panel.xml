@@ -8,7 +8,7 @@
     <property name="dark-mode" type="bool" value="true"/>
     <property name="panel-1" type="empty">
       <property name="position" type="string" value="p=8;x=96;y=1175"/>
-      <property name="size" type="uint" value="32"/>
+      <property name="size" type="uint" value="36"/>
       <property name="icon-size" type="uint" value="0"/>
       <property name="enable-struts" type="bool" value="true"/>
       <property name="length" type="double" value="100"/>
@@ -27,11 +27,11 @@
         <value type="int" value="43"/>
         <value type="int" value="50"/>
         <value type="int" value="53"/>
+        <value type="int" value="1"/>
         <value type="int" value="54"/>
         <value type="int" value="45"/>
         <value type="int" value="32"/>
         <value type="int" value="3"/>
-        <value type="int" value="1"/>
         <value type="int" value="26"/>
         <value type="int" value="47"/>
       </property>
@@ -89,6 +89,8 @@
       <property name="show-command-logout" type="bool" value="false"/>
       <property name="show-command-lockscreen" type="bool" value="false"/>
       <property name="recent" type="array">
+        <value type="string" value="emoji-picker.desktop"/>
+        <value type="string" value="com.teamviewer.TeamViewer.desktop"/>
         <value type="string" value="xfce-wm-settings.desktop"/>
         <value type="string" value="xfce-backdrop-settings.desktop"/>
         <value type="string" value="xfce-ui-settings.desktop"/>
@@ -97,8 +99,6 @@
         <value type="string" value="org.xfce.mousepad.desktop"/>
         <value type="string" value="docker-desktop.desktop"/>
         <value type="string" value="gnome-language-selector.desktop"/>
-        <value type="string" value="xfce-keyboard-settings.desktop"/>
-        <value type="string" value="xfce4-web-browser.desktop"/>
       </property>
       <property name="favorites" type="array">
         <value type="string" value="xfce4-web-browser.desktop"/>
@@ -285,7 +285,6 @@
         <value type="string" value="173916061813.desktop"/>
       </property>
     </property>
-    <property name="plugin-1" type="string" value="genmon"/>
     <property name="plugin-3" type="string" value="systray">
       <property name="known-legacy-items" type="array">
         <value type="string" value="ibus panel"/>
@@ -304,6 +303,15 @@
       <property name="hide-new-items" type="bool" value="false"/>
       <property name="square-icons" type="bool" value="false"/>
       <property name="hidden-legacy-items" type="array">
+      </property>
+    </property>
+    <property name="plugin-1" type="string" value="genmon"/>
+    <property name="clipman" type="empty">
+      <property name="settings" type="empty">
+        <property name="add-primary-clipboard" type="bool" value="false"/>
+      </property>
+      <property name="tweaks" type="empty">
+        <property name="popup-at-pointer" type="bool" value="false"/>
       </property>
     </property>
   </property>
