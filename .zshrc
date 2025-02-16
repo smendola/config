@@ -250,3 +250,4 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
+eval $(dbus-launch --sh-syntax)
