@@ -36,6 +36,9 @@
         <value type="int" value="26"/>
         <value type="int" value="47"/>
       </property>
+      <property name="background-style" type="uint" value="0"/>
+      <property name="enter-opacity" type="uint" value="100"/>
+      <property name="leave-opacity" type="uint" value="100"/>
     </property>
     <property name="panel-3" type="empty">
       <property name="position" type="string" value="p=6;x=25;y=60"/>
