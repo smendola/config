@@ -18,6 +18,7 @@
         <value type="int" value="60"/>
         <value type="int" value="61"/>
         <value type="int" value="67"/>
+        <value type="int" value="2"/>
         <value type="int" value="66"/>
         <value type="int" value="65"/>
         <value type="int" value="63"/>
@@ -41,6 +42,8 @@
       <property name="size" type="uint" value="48"/>
       <property name="plugin-ids" type="array">
         <value type="int" value="69"/>
+        <value type="int" value="4"/>
+        <value type="int" value="5"/>
       </property>
       <property name="mode" type="uint" value="1"/>
       <property name="length" type="double" value="10"/>
@@ -89,6 +92,7 @@
       <property name="show-command-logout" type="bool" value="false"/>
       <property name="show-command-lockscreen" type="bool" value="false"/>
       <property name="recent" type="array">
+        <value type="string" value="xfce-session-settings.desktop"/>
         <value type="string" value="xfce-mouse-settings.desktop"/>
         <value type="string" value="xfce4-settings-editor.desktop"/>
         <value type="string" value="emoji-picker.desktop"/>
@@ -98,7 +102,6 @@
         <value type="string" value="xfce-ui-settings.desktop"/>
         <value type="string" value="org.xfce.mousepad.desktop"/>
         <value type="string" value="docker-desktop.desktop"/>
-        <value type="string" value="gnome-language-selector.desktop"/>
       </property>
       <property name="favorites" type="array">
         <value type="string" value="xfce4-web-browser.desktop"/>
@@ -312,6 +315,21 @@
       </property>
       <property name="tweaks" type="empty">
         <property name="popup-at-pointer" type="bool" value="false"/>
+      </property>
+    </property>
+    <property name="plugin-2" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="17397196041.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-4" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="17397205682.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-5" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="17397206143.desktop"/>
       </property>
     </property>
   </property>
