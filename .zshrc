@@ -39,7 +39,12 @@ if [[ -z $DISPLAY ]]; then
       # export DISPLAY=${DISPLAY:-127.0.0.1:0}
     fi
 fi
-nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+
+if [[ $DISPLAY == "?*:*" ]]; then
+  nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+else
+                                xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
