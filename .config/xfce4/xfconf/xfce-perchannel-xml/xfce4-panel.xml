@@ -89,13 +89,13 @@
       <property name="show-command-logout" type="bool" value="false"/>
       <property name="show-command-lockscreen" type="bool" value="false"/>
       <property name="recent" type="array">
+        <value type="string" value="xfce-mouse-settings.desktop"/>
+        <value type="string" value="xfce4-settings-editor.desktop"/>
         <value type="string" value="emoji-picker.desktop"/>
         <value type="string" value="com.teamviewer.TeamViewer.desktop"/>
         <value type="string" value="xfce-wm-settings.desktop"/>
         <value type="string" value="xfce-backdrop-settings.desktop"/>
         <value type="string" value="xfce-ui-settings.desktop"/>
-        <value type="string" value="xfce4-settings-editor.desktop"/>
-        <value type="string" value="xfce-mouse-settings.desktop"/>
         <value type="string" value="org.xfce.mousepad.desktop"/>
         <value type="string" value="docker-desktop.desktop"/>
         <value type="string" value="gnome-language-selector.desktop"/>

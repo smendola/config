@@ -4,6 +4,11 @@
   <property name="Logitech_G602" type="empty">
     <property name="RightHanded" type="bool" value="true"/>
     <property name="Threshold" type="int" value="1"/>
-    <property name="Acceleration" type="double" value="0.80000000000000004"/>
+    <property name="Acceleration" type="double" value="0.40000000000000002"/>
+  </property>
+  <property name="Primax_HP_125_White_Wired_Keyboard_Consumer_Control" type="empty">
+    <property name="RightHanded" type="bool" value="true"/>
+    <property name="Threshold" type="int" value="4"/>
+    <property name="Acceleration" type="double" value="0"/>
   </property>
 </channel>
