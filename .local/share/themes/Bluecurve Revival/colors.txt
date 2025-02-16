@@ -1,0 +1,13 @@
+Bluecurve Revival XFCE (colors)
+================================
+
+original blue: #6976C9
+revival blue: #6674CC
+
+inactive (Clearlooks): #EDECEB
+
+red:	#FF4D4D
+green:	#32A63C
+violet: #B266FF
+orange: #F27318
+
