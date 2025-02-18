@@ -114,17 +114,28 @@ function 1,000 ()
 
 function check_x()
 {
-    if [ -z "$DISPLAY" ]
-    then
+    local display_number
+    local host
+    local port
+
+    if [ -z "$DISPLAY" ]; then
       echo "DISPLAY needs to be set"
       return 1
-    elif nc -w1 ${DISPLAY/:*/} 6000 && xset q > /dev/null
-    then
-        return 0
-    else
-      echo "Problem with display? ($DISPLAY)" 2>&1
-      return 1
     fi
+
+    # display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
+    # display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
+    # host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
+    # host=${host:-localhost}      # if host is empty, use localhost
+    # port=$((6000 + display_number))
+
+    # if nc -w1 $host $port && xset q > /dev/null; then
+    #   return 0
+    # fi
+
+    xset q > /dev/null 2>&1 && return 0
+
+    echo "Problem with display? ($DISPLAY)" 2>&1
 }
 
 function fixtty() {
@@ -348,3 +359,61 @@ wp() {
   echo ''
   (echo -n "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
+
+# Unit tests for check_x function
+function test_check_x() {
+    local old_display=$DISPLAY
+    local failed=0
+    
+    # Helper function to run a test case
+    test_case() {
+        local test_display=$1
+        local expected_host=$2
+        local expected_port=$3
+        
+        DISPLAY=$test_display
+        
+        # Source the function to get access to local variables
+        eval "$(declare -f check_x | sed '1s/check_x/check_x_test/')"
+        check_x_test > /dev/null 2>&1  # Run function but suppress output
+        
+        # Extract the values that were calculated
+        local actual_host=$host
+        local actual_port=$port
+        
+        if [[ $actual_host != $expected_host || $actual_port != $expected_port ]]; then
+            echo "FAIL: DISPLAY=$test_display"
+            echo "  Expected: host=$expected_host port=$expected_port"
+            echo "  Got:      host=$actual_host port=$actual_port"
+            failed=$((failed + 1))
+        else
+            echo "PASS: DISPLAY=$test_display"
+        fi
+    }
+    
+    # Test cases
+    test_case "localhost:0" "localhost" 6000
+    test_case "localhost:0.1" "localhost" 6000
+    test_case ":0" "localhost" 6000
+    test_case ":0.1" "localhost" 6000
+    test_case ":1" "localhost" 6001
+    test_case ":1.0" "localhost" 6001
+    test_case "somehost:2.1" "somehost" 6002
+    
+    # Restore original DISPLAY
+    DISPLAY=$old_display
+    
+    # Report results
+    if ((failed > 0)); then
+        echo "$failed test(s) failed"
+        return 1
+    else
+        echo "All tests passed"
+        return 0
+    fi
+}
+
+# Run tests if called with --test argument
+if [[ "${1:-}" == "--test" ]]; then
+    test_check_x
+fi
