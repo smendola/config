@@ -272,3 +272,4 @@ then
   source $HOME/.custom.sh
 fi
 
+eval $(dbus-launch --sh-syntax)
