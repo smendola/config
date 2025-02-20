@@ -1,0 +1,151 @@
+[ca/desrt/dconf-editor]
+saved-pathbar-path='/system/proxy/'
+saved-view='/'
+window-height=834
+window-is-maximized=false
+window-width=1037
+
+[com/gexperts/Tilix]
+control-scroll-zoom=true
+copy-on-select=true
+enable-wide-handle=true
+prompt-on-close=true
+prompt-on-delete-profile=true
+quake-specific-monitor=0
+quake-tab-position='top'
+recent-session-files=['/home/dev/split1.json']
+sidebar-on-right=false
+tab-position='top'
+terminal-title-style='normal'
+theme-variant='dark'
+use-tabs=true
+window-style='normal'
+
+[com/gexperts/Tilix/keybindings]
+terminal-zoom-in='<Primary>equal'
+
+[com/gexperts/Tilix/profiles]
+list=['2b7c4080-0ddd-46c5-8f23-563fd3ba789d', '192ee3ff-1a4f-4d26-a179-216976df780d']
+
+[com/gexperts/Tilix/profiles/192ee3ff-1a4f-4d26-a179-216976df780d]
+allow-bold=true
+automatic-switch=@as []
+background-color='#27272C2C3434'
+background-transparency-percent=0
+backspace-binding='ascii-delete'
+badge-color='#ffffff'
+badge-color-set=false
+badge-font='Monospace 12'
+badge-position='northeast'
+badge-text=''
+badge-use-system-font=false
+bold-color='#ffffff'
+bold-color-set=false
+bold-is-bright=true
+cell-height-scale=1.0
+cell-width-scale=1.0
+cjk-utf8-ambiguous-width='narrow'
+cursor-background-color='#FFFF00000000'
+cursor-blink-mode='system'
+cursor-colors-set=true
+cursor-foreground-color='#F6F6F5F5F4F4'
+cursor-shape='block'
+custom-command='htop'
+custom-hyperlinks=@as []
+default-size-columns=80
+default-size-rows=24
+delete-binding='delete-sequence'
+dim-transparency-percent=16
+draw-margin=80
+encoding='UTF-8'
+exit-action='close'
+font='Meslo LG S 14'
+foreground-color='#F8F8F2'
+highlight-background-color='#000000'
+highlight-colors-set=false
+highlight-foreground-color='#ffffff'
+login-shell=false
+notify-silence-enabled=false
+notify-silence-threshold=0
+palette=['#181819191F1F', '#E0E06B6B7474', '#9898C3C37979', '#E5E5C0C07B7B', '#35358484E4E4', '#DCDC8A8ADDDD', '#5656B6B6C2C2', '#DCDCDFDFE4E4', '#545652', '#FFFF7B7B8585', '#BCBCF2F29696', '#FFFFE6E68989', '#6262A0A0EAEA', '#E3E38A8AFFFF', '#6767DADAE8E8', '#F6F6F9F9FFFF']
+rewrap-on-resize=true
+scroll-on-keystroke=true
+scroll-on-output=false
+scrollback-lines=8192
+scrollback-unlimited=false
+select-by-word-chars=''
+shortcut='disabled'
+show-scrollbar=true
+terminal-bell='icon-sound'
+terminal-title='${id}: ${title}'
+text-blink-mode='always'
+triggers=@as []
+use-custom-command=true
+use-system-font=false
+use-theme-colors=false
+visible-name='htop'
+
+[com/gexperts/Tilix/profiles/2b7c4080-0ddd-46c5-8f23-563fd3ba789d]
+background-color='#27272C2C3434'
+badge-color-set=false
+badge-text=''
+badge-use-system-font=false
+bold-color-set=false
+bold-is-bright=true
+cell-height-scale=1.0
+cell-width-scale=1.0
+cursor-background-color='#FFFF00000000'
+cursor-blink-mode='system'
+cursor-colors-set=true
+cursor-foreground-color='#F6F6F5F5F4F4'
+cursor-shape='block'
+dim-transparency-percent=16
+font='Meslo LG S 13'
+foreground-color='#F8F8F2'
+highlight-colors-set=false
+login-shell=true
+notify-silence-enabled=false
+palette=['#181819191F1F', '#E0E06B6B7474', '#9898C3C37979', '#E5E5C0C07B7B', '#35358484E4E4', '#DCDC8A8ADDDD', '#5656B6B6C2C2', '#DCDCDFDFE4E4', '#545652', '#FFFF7B7B8585', '#BCBCF2F29696', '#FFFFE6E68989', '#6262A0A0EAEA', '#E3E38A8AFFFF', '#6767DADAE8E8', '#F6F6F9F9FFFF']
+select-by-word-chars=''
+terminal-bell='icon-sound'
+use-system-font=false
+use-theme-colors=false
+visible-name='Default'
+
+[org/gnome/baobab/ui]
+window-size=(1573, 600)
+window-state=128
+
+[org/gnome/meld]
+custom-font='Meslo LG S 12'
+draw-spaces=@as []
+highlight-current-line=true
+highlight-syntax=true
+ignore-blank-lines=false
+show-line-numbers=true
+text-filters=[('CVS/SVN keywords', false, '\\$\\w+(:[^\\n$]+)?\\$'), ('C++ comment', false, '//.*'), ('C comment', false, '/\\*.*?\\*/'), ('All whitespace', false, '[ \\t\\r\\f\\v]*'), ('Leading whitespace', true, '^[ \\t\\r\\f\\v]*'), ('Trailing whitespace', false, '[ \\t\\r\\f\\v]*$'), ('Script comment', false, '#.*'), ('wp', false, 'webpacker'), ('fe', false, 'frontend')]
+use-system-font=false
+wrap-mode='char'
+
+[org/gnome/meld/window-state]
+height=1587
+is-maximized=false
+width=2411
+
+[org/gtk/settings/color-chooser]
+custom-colors=[(0.8901960784313725, 0.54117647058823526, 1.0, 1.0), (0.77647058823529413, 0.47058823529411764, 0.8666666666666667, 1.0), (0.40392156862745099, 0.72941176470588232, 1.0, 1.0), (0.38039215686274508, 0.68627450980392157, 0.93725490196078431, 1.0), (1.0, 0.0, 0.0, 1.0), (0.86274509803921573, 0.87450980392156863, 0.89411764705882357, 1.0), (0.82745098039215681, 0.83921568627450982, 0.81176470588235294, 1.0), (0.96470588235294119, 0.97647058823529409, 1.0, 1.0)]
+selected-color=(true, 0.86274509803921573, 0.54117647058823526, 0.8666666666666667, 1.0)
+
+[org/gtk/settings/file-chooser]
+date-format='regular'
+location-mode='path-bar'
+show-hidden=false
+show-size-column=true
+show-type-column=true
+sidebar-width=171
+sort-column='name'
+sort-directories-first=false
+sort-order='descending'
+type-format='category'
+window-position=(8, 31)
+window-size=(1203, 902)

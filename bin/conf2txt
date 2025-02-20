@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Export dconf settings to text format
+dconf dump / > ~/.config/dconf/user.txt

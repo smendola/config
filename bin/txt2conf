@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Load dconf settings from text format
+dconf load / < ~/.config/dconf/user.txt
