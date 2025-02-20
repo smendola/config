@@ -1,0 +1,31 @@
+#!/bin/bash
+
+CONF_BIN="$HOME/.config/dconf/user"
+CONF_TXT="$HOME/.config/dconf/user.txt"
+
+# Check if both files exist
+if [ ! -f "$CONF_BIN" ]; then
+    echo "Error: $CONF_BIN does not exist"
+    exit 1
+fi
+
+# Create text file if it doesn't exist
+if [ ! -f "$CONF_TXT" ]; then
+    echo "Creating initial $CONF_TXT"
+    dconf dump / > "$CONF_TXT"
+    exit 0
+fi
+
+# Get modification times
+bin_time=$(stat -c %Y "$CONF_BIN")
+txt_time=$(stat -c %Y "$CONF_TXT")
+
+if [ "$bin_time" -gt "$txt_time" ]; then
+    echo "Binary config is newer, converting to text..."
+    dconf dump / > "$CONF_TXT"
+elif [ "$txt_time" -gt "$bin_time" ]; then
+    echo "Text config is newer, converting to binary..."
+    dconf load / < "$CONF_TXT"
+else
+    echo "Configurations are in sync"
+fi
