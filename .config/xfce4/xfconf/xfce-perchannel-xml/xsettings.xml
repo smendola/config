@@ -2,13 +2,13 @@
 
 <channel name="xsettings" version="1.0">
   <property name="Net" type="empty">
-    <property name="ThemeName" type="string" value="Yaru-blue"/>
+    <property name="ThemeName" type="string" value="PRO-dark-XFCE-edition II-1"/>
     <property name="IconThemeName" type="string" value="elementary-xfce"/>
     <property name="DoubleClickTime" type="empty"/>
     <property name="DoubleClickDistance" type="empty"/>
     <property name="DndDragThreshold" type="empty"/>
     <property name="CursorBlink" type="empty"/>
-    <property name="CursorBlinkTime" type="empty"/>
+    <property name="CursorBlinkTime" type="int" value="1000"/>
     <property name="SoundThemeName" type="empty"/>
     <property name="EnableEventSounds" type="bool" value="true"/>
     <property name="EnableInputFeedbackSounds" type="bool" value="true"/>

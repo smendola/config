@@ -1,5 +1,5 @@
 size=20
-label=$\ 
+label=\ $\ 
 history-length=25
 use-url=true
 use-email=true
