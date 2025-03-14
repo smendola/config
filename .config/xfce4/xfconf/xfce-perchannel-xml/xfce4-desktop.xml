@@ -15,22 +15,22 @@
   <property name="backdrop" type="empty">
     <property name="screen0" type="empty">
       <property name="monitor0" type="empty">
-        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         <property name="image-style" type="empty"/>
         <property name="image-show" type="empty"/>
       </property>
       <property name="monitor1" type="empty">
-        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         <property name="image-style" type="empty"/>
         <property name="image-show" type="empty"/>
       </property>
       <property name="monitor2" type="empty">
-        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         <property name="image-style" type="empty"/>
         <property name="image-show" type="empty"/>
       </property>
       <property name="monitor3" type="empty">
-        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+        <property name="image-path" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         <property name="image-style" type="empty"/>
         <property name="image-show" type="empty"/>
       </property>
@@ -38,22 +38,22 @@
         <property name="workspace0" type="empty">
           <property name="color-style" type="int" value="0"/>
           <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         </property>
         <property name="workspace1" type="empty">
           <property name="color-style" type="int" value="0"/>
           <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         </property>
         <property name="workspace2" type="empty">
           <property name="color-style" type="int" value="0"/>
           <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         </property>
         <property name="workspace3" type="empty">
           <property name="color-style" type="int" value="0"/>
           <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-f378c09a9d59bac27f8d94d6663cd6f2.jpg"/>
+          <property name="last-image" type="string" value="/home/sal/.config/variety/wallpaper/wallpaper-clock-b80d5a90347e53403396bfb6bfa5bead.jpg"/>
         </property>
       </property>
     </property>
