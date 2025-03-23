@@ -6,8 +6,16 @@ import argparse
 import os
 import select
 
-def log_stdio(command, log_file):
-    with open(log_file, 'a') as log:
+# ANSI color codes for log file only
+GREEN = '\033[32m'
+CYAN = '\033[36m'
+RED = '\033[31m'
+RESET = '\033[0m'
+
+def log_stdio(command, log_file, append=True):
+    # Open log file in append mode ('a') or write mode ('w')
+    mode = 'a' if append else 'w'
+    with open(log_file, mode) as log:
         process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -33,9 +41,10 @@ def log_stdio(command, log_file):
                         process.stdin.close()
                         poller.unregister(sys.stdin)
                     else:
-                        log.write(f"STDIN > {line}")
+                        log.write(f"{CYAN}STDIN:  {line}{RESET}")
                         process.stdin.write(line)
                         process.stdin.flush()
+                        log.flush()
                 elif fd == process.stdout.fileno():
                     line = process.stdout.readline()
                     if not line:
@@ -43,7 +52,8 @@ def log_stdio(command, log_file):
                     else:
                         sys.stdout.write(line)
                         sys.stdout.flush()
-                        log.write(f"STDOUT < {line}")
+                        log.write(f"{GREEN}STDOUT: {line}{RESET}")
+                        log.flush()
                 elif fd == process.stderr.fileno():
                     line = process.stderr.readline()
                     if not line:
@@ -51,22 +61,35 @@ def log_stdio(command, log_file):
                     else:
                         sys.stderr.write(line)
                         sys.stderr.flush()
-                        log.write(f"STDERR < {line}")
+                        log.write(f"{RED}STDERR: {line}{RESET}")
+                        log.flush()
 
             if process.poll() is not None:
                 break
 
 def main():
     parser = argparse.ArgumentParser(description="Log stdin, stdout, and stderr while executing a command.")
-    parser.add_argument('-o', '--output', default='stdio.log', help="Output log file (default: stdio.log)")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-o', '--output', dest='output', metavar='FILE', default='stdio.log', 
+                       help="Append output to log file (default: stdio.log)")
+    group.add_argument('-O', '--overwrite', dest='overwrite', metavar='FILE',
+                       help="Overwrite log file instead of appending")
     parser.add_argument('command', nargs=argparse.REMAINDER, help="Command to execute (default: cat)")
 
     args = parser.parse_args()
 
     if not args.command:
         args.command = ['cat']
+    
+    # Determine log file path and append mode
+    if args.overwrite:
+        log_file = args.overwrite
+        append = False
+    else:
+        log_file = args.output
+        append = True
 
-    log_stdio(args.command, args.output)
+    log_stdio(args.command, log_file, append)
 
 if __name__ == "__main__":
     main()
