@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Step 1: Create applications directory and explorer.desktop
+mkdir -p ~/.local/share/applications
+
+cat > ~/.local/share/applications/explorer.desktop << 'EOF'
+[Desktop Entry]
+Name=Windows Explorer
+Exec=explorer.exe "$(wslpath -wa '%f')"
+Terminal=false
+Type=Application
+NoDisplay=true
+MimeType=inode/directory;
+EOF
+
+# Step 2: Update desktop database
+update-desktop-database ~/.local/share/applications
+
+# Step 3: Set explorer.desktop as the default handler for directories
+xdg-mime default explorer.desktop inode/directory
+
+# Confirm the change
+echo "Default handler for directories is now: $(xdg-mime query default inode/directory)"
+
+# Test (optional)
+# Uncomment the following line to test immediately
+# xdg-open .
