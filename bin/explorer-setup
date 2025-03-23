@@ -2,23 +2,33 @@
 
 set -e
 
-# Step 1: Create applications directory and explorer.desktop
+# Step 1: Create the wrapper script
+mkdir -p ~/.local/bin
+
+cat > ~/.local/bin/wsl-open-dir << 'EOF'
+#!/usr/bin/env bash
+explorer.exe "$(wslpath -wa "$1")"
+EOF
+
+chmod +x ~/.local/bin/wsl-open-dir
+
+# Step 2: Create applications directory and explorer.desktop
 mkdir -p ~/.local/share/applications
 
 cat > ~/.local/share/applications/explorer.desktop << EOF
 [Desktop Entry]
 Name=Windows Explorer
-Exec=explorer.exe $(wslpath %f)
+Exec=$HOME/.local/bin/wsl-open-dir %f
 Terminal=false
 Type=Application
 NoDisplay=true
 MimeType=inode/directory;
 EOF
 
-# Step 2: Update desktop database
+# Step 3: Update desktop database
 update-desktop-database ~/.local/share/applications
 
-# Step 3: Set explorer.desktop as the default handler for directories
+# Step 4: Set explorer.desktop as the default handler for directories
 xdg-mime default explorer.desktop inode/directory
 
 # Confirm the change
