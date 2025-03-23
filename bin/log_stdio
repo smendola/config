@@ -4,11 +4,10 @@ import sys
 import subprocess
 import argparse
 import os
+import select
 
 def log_stdio(command, log_file):
-    # Open the log file
     with open(log_file, 'a') as log:
-        # Create a subprocess
         process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -19,29 +18,43 @@ def log_stdio(command, log_file):
             universal_newlines=True
         )
 
-        # Handle stdin
-        for line in sys.stdin:
-            log.write(f"STDIN > {line}")
-            process.stdin.write(line)
-            process.stdin.flush()
+        # Set up polling
+        poller = select.poll()
+        poller.register(sys.stdin, select.POLLIN)
+        poller.register(process.stdout, select.POLLIN)
+        poller.register(process.stderr, select.POLLIN)
 
-        # Close stdin to signal EOF to the subprocess
-        process.stdin.close()
+        while True:
+            ready = poller.poll(10)  # 10ms timeout
+            for fd, event in ready:
+                if fd == sys.stdin.fileno():
+                    line = sys.stdin.readline()
+                    if not line:  # EOF
+                        process.stdin.close()
+                        poller.unregister(sys.stdin)
+                    else:
+                        log.write(f"STDIN > {line}")
+                        process.stdin.write(line)
+                        process.stdin.flush()
+                elif fd == process.stdout.fileno():
+                    line = process.stdout.readline()
+                    if not line:
+                        poller.unregister(process.stdout)
+                    else:
+                        sys.stdout.write(line)
+                        sys.stdout.flush()
+                        log.write(f"STDOUT < {line}")
+                elif fd == process.stderr.fileno():
+                    line = process.stderr.readline()
+                    if not line:
+                        poller.unregister(process.stderr)
+                    else:
+                        sys.stderr.write(line)
+                        sys.stderr.flush()
+                        log.write(f"STDERR < {line}")
 
-        # Handle stdout
-        for line in process.stdout:
-            sys.stdout.write(line)
-            sys.stdout.flush()
-            log.write(f"STDOUT < {line}")
-
-        # Handle stderr
-        for line in process.stderr:
-            sys.stderr.write(line)
-            sys.stderr.flush()
-            log.write(f"STDERR < {line}")
-
-        # Wait for the process to complete
-        process.wait()
+            if process.poll() is not None:
+                break
 
 def main():
     parser = argparse.ArgumentParser(description="Log stdin, stdout, and stderr while executing a command.")
@@ -50,7 +63,6 @@ def main():
 
     args = parser.parse_args()
 
-    # If no command is specified, use 'cat'
     if not args.command:
         args.command = ['cat']
 
