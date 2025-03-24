@@ -1,3 +1,12 @@
+# Force software rendering with llvmpipe
+export LIBGL_ALWAYS_SOFTWARE=1
+unset LIBGL_ALWAYS_INDIRECT
+unset __NV_PRIME_RENDER_OFFLOAD
+unset __GLX_VENDOR_LIBRARY_NAME
+unset __VK_LAYER_NV_optimus
+unset MESA_GL_VERSION_OVERRIDE
+unset VGL_DISPLAY
+
 MYBG=056
 export EDITOR=micro
 export SUDO_EDITOR=micro
@@ -677,3 +686,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+
+
