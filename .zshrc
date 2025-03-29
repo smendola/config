@@ -96,29 +96,6 @@ export LESSOPEN='|lesspipe.sh %s'
 ### PATH CONSTRUCTION
 ###############################################################
 
-# Add all ~/tools/*/bin to PATH
-#
-# NOTE: some of these packages may contain binaries
-#       whose names confict with cygwin utils, e.g.
-#       AccuRev has a "diff.exe"
-#       For this reason, it's safer to add these to the PATH
-#       *after* not in before, /bin
-#
-# for d in $TOOLS_DIR/*
-# do
-    # if [ -d $d/Scripts ]
-    # then
-        # PATH=$PATH:$d/Scripts
-    # fi
-    # if [ -d $d/bin ]
-    # then
-        # PATH=$PATH:$d/bin
-    # else
-        # PATH=$PATH:$d
-    # fi
-# done
-
-PATH=$PATH:/opt/AccuRev/bin
 PATH=$PATH:/snap/bin
 
 ###############################################################
@@ -273,3 +250,5 @@ then
 fi
 
 eval $(dbus-launch --sh-syntax)
+eval "$(uv generate-shell-completion zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
