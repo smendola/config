@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+if [[ $(pwd) = $HOME ]]
+then
+  /usr/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
+fi
