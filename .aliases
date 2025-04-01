@@ -413,7 +413,12 @@ function test_check_x() {
     fi
 }
 
+submodules () {
+  git submodule update --init --recursive
+}
+
 # Run tests if called with --test argument
 if [[ "${1:-}" == "--test" ]]; then
     test_check_x
 fi
+
