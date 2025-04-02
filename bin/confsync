@@ -3,11 +3,9 @@
 CONF_BIN="$HOME/.config/dconf/user"
 CONF_TXT="$HOME/.config/dconf/user.txt"
 
-# Check if both files exist
-if [ ! -f "$CONF_BIN" ]; then
-    echo "Error: $CONF_BIN does not exist"
-    exit 1
-fi
+# Get modification times
+bin_time=$(stat -c %Y "$CONF_BIN" || echo 0)
+txt_time=$(stat -c %Y "$CONF_TXT" || echo 0)
 
 # Create text file if it doesn't exist
 if [ ! -f "$CONF_TXT" ]; then
@@ -15,10 +13,6 @@ if [ ! -f "$CONF_TXT" ]; then
     dconf dump / > "$CONF_TXT"
     exit 0
 fi
-
-# Get modification times
-bin_time=$(stat -c %Y "$CONF_BIN")
-txt_time=$(stat -c %Y "$CONF_TXT")
 
 if [ "$bin_time" -gt "$txt_time" ]; then
     echo "Binary config is newer, converting to text..."
