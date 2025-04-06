@@ -64,10 +64,19 @@ kc() {
 }
 
 reset_test() {
-  # to NOT combine those two into one rails command, it fails to save AET's
-  rails db:drop db:create db:migrate RAILS_ENV=test &&
-  git co db/schema.rb &&
-  rails db:seed:audit_event_types RAILS_ENV=test
+  (
+    set -ex
+	export RAILS_ENV=test
+
+	# Do not combine any of these; there are reasons
+	rails db:drop 
+	rails db:create
+	rails db:migrate 
+
+	git co db/schema.rb
+
+	rails db:seed:audit_event_types
+  )
 }
 
 reset() {
@@ -670,7 +679,7 @@ expand-env ()
   esac
 }
 
-alias cursor='PYTHONPATH=$(python -c "import site; print(site.getsitepackages()[0])") ~/Applications/cursor.AppImage --no-sandbox'
+#alias cursor='PYTHONPATH=$(python -c "import site; print(site.getsitepackages()[0])") ~/Applications/cursor.AppImage --no-sandbox'
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

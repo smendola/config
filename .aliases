@@ -18,6 +18,7 @@ alias igrep='grep --color=auto -i'
 alias rm='rm -i'
 alias type='builtin type -f'
 alias undos=dos2unix
+alias du='du -h'
 
 trace() ( set -x; "$@" )
 
