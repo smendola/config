@@ -2,4 +2,6 @@
 if [[ $(pwd) = $HOME ]]
 then
   /usr/bin/git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
+else
+  /usr/bin/git "$@"
 fi
