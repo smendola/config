@@ -17,12 +17,13 @@ copy-on-select=true
 enable-wide-handle=true
 prompt-on-close=true
 prompt-on-delete-profile=true
+quake-height-percent=30
 quake-hide-headerbar=true
 quake-hide-lose-focus=true
 quake-specific-monitor=0
 quake-tab-position='top'
 quake-window-position='bottom'
-recent-session-files=['/home/dev/split1.json']
+recent-session-files=['/home/sal/ai/agents/booking_agent_v2/session_log.txt.json', '/home/dev/split1.json']
 sidebar-on-right=false
 tab-position='top'
 terminal-title-show-when-single=false
@@ -149,13 +150,13 @@ window-selected-page='performance-page'
 window-width=1046
 
 [org/blueman/general]
-window-properties=[506, 350, 710, 472]
+window-properties=[566, 350, 713, 497]
 
 [org/blueman/plugins/powermanager]
 auto-power-on=@mb true
 
 [org/blueman/plugins/recentconns]
-recent-connections=[{'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A3', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1741920632.362331', 'device': '/org/bluez/hci0/dev_D5_C0_DE_87_71_A3'}]
+recent-connections=[{'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A3', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1743868819.7463095', 'device': '/org/bluez/hci0/dev_D5_C0_DE_87_71_A3'}]
 
 [org/cinnamon/desktop/background]
 picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
@@ -171,6 +172,9 @@ window-size=(1425, 600)
 [org/gnome/control-center]
 last-panel='keyboard'
 window-state=(980, 640, false)
+
+[org/gnome/desktop/a11y/applications]
+screen-reader-enabled=false
 
 [org/gnome/desktop/app-folders]
 folder-children=['Utilities', 'YaST', 'Pardus', 'cc374423-e0bc-41d0-9b7c-4da9e3c2e0c6', '9448d673-e69e-4a3c-8a15-a8e4c76ada39', 'af110ab6-e582-4b43-9dcc-d458a3b4fd4d', '1f576c3c-aab8-4edd-804c-4a6a6c373a68', '66a1f5c3-5a7e-4a3c-9bdf-d70a2c9bc2ae']
@@ -220,12 +224,18 @@ sources=[('xkb', 'us')]
 xkb-options=@as []
 
 [org/gnome/desktop/interface]
-color-scheme='prefer-dark'
-cursor-theme='Yaru'
+color-scheme='default'
+cursor-size=24
+cursor-theme='Win10OS-cursors'
+enable-animations=true
 enable-hot-corners=false
+font-name='Noto Sans,  10'
 gtk-theme='PRO-dark-XFCE-edition II-1'
-icon-theme='elementary-xfce'
+icon-theme='Win11'
 monospace-font-name='Meslo LG S 10'
+scaling-factor=uint32 1
+text-scaling-factor=1.0
+toolbar-style='text'
 
 [org/gnome/desktop/notifications]
 application-children=['gnome-power-panel', 'org-gnome-terminal-preferences', 'apport-gtk', 'google-chrome', 'org-gnome-baobab', 'firefox-firefox', 'org-gnome-characters', 'mailspring-mailspring', 'whatsapp-electron-whatsapp-electron', 'com-teamviewer-teamviewer-host', 'com-teamviewer-teamviewer', 'thunar']
@@ -294,6 +304,9 @@ idle-delay=uint32 900
 maximize=@as []
 panel-run-dialog=['<Super>r']
 unmaximize=@as []
+
+[org/gnome/desktop/wm/preferences]
+button-layout='icon:minimize,maximize,close'
 
 [org/gnome/evolution-data-server]
 migrated=true
@@ -483,8 +496,8 @@ sort-column='name'
 sort-directories-first=true
 sort-order='ascending'
 type-format='category'
-window-position=(8, 31)
-window-size=(1203, 902)
+window-position=(295, 0)
+window-size=(1203, 863)
 
 [org/mate/engrampa/dialogs/extract]
 overwrite=true
@@ -507,7 +520,7 @@ window-height=480
 window-width=600
 
 [org/nemo/window-state]
-geometry='800x550+0+592'
+geometry='800x550+557+292'
 maximized=false
 sidebar-bookmark-breakpoint=5
 start-with-sidebar=true
