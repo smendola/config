@@ -53,8 +53,19 @@ fix-net() {
   # netscript restart
 }
 
-kserv() {( cd ~/aurora; bin/ksrv)}
-ksrv() {( cd ~/aurora; bin/ksrv)}
+
+c() {(
+  test -f Procfile || cd ~/aurora
+  rails c
+)}
+ksrv() {(
+  test -f Procfile || cd ~/aurora
+  bin/ksrv
+)}
+kserv() {(
+  test -f Procfile || cd ~/aurora
+  bin/ksrv
+)}
 kc() {
   spring stop && sleep 2 && pkill -f spring
   pkill -f 'rails c' && sleep 3
@@ -119,10 +130,6 @@ reup() { (
   up
 ) }
 
-c() {(
-  cd ~/aurora
-  rails c
-)}
 
 
 production-shell() {
@@ -695,6 +702,3 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-
-
