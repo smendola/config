@@ -360,65 +360,29 @@ wp() {
   (echo -n "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
 
-# Unit tests for check_x function
-function test_check_x() {
-    local old_display=$DISPLAY
-    local failed=0
+
+reify() {
+  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+  
+  if [[ $current_branch == "HEAD" ]]; then
+    # Get the exact ref that HEAD is pointing to
+    local current_sha=$(git rev-parse HEAD)
     
-    # Helper function to run a test case
-    test_case() {
-        local test_display=$1
-        local expected_host=$2
-        local expected_port=$3
-        
-        DISPLAY=$test_display
-        
-        # Source the function to get access to local variables
-        eval "$(declare -f check_x | sed '1s/check_x/check_x_test/')"
-        check_x_test > /dev/null 2>&1  # Run function but suppress output
-        
-        # Extract the values that were calculated
-        local actual_host=$host
-        local actual_port=$port
-        
-        if [[ $actual_host != $expected_host || $actual_port != $expected_port ]]; then
-            echo "FAIL: DISPLAY=$test_display"
-            echo "  Expected: host=$expected_host port=$expected_port"
-            echo "  Got:      host=$actual_host port=$actual_port"
-            failed=$((failed + 1))
-        else
-            echo "PASS: DISPLAY=$test_display"
-        fi
-    }
+    # Find all branches (remote and local) that directly point to the current commit
+    local matching_branches=$(git branch -a --points-at $current_sha | grep -v "HEAD detached" | sed 's/^[* ] //' | sed 's/^remotes\///')
     
-    # Test cases
-    test_case "localhost:0" "localhost" 6000
-    test_case "localhost:0.1" "localhost" 6000
-    test_case ":0" "localhost" 6000
-    test_case ":0.1" "localhost" 6000
-    test_case ":1" "localhost" 6001
-    test_case ":1.0" "localhost" 6001
-    test_case "somehost:2.1" "somehost" 6002
-    
-    # Restore original DISPLAY
-    DISPLAY=$old_display
-    
-    # Report results
-    if ((failed > 0)); then
-        echo "$failed test(s) failed"
-        return 1
+    if [[ -n "$matching_branches" ]]; then
+      # Extract the branch name, removing any remote prefix
+      local branch_name=$(echo "$matching_branches" | head -1 | sed -E 's/^(origin|upstream)\///' | xargs)
+      
+      echo "Checking out branch: $branch_name"
+      
+      git checkout "$branch_name"
     else
-        echo "All tests passed"
-        return 0
+      echo "Could not find any branch pointing to the current commit."
+      return 1
     fi
+  else
+    echo "Not in detached HEAD state. Currently on branch: $current_branch"
+  fi
 }
-
-submodules () {
-  git submodule update --init --recursive
-}
-
-# Run tests if called with --test argument
-if [[ "${1:-}" == "--test" ]]; then
-    test_check_x
-fi
-
