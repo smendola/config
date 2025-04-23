@@ -10,22 +10,26 @@ PACKAGE="$1"
 
 # Find which source provides the package
 echo "Finding source for $PACKAGE..."
-SOURCE_INFO=$(apt-cache policy "$PACKAGE" 2>/dev/null | grep -E "^ *[0-9]" | head -n1)
+SOURCE_INFO=$(apt-cache policy "$PACKAGE" | grep -E "http" | head -n1)
+# echo SOURCE_INFO=$SOURCE_INFO
 if [ -z "$SOURCE_INFO" ]; then
   echo "Package $PACKAGE not found in any repository."
   exit 1
 fi
 
+
 # Extract repository from policy output
-REPO_LINE=$(echo "$SOURCE_INFO" | sed -E 's/.*http/http/' | sed -E 's/ [0-9].*//')
+REPO_LINE=$(echo "$SOURCE_INFO" | sed -E 's/.*http/http/' | awk '{print $1}')
+# echo REPO_LINE=$REPO_LINE
 if [ -z "$REPO_LINE" ]; then
   echo "Could not determine repository for $PACKAGE."
   exit 1
 fi
 
+
 # Find matching repository in sources.list
-echo "Determining APT source..."
-SOURCE_FILE=$(grep -l "$REPO_LINE" /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null | head -n1)
+# echo "Determining APT source..."
+SOURCE_FILE=$(grep -F -l "$REPO_LINE" /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null | head -n1)
 if [ -z "$SOURCE_FILE" ]; then
   echo "Could not find source file for repository."
   exit 1
