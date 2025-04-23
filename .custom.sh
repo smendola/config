@@ -428,20 +428,6 @@ cdc() {
   fi
 }
 
-reify() {
-    # Get the branch that contains the current commit, excluding 'detached' info
-    local branch=$(git branch --contains HEAD | grep -v "detached" | sed 's/^[* ]*//')
-
-    # If no branch is found, print an error
-    if [ -z "$branch" ]; then
-        echo "No branch found containing the current commit."
-    else
-        # Checkout the branch
-        git checkout "$branch"
-        echo "Switched to branch: $branch"
-    fi
-}
-
 co() {(
   set -e
   _top

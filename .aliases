@@ -348,3 +348,30 @@ wp() {
   echo ''
   (echo -n "$w_path" | xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || ( echo -e '\e[31m(No clipboard)\e[m' )
 }
+
+
+reify() {
+  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+  
+  if [[ $current_branch == "HEAD" ]]; then
+    # Get the exact ref that HEAD is pointing to
+    local current_sha=$(git rev-parse HEAD)
+    
+    # Find all branches (remote and local) that directly point to the current commit
+    local matching_branches=$(git branch -a --points-at $current_sha | grep -v "HEAD detached" | sed 's/^[* ] //' | sed 's/^remotes\///')
+    
+    if [[ -n "$matching_branches" ]]; then
+      # Extract the branch name, removing any remote prefix
+      local branch_name=$(echo "$matching_branches" | head -1 | sed -E 's/^(origin|upstream)\///' | xargs)
+      
+      echo "Checking out branch: $branch_name"
+      
+      git checkout "$branch_name"
+    else
+      echo "Could not find any branch pointing to the current commit."
+      return 1
+    fi
+  else
+    echo "Not in detached HEAD state. Currently on branch: $current_branch"
+  fi
+}
