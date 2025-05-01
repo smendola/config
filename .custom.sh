@@ -84,9 +84,9 @@ reset_test() {
 	export RAILS_ENV=test
 
 	# Do not combine any of these; there are reasons
-	rails db:drop 
+	rails db:drop
 	rails db:create
-	rails db:migrate 
+	rails db:migrate
 
 	git co db/schema.rb
 
@@ -692,3 +692,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+export TRACE_OPENAI_API_PARAMS=true
+export TRACE_OPENAI_API_RESPONSES=true

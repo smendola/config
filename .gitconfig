@@ -62,9 +62,11 @@
 [push]
 	default = current
 	autoSetupRemote = true
+	autoSetupRemote = true
 [credential]
 	helper = store
 [pull]
 	rebase = false
+	default = current
 [init]
 	defaultBranch = main
