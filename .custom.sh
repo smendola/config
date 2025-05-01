@@ -45,6 +45,10 @@ export TRACE_STREAM_CALLS=true
 export ACTIVE_RECORD_LOG_LEVEL=info
 export FEATURE_FLAG_WEB_CHAT=on
 
+export TRACE_OPENAI_API_PARAMS=1
+export TRACE_OPENAI_API_RESPONSES=1
+export TRACE_OPEANI_API_TIMINGS=1
+
 export NODE_OPTIONS="--max-old-space-size=8192"
 
 alias pga='ping www.google.com'
