@@ -18,3 +18,4 @@ endif
 
 execute pathogen#infect()
 
+colorscheme habamax 
