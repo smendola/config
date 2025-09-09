@@ -2,15 +2,22 @@
 
 if [[ $1 == "mods" ]]
 then
-        declare -a mods=($(git status -s -uno | sed -e 's/^.* //g'))
-        exec ttysend "${mods[@]}"
+  declare -a mods=($(git status -s -uno | sed -e 's/^.* //g'))
+  exec ttysend "${mods[@]}"
 fi
 
-if [[ ! -e "$1" ]]
+if [[ $1 == "diffs" ]]
 then
-        echo "No such file: $1" >&2
-        return
+  shift
+  exec tty-send-diffs "$@"
 fi
+
+for file in "$@"; do
+  if [[ ! -e "$file" ]]; then
+    echo "No such file or directory: $file" >&2
+    exit 1
+  fi
+done
 
 clear
 echo -n -e '\e[32m'
