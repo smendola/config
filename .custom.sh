@@ -31,7 +31,7 @@ alias mine=rubymine.sh
 ide() {
   pkill -ABRT -f RubyMine
   # &! "disowns" the process
-  rubymine.sh > /tmp/rubymine.out 2>&1 &!
+  rubymine > /tmp/rubymine.out 2>&1 &!
 }
 
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
@@ -41,15 +41,14 @@ export STREAM_APP_NAME=reachire-developer-sal
 
 
 export LOGRAGE_ENABLED=true
-export TRACE_STREAM_CALLS=true
+export TRACE_STREAM_CALLS=false
 export ACTIVE_RECORD_LOG_LEVEL=info
 export FEATURE_FLAG_WEB_CHAT=on
 
-export TRACE_OPENAI_API_PARAMS=1
-export TRACE_OPENAI_API_RESPONSES=1
-export TRACE_OPEANI_API_TIMINGS=1
-
-export NODE_OPTIONS="--max-old-space-size=8192"
+export PRETTY_JSON_LOGGING=true
+export TRACE_OPENAI_API_PARAMS=false
+export TRACE_OPENAI_API_RESPONSES=false
+export TRACE_TIMINGS=true
 
 alias pga='ping www.google.com'
 fix-net() {
@@ -90,7 +89,7 @@ reset_test() {
 
 	git co db/schema.rb
 
-	rails db:seed:audit_event_types
+	rails db:seed
   )
 }
 
@@ -112,7 +111,7 @@ reset() {
 
 up() {
   truncate -s0 ~/aurora/log/development.log
-  rails db:migrate "$@" 2>&1 | (grep -v /gems/ || true)
+  rails db:migrate "$@" 2>&1 | /usr/bin/grep -v /gems/
 }
 
 down() {
@@ -123,6 +122,10 @@ down() {
 
   truncate -s0 ~/aurora/log/development.log
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
+}
+
+rollback() {
+  rails db:migrate:down VERSION=$1
 }
 
 reup() { (
@@ -396,13 +399,6 @@ function shutdown() {
 sudo pkill -0 dockerd || (sudo dockerd 2> /dev/null&)
 export DOCKER_BUILDKIT=1
 alias dirt='docker run -it'
-
-alias e=micro
-vi () {
-  echo '** Use micro instead **'
-  sleep 1
-  micro "$@"
-}
 
 micro () {
 	command micro "$@"
@@ -692,6 +688,3 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-export TRACE_OPENAI_API_PARAMS=true
-export TRACE_OPENAI_API_RESPONSES=true
