@@ -24,7 +24,7 @@
 [color "status"]
 	; added = green
 	changed = yellow
-	; untracked = red
+    untracked = red italic
 
 [alias]
 	co = checkout
@@ -54,7 +54,7 @@
 [diff]
 	tool = meld
 [merge]
-	tool = diffmerge
+	tool = meld
 
 [gui]
 [url "https://"]
@@ -75,7 +75,7 @@
     pager = delta
 
 [interactive]
-    diffFilter = delta --color-only
+    eiffFilter = delta --color-only
 
 [delta]
     features = zenburn
