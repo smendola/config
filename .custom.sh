@@ -586,6 +586,11 @@ hbc () {
   heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
 }
 
+hb () {
+  local comment=${1:-'Force build'}
+  git commit -m "$comment" --allow-empty && git push
+}
+
 alt-drag () {
 	taskkill.exe -f -im AltDrag.exe > /dev/null 2>&1
 	( $(wslpath -u 'C:\Users\smend\AppData\Roaming\AltDrag\AltDrag.exe') &)
