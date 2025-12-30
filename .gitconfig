@@ -24,7 +24,7 @@
 [color "status"]
 	; added = green
 	changed = yellow
-	; untracked = red
+    untracked = red italic
 
 [alias]
 	co = checkout
@@ -54,7 +54,7 @@
 [diff]
 	tool = meld
 [merge]
-	tool = diffmerge
+	tool = meld
 
 [gui]
 [url "https://"]
@@ -62,9 +62,36 @@
 [push]
 	default = current
 	autoSetupRemote = true
+	autoSetupRemote = true
 [credential]
 	helper = store
 [pull]
 	rebase = false
+	default = current
 [init]
 	defaultBranch = main
+
+[core]
+    pager = delta
+
+[interactive]
+    eiffFilter = delta --color-only
+
+[delta]
+    features = zenburn
+    navigate = true    # use n and N to move between diff sections
+
+    # delta detects terminal colors automatically; set one of these to disable auto-detection
+    dark = true
+    # light = true
+
+    side-by-side = true
+    minus-style = syntax "#400020"
+    plus-style = syntax "#004000"
+
+[merge]
+#    conflictStyle = zdiff3
+
+[include]
+    path = /home/dev/.gitconfig.themes
+

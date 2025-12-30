@@ -3,16 +3,22 @@
 # Usage:
 #  send PATH ...
 #  send mods
+#  send diffs [PATH ...]
 #  Can send mix of files and dirs
 #  If PATH is exactly 'mods' it will instead send
 #  files that are modified in git
+#  If PATH is exactly 'diffs' it will send a patch produced by
+#  `git diff -U1 HEAD [PATH ...]` which will be auto-applied via `git apply`
 # The output of this command includes the command
 # to be used on the receiving end to receive the files.
 # If possible, the command is also sent to the clipboard.
 
 TMP_FILE=send.$$.tar
+# Optional temp dir for diffs mode
+TMP_DIR=""
 
-trap "rm -f $TMP_FILE" EXIT
+# Ensure we always clean up temp artifacts
+trap "rm -f $TMP_FILE; [ -n \"$TMP_DIR\" ] && rm -rf \"$TMP_DIR\"" EXIT
 
 Z=6
 if [[ $1 =~ ^-[0-9]$ ]]
@@ -27,6 +33,24 @@ then
   exec send "${mods[@]}"
 fi
 
+# If the user wants to send diffs, create a temporary patch file to package
+DIFFS_MODE=0
+if [[ $1 == "diffs" ]]
+then
+  shift
+  TMP_DIR=$(mktemp -d -t senddiffs.XXXXXX)
+  # Collect the diff content (force plain output; omit --binary to keep GNU patch-compatible)
+  if ! git diff --no-ext-diff --no-color -U1 HEAD -- "$@" > "$TMP_DIR/diff.patch"; then
+    echo "Failed to create diff" >&2
+    exit 1
+  fi
+  if [[ ! -s "$TMP_DIR/diff.patch" ]]; then
+    echo "No changes found" >&2
+    exit 1
+  fi
+  DIFFS_MODE=1
+fi
+
 read -sp "Passphrase for encryption, empty for unencrypted: " password
 echo
 
@@ -34,10 +58,19 @@ echo
 if [[ -z "$password" ]];
 then
   echo -e '\e[31m*** Sending unencrypted ***\e[m'
-  (set -x; tar cf - "$@" | gpg --store -z $Z -a -o "$TMP_FILE")
+  if [[ $DIFFS_MODE -eq 1 ]]; then
+    (set -x; tar cf - -C "$TMP_DIR" diff.patch | gpg --store -z $Z -a -o "$TMP_FILE")
+  else
+    (set -x; tar cf - "$@" | gpg --store -z $Z -a -o "$TMP_FILE")
+  fi
 else
-  tar cf - "$@" |
-  (set -x; gpg --batch --passphrase-fd 3 -ac -z $Z -o "$TMP_FILE" 3<<<"$password")
+  if [[ $DIFFS_MODE -eq 1 ]]; then
+    tar cf - -C "$TMP_DIR" diff.patch |
+    (set -x; gpg --batch --passphrase-fd 3 -ac -z $Z -o "$TMP_FILE" 3<<<"$password")
+  else
+    tar cf - "$@" |
+    (set -x; gpg --batch --passphrase-fd 3 -ac -z $Z -o "$TMP_FILE" 3<<<"$password")
+  fi
 fi
 
 json=$(set -x ; curl -F "files[]=@${TMP_FILE}" https://uguu.se/upload.php)
@@ -54,7 +87,11 @@ then
 fi
 
 n=${link##*/}
-receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar xfvv - && /bin/rm -f \$T)"
+if [[ $DIFFS_MODE -eq 1 ]]; then
+  receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar xfvv - && patch -p1 < diff.patch && /bin/rm -f diff.patch \$T)"
+else
+  receive_cmd="(T=/tmp/$n.gpg; (test -f \$T || curl -f -s '$link' -o \$T) && gpg -d -o- \$T | tar xfvv - && /bin/rm -f \$T)"
+fi
 echo -n -e '\e[32m'
 echo "To receive the file, use the following command:"
 echo -e '\e[m'

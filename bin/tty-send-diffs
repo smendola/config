@@ -16,7 +16,7 @@ echo '##########################################################################
 echo -e '\e[0m'
 
 (
-echo 'base64 -d << EOF | gunzip | git apply'
-echo "$diff_content" | gzip | base64
-echo 'EOF'
+  echo 'base64 -d << EOF | gunzip | git apply'
+  echo "$diff_content" | gzip | base64
+  echo 'EOF'
 ) | tee /dev/tty | (xsel -i -b 2>/dev/null && echo -e '\e[32m(Sent to clipboard)\e[m') || (echo -e '\e[31m(No clipboard)\e[m')
