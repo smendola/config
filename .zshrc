@@ -252,7 +252,11 @@ then
 fi
 
 eval $(dbus-launch --sh-syntax)
+
+if uv --help 2> /dev/null; then
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
+fi
+
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
