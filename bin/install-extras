@@ -77,6 +77,9 @@ curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trust
     sudo apt update && \
     sudo apt install ngrok
 
+echo "INSTALLING GIT-DELTA"
+install git-delta
+
 #echo "INSTALLING OOKLA SPEEDTEST"
 #curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
 #install speedtest
