@@ -1,5 +1,6 @@
 # Kiro CLI pre block. Keep at the top of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
+
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
 ### if just are getting started with zsh. You will have to
@@ -253,9 +254,9 @@ fi
 
 eval $(dbus-launch --sh-syntax)
 
-if uv --help 2> /dev/null; then
-eval "$(uv generate-shell-completion zsh)"
-eval "$(uvx --generate-shell-completion zsh)"
+if uv --help > /dev/null 2>&1; then
+  eval "$(uv generate-shell-completion zsh)"
+  eval "$(uvx --generate-shell-completion zsh)"
 fi
 
 # Kiro CLI post block. Keep at the bottom of this file.

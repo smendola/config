@@ -1,5 +1,6 @@
 # Kiro CLI pre block. Keep at the top of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/bash_profile.pre.bash" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/bash_profile.pre.bash"
+
 # in non-interactive shells, do not do any of this stuff
 # output from .bashrc etc. causes scp to fail
 if [[ $PS1 ]]
