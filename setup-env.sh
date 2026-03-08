@@ -23,7 +23,7 @@ done
 
 # Prompt for selection
 while true; do
-    read -er -p "Select branch number (1-${#BRANCHES[@]}): " SELECTION
+    read -er -p "Select branch number (1-${#BRANCHES[@]}): " SELECTION </dev/tty
     if [[ "$SELECTION" =~ ^[0-9]+$ ]] && [ "$SELECTION" -ge 1 ] && [ "$SELECTION" -le ${#BRANCHES[@]} ]; then
         BRANCH="${BRANCHES[$((SELECTION-1))]}"
         echo "Selected branch: $BRANCH"
