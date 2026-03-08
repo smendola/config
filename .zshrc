@@ -40,10 +40,10 @@ if [[ -z $DISPLAY ]]; then
     fi
 fi
 
-if [[ $DISPLAY == "?*:*" ]]; then
+if [[ $DISPLAY = ?*:* ]]; then
   nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 else
-                                xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+  echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
