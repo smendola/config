@@ -226,6 +226,11 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
+if [[ $_x_status = green ]]; then
+  eval $(dbus-launch --sh-syntax)
+fi
+
+
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   echo "vte init for tilix"
   source /etc/profile.d/vte.sh
@@ -252,8 +257,6 @@ then
   source $HOME/.custom.sh
 fi
 
-eval $(dbus-launch --sh-syntax)
-
 if uv --help > /dev/null 2>&1; then
   eval "$(uv generate-shell-completion zsh)"
   eval "$(uvx --generate-shell-completion zsh)"
@@ -262,7 +265,11 @@ fi
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+if [[ -d /home/linuxbrew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+fi
 
-# OpenClaw Completion
-source "/home/sal/.openclaw/completions/openclaw.zsh"
+if [[ -d $HOME/.openclaw/completions ]]; then
+  # OpenClaw Completion
+  source "$HOME/.openclaw/completions/openclaw.zsh"
+fi

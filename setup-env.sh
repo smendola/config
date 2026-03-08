@@ -6,7 +6,32 @@ function dots() {
 
 cd $HOME
 
-read -er -p "What branch do you want to fetch? (e.g. xubuntu, wsl): " BRANCH
+# Fetch available branches from the repository
+echo "Fetching available branches..."
+BRANCHES=($(git ls-remote --heads https://smendola@github.com/smendola/config.git | sed 's|.*refs/heads/||' | sort))
+
+if [ ${#BRANCHES[@]} -eq 0 ]; then
+    echo "Error: No branches found in repository"
+    exit 1
+fi
+
+# Display branches as a numbered menu
+echo "Available branches:"
+for i in "${!BRANCHES[@]}"; do
+    echo "$((i+1))) ${BRANCHES[$i]}"
+done
+
+# Prompt for selection
+while true; do
+    read -er -p "Select branch number (1-${#BRANCHES[@]}): " SELECTION </dev/tty
+    if [[ "$SELECTION" =~ ^[0-9]+$ ]] && [ "$SELECTION" -ge 1 ] && [ "$SELECTION" -le ${#BRANCHES[@]} ]; then
+        BRANCH="${BRANCHES[$((SELECTION-1))]}"
+        echo "Selected branch: $BRANCH"
+        break
+    else
+        echo "Invalid selection. Please enter a number between 1 and ${#BRANCHES[@]}"
+    fi
+done
 
 rm -rf config .config.git .oh-my-zsh
 
