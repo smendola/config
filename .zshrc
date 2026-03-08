@@ -1,4 +1,5 @@
 # Kiro CLI pre block. Keep at the top of this file.
+kiro-cli update >/dev/null 2>&1
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
@@ -42,10 +43,10 @@ if [[ -z $DISPLAY ]]; then
     fi
 fi
 
-if [[ $DISPLAY == "?*:*" ]]; then
+if [[ $DISPLAY = ?*:* ]]; then
   nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 else
-                                xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+  echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
@@ -257,7 +258,9 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
-eval $(dbus-launch --sh-syntax)
+if [[ $_x_status = green ]]; then
+  eval $(dbus-launch --sh-syntax)
+fi
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
