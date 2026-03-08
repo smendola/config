@@ -156,7 +156,7 @@ then
     plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 urltools)
     # Path to your oh-my-zsh configuration.
     ZSH_THEME="sm"
-    MYBG=021
+    MYBG=024
     source $ZSH/oh-my-zsh.sh
 else
     echo "*** Oh-my-zsh is not present"
