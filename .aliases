@@ -292,6 +292,11 @@ function gcp() {
   git cherry-pick "$@"
 }
 
+function gups() {
+  local br=$(git branch --show-current)
+  git branch --set-upstream-to=origin/$br $br
+}
+
 alias gpr='git pull --rebase'
 alias mods='git status'
 alias start=xdg-open
