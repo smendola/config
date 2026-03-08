@@ -226,6 +226,11 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
+if [[ $_x_status = green ]]; then
+  eval $(dbus-launch --sh-syntax)
+fi
+
+
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   echo "vte init for tilix"
   source /etc/profile.d/vte.sh
@@ -251,8 +256,6 @@ then
   echo "Now sourcing $HOME/.custom.sh"
   source $HOME/.custom.sh
 fi
-
-eval $(dbus-launch --sh-syntax)
 
 if uv --help > /dev/null 2>&1; then
   eval "$(uv generate-shell-completion zsh)"
