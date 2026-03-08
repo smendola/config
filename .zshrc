@@ -265,7 +265,11 @@ fi
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+if [[ -d /home/linuxbrew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+fi
 
-# OpenClaw Completion
-source "/home/sal/.openclaw/completions/openclaw.zsh"
+if [[ -d $HOME/.openclaw/completions ]]; then
+  # OpenClaw Completion
+  source "$HOME/.openclaw/completions/openclaw.zsh"
+fi
