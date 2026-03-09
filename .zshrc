@@ -87,7 +87,6 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
-[ -f ~/.aliases.ng ] && . ~/.aliases.ng
 
 
 export LESSOPEN='|lesspipe.sh %s'
@@ -187,10 +186,6 @@ export NO_AT_BRIDGE=1 ; # https://unix.stackexchange.com/a/230442
 
 export SUDO_EDITOR=vim
 
-# Here's everyone's chance to add custom stuff
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/dev/.sdkman"
-[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
 
 if [[ -d $HOME/.nvm ]]
 then
@@ -226,30 +221,10 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
-if [[ $_x_status = green ]]; then
-  eval $(dbus-launch --sh-syntax)
-fi
-
-
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   echo "vte init for tilix"
   source /etc/profile.d/vte.sh
 fi
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/sal/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/sal/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/sal/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/sal/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
 if [ -f $HOME/.custom.sh ]
 then
@@ -257,19 +232,9 @@ then
   source $HOME/.custom.sh
 fi
 
-if uv --help > /dev/null 2>&1; then
-  eval "$(uv generate-shell-completion zsh)"
-  eval "$(uvx --generate-shell-completion zsh)"
-fi
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/dev/.sdkman"
+[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
-
-if [[ -d /home/linuxbrew ]]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
-fi
-
-if [[ -d $HOME/.openclaw/completions ]]; then
-  # OpenClaw Completion
-  source "$HOME/.openclaw/completions/openclaw.zsh"
-fi
