@@ -24,7 +24,6 @@ if [[ ! -z $WSLENV ]]; then
 fi
 
 if [[ -z $DISPLAY ]]; then
-
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
@@ -90,7 +89,6 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
-[ -f ~/.aliases.ng ] && . ~/.aliases.ng
 
 
 export LESSOPEN='|lesspipe.sh %s'
@@ -102,29 +100,6 @@ export LESSOPEN='|lesspipe.sh %s'
 ### PATH CONSTRUCTION
 ###############################################################
 
-# Add all ~/tools/*/bin to PATH
-#
-# NOTE: some of these packages may contain binaries
-#       whose names confict with cygwin utils, e.g.
-#       AccuRev has a "diff.exe"
-#       For this reason, it's safer to add these to the PATH
-#       *after* not in before, /bin
-#
-# for d in $TOOLS_DIR/*
-# do
-    # if [ -d $d/Scripts ]
-    # then
-        # PATH=$PATH:$d/Scripts
-    # fi
-    # if [ -d $d/bin ]
-    # then
-        # PATH=$PATH:$d/bin
-    # else
-        # PATH=$PATH:$d
-    # fi
-# done
-
-PATH=$PATH:/opt/AccuRev/bin
 PATH=$PATH:/snap/bin
 
 ###############################################################
@@ -213,16 +188,6 @@ export NO_AT_BRIDGE=1 ; # https://unix.stackexchange.com/a/230442
 
 export SUDO_EDITOR=vim
 
-# Here's everyone's chance to add custom stuff
-if [ -f $HOME/.custom.sh ]
-then
-  echo "Now sourcing $HOME/.custom.sh"
-  source $HOME/.custom.sh
-fi
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/dev/.sdkman"
-[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
 
 if [[ -d $HOME/.nvm ]]
 then
@@ -258,9 +223,20 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
 
-if [[ $_x_status = green ]]; then
-  eval $(dbus-launch --sh-syntax)
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  echo "vte init for tilix"
+  source /etc/profile.d/vte.sh
 fi
+
+if [ -f $HOME/.custom.sh ]
+then
+  echo "Now sourcing $HOME/.custom.sh"
+  source $HOME/.custom.sh
+fi
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/dev/.sdkman"
+[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
