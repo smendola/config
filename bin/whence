@@ -1,0 +1,47 @@
+#!/bin/bash
+
+if [[ -z "$1" || $1 = -* ]]; then
+    echo "Usage: whence <command>"
+    exit 1
+fi
+
+cmd="$1"
+
+# Check snap first (by name)
+if snap list "$cmd" &>/dev/null; then
+    echo "snap install $cmd"
+    exit 0
+fi
+
+cmd_path=$(command -v "$cmd" 2>/dev/null)
+
+if [ -z "$cmd_path" ]; then
+    echo "Unable to determine"
+    exit 1
+fi
+
+# Check snap (by path)
+if [[ "$cmd_path" == /snap/* ]]; then
+    pkg=$(echo "$cmd_path" | cut -d'/' -f4)
+    echo "snap install $pkg"
+    exit 0
+fi
+
+# Check flatpak
+if [[ "$cmd_path" == *flatpak* ]]; then
+    pkg=$(flatpak list --app --columns=application,name 2>/dev/null | grep -i "$cmd" | head -1 | awk '{print $1}')
+    if [ -n "$pkg" ]; then
+        echo "flatpak install $pkg"
+        exit 0
+    fi
+fi
+
+# Check apt (resolve symlinks)
+real_path=$(readlink -f "$cmd_path")
+pkg=$(dpkg -S "$real_path" 2>/dev/null | cut -d':' -f1)
+if [ -n "$pkg" ]; then
+    echo "apt install $pkg"
+    exit 0
+fi
+
+echo "Unable to determine"
