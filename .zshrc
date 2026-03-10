@@ -30,8 +30,12 @@ if [[ -z $DISPLAY ]]; then
     _REMOTE_IP=${_REMOTE_IP:=127.0.0.1}
 
     # the nc -w1 avoids long delay if X11 is not running
+    _CAND_DISPLAY="${_REMOTE_IP}:0"
+    _CAND_PORT=6000
+    [[ "$_CAND_DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && _CAND_PORT=$((6000 + match[1]))
+
     if [[ ! -z $SSH_CLIENT ]] &&
-       nc -w1 $_REMOTE_IP 6000 < /dev/null &&
+       nc -w1 $_REMOTE_IP $_CAND_PORT < /dev/null &&
        xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
     then
       export DISPLAY=$_REMOTE_IP:0
@@ -42,8 +46,12 @@ if [[ -z $DISPLAY ]]; then
     fi
 fi
 
+# X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
+unset X11_DPY_PORT
+[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
+
 if [[ $DISPLAY = ?*:* ]]; then
-  nc -w1 ${DISPLAY/:*/} 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+  nc -w1 ${DISPLAY/:*/} ${X11_DPY_PORT:-6000} && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 else
   echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 fi
