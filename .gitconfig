@@ -28,6 +28,8 @@
 
 [alias]
 	co = checkout
+    c-p = cherry-pick
+    wt = worktree
 	ci = commit
 	dt = difftool
 	dty = difftool -y
