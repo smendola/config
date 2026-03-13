@@ -1,0 +1,29 @@
+#!/bin/bash
+# Script to uninstall user-installed Python packages
+
+# Get a list of all user-installed packages
+PKGS=$(pip list --user --format=freeze | cut -d= -f1)
+
+if [ -z "$PKGS" ]; then
+    echo "No user-installed packages found."
+    exit 0
+fi
+
+echo "The following user-installed packages will be uninstalled:"
+echo "$PKGS"
+echo
+
+# Confirm before proceeding
+read -p "Do you want to proceed with uninstallation? (y/n): " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    echo "Uninstallation cancelled."
+    exit 0
+fi
+
+# Uninstall each package
+for pkg in $PKGS; do
+    echo "Uninstalling $pkg..."
+    pip uninstall -y "$pkg"
+done
+
+echo "Uninstallation complete."
