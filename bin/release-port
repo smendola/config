@@ -1,10 +1,11 @@
 #!/bin/sh
 
 if [ $# -eq 0 ]; then
-  echo "Usage: release-port [-9] [-i] PORT"
+  echo "Usage: release-port [-9 | -0] [-i] PORT"
   exit 1
 fi
 
+PORT=
 SIGNAL=""
 INTERACTIVE=0
 
@@ -12,10 +13,12 @@ while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
       echo "Usage: release-port [-9] [-i] PORT"
+      echo "  -0  Probe but don't kill"
       echo "  -9  Use SIGKILL instead of SIGTERM"
       echo "  -i  Interactive mode (ask before killing)"
       exit 0
       ;;
+    -0) SIGNAL="-0"; shift ;;
     -9) SIGNAL="-9"; shift ;;
     -i) INTERACTIVE=1; shift ;;
     -*) echo "Unknown option: $1"; exit 1 ;;
