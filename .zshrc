@@ -18,12 +18,9 @@ function hostip() { ipconfig.exe | grep -A 10 "WSL (Hyper-V firewall)" | grep "I
 #sudo sed -i "s/nameserver .*/nameserver $(hostip)/" /etc/resolv.conf
 
 if [[ ! -z $WSLENV ]]; then
-    # for WSL2
-    export DISPLAY=$(hostip):0
-    export LIBGL_ALWAYS_INDIRECT=1
-fi
-
-if [[ -z $DISPLAY ]]; then
+    # WSLg hopefully?
+    xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+elif [[ -z $DISPLAY ]]; then
     # If X11 display can be reached directly, do it that way
     # in preference to display tunneled over SSH; more efficient.
     _REMOTE_IP=${SSH_CLIENT%% *}
@@ -44,17 +41,17 @@ if [[ -z $DISPLAY ]]; then
       export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
       # export DISPLAY=${DISPLAY:-127.0.0.1:0}
     fi
+	# X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
+	unset X11_DPY_PORT
+	[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
+
+	if [[ $DISPLAY = ?*:* ]]; then
+	  nc -w1 ${DISPLAY/:*/} ${X11_DPY_PORT:-6000} && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+	else
+	  echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+	fi
 fi
 
-# X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
-unset X11_DPY_PORT
-[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
-
-if [[ $DISPLAY = ?*:* ]]; then
-  nc -w1 ${DISPLAY/:*/} ${X11_DPY_PORT:-6000} && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
-else
-  echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
-fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
