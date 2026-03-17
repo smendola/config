@@ -26,7 +26,6 @@ test -d ~/.rvm/scripts/rvm && source ~/.rvm/scripts/rvm
 
 path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
-path+=(~/aurora/bin)
 alias mine=rubymine.sh
 ide() {
   pkill -ABRT -f RubyMine
@@ -56,17 +55,19 @@ fix-net() {
   # netscript restart
 }
 
-
 c() {(
-  test -f Procfile || cd ~/aurora
+  cd_proj_root
+  test -f Procfile || return 1
   rails c
 )}
 ksrv() {(
-  test -f Procfile || cd ~/aurora
+  cd_proj_root
+  test -f Procfile || return 1
   bin/ksrv
 )}
 kserv() {(
-  test -f Procfile || cd ~/aurora
+  cd_proj_root
+  test -f Procfile || return 1
   bin/ksrv
 )}
 kc() {
