@@ -24,6 +24,8 @@ experimental
 /.ssh/config
 /.ssh/known_hosts
 /.ssh/id_*
+/.ssh/*.key
+/.ssh/*.key.pub
 !/bin
 !/bin.personal
 !.gnupg/gpg.conf
