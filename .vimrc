@@ -11,11 +11,13 @@ if has("gui_running")
   endif
 endif
 
-if &t_Co > 1
-   let g:zenburn_high_Contrast=1
-   syntax enable
-   colorscheme zenburn
-endif
+colorscheme habamax
+
+"if &t_Co > 1
+"   let g:zenburn_high_Contrast=1
+"   syntax enable
+"   colorscheme zenburn
+"endif
 
 execute pathogen#infect()
 
