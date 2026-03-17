@@ -10,7 +10,7 @@ unset VGL_DISPLAY
 MYBG=056
 export EDITOR=micro
 export SUDO_EDITOR=micro
-WIN_PROFILE_DIR="$(wslpath -u $(cd /mnt/c; /mnt/c/windows/system32/cmd.exe /c 'echo %USERPROFILE%' | dos2unix))"
+WIN_PROFILE_DIR="$(wslpath -u $(cd /mnt/c; /mnt/c/windows/system32/cmd.exe /c 'echo %USERPROFILE%' | tr -d '\r'))"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/dev/.sdkman"
@@ -392,7 +392,6 @@ function recd() {
   cd /; cd -
 }
 
-unalias shutdown || true
 function shutdown() {
   wsl.exe --shutdown
 }
