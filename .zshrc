@@ -18,7 +18,7 @@ function hostip() { ipconfig.exe | grep -A 10 "WSL (Hyper-V firewall)" | grep "I
 #sudo sed -i "s/nameserver .*/nameserver $(hostip)/" /etc/resolv.conf
 
 if [[ ! -z $WSLENV ]]; then
-   DISPLAY=$(hostip):0
+   export DISPLAY=$(hostip):0
    nc -w1 $(hostip) 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
    if [[ $_x_status = red ]]; then
      echo -e "\033[33mNo X11; falling back to WSLg\033[0m"
