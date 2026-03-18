@@ -1,4 +1,6 @@
 # Force software rendering with llvmpipe
+export GDK_SCALE=1 
+export GDK_DPI_SCALE=1.25
 export LIBGL_ALWAYS_SOFTWARE=1
 unset LIBGL_ALWAYS_INDIRECT
 unset __NV_PRIME_RENDER_OFFLOAD
