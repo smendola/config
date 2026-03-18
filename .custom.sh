@@ -396,9 +396,9 @@ function shutdown() {
   wsl.exe --shutdown
 }
 
-sudo pkill -0 dockerd || (sudo dockerd 2> /dev/null&)
-export DOCKER_BUILDKIT=1
-alias dirt='docker run -it'
+#sudo pkill -0 dockerd || (sudo dockerd 2> /dev/null&)
+#export DOCKER_BUILDKIT=1
+#alias dirt='docker run -it'
 
 micro () {
 	command micro "$@"
