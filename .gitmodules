@@ -1,3 +1,4 @@
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
-	url = https://smendola@bitbucket.org/smendola/.oh-my-zsh.git
+	url = https://github.com/smendola/config.git
+	branch = master
