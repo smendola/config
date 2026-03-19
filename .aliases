@@ -54,6 +54,15 @@ function ,() {
 # E.g. = 2+2
 = () { echo "$@" | bc -l; }
 
+function gi() {
+  if [[ $1 = t* ]]; then
+    echo "${fg[yellow]}You mean: git ${1#t} ${@:2}${reset_color}" > /dev/tty
+    git "${1#t}" "${@:2}"
+  else
+    command gi "$@"
+  fi
+}
+
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
