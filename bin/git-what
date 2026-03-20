@@ -1,5 +1,0 @@
-#!/bin/bash
-curr=$(git rev-parse --abbrev-ref HEAD)
-branch=${1:-$curr}
-# first sed also filters OUT non-BP tags
-git tag -n1 --list BP-$branch | sed -n 's/^BP-//p' | sed -r 's/(^[^ ]+)[ ]*/\1: /g'
