@@ -33,6 +33,8 @@
 	ci = commit
 	dt = difftool
 	dty = difftool -y
+    comit = commit
+    commmit = commit
 	
 	; see: http://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git/4991675#4991675
 	oldest-ancestor = !bash -c 'diff -u <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
