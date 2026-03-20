@@ -13,12 +13,13 @@ prompt-on-close=true
 prompt-on-delete-profile=true
 quake-specific-monitor=0
 quake-tab-position='top'
-recent-session-files=['/home/dev/split1.json']
+recent-session-files=['quad.json', '/home/dev/quad.json', '/home/dev/split1.json']
 sidebar-on-right=false
 tab-position='top'
 terminal-title-style='normal'
 theme-variant='dark'
 use-tabs=true
+warn-vte-config-issue=false
 window-style='normal'
 
 [com/gexperts/Tilix/keybindings]
@@ -59,7 +60,7 @@ dim-transparency-percent=16
 draw-margin=80
 encoding='UTF-8'
 exit-action='close'
-font='Meslo LG S 14'
+font='Meslo LG S 12'
 foreground-color='#F8F8F2'
 highlight-background-color='#000000'
 highlight-colors-set=false
@@ -100,7 +101,7 @@ cursor-colors-set=true
 cursor-foreground-color='#F6F6F5F5F4F4'
 cursor-shape='block'
 dim-transparency-percent=16
-font='Meslo LG S 13'
+font='Meslo LG S 12'
 foreground-color='#F8F8F2'
 highlight-colors-set=false
 login-shell=true
@@ -116,21 +117,34 @@ visible-name='Default'
 window-size=(1573, 600)
 window-state=128
 
+[org/gnome/gedit/plugins]
+active-plugins=['filebrowser', 'spell', 'sort', 'modelines', 'docinfo', 'openlinks']
+
+[org/gnome/gedit/preferences/ui]
+show-tabs-mode='auto'
+
+[org/gnome/gedit/state/window]
+bottom-panel-size=140
+side-panel-active-page='GeditWindowDocumentsPanel'
+side-panel-size=200
+size=(896, 700)
+state=0
+
 [org/gnome/meld]
 custom-font='Meslo LG S 12'
 draw-spaces=@as []
 highlight-current-line=true
 highlight-syntax=true
-ignore-blank-lines=false
+ignore-blank-lines=true
 show-line-numbers=true
-text-filters=[('CVS/SVN keywords', false, '\\$\\w+(:[^\\n$]+)?\\$'), ('C++ comment', false, '//.*'), ('C comment', false, '/\\*.*?\\*/'), ('All whitespace', false, '[ \\t\\r\\f\\v]*'), ('Leading whitespace', true, '^[ \\t\\r\\f\\v]*'), ('Trailing whitespace', false, '[ \\t\\r\\f\\v]*$'), ('Script comment', false, '#.*'), ('wp', false, 'webpacker'), ('fe', false, 'frontend')]
+text-filters=[('CVS/SVN keywords', false, '\\$\\w+(:[^\\n$]+)?\\$'), ('C++ comment', false, '//.*'), ('C comment', false, '/\\*.*?\\*/'), ('All whitespace', true, '[ \\t\\r\\f\\v]*'), ('Leading whitespace', true, '^[ \\t\\r\\f\\v]*'), ('Trailing whitespace', false, '[ \\t\\r\\f\\v]*$'), ('Script comment', false, '#.*'), ('wp', false, 'webpacker'), ('fe', false, 'frontend')]
 use-system-font=false
 wrap-mode='char'
 
 [org/gnome/meld/window-state]
 height=1587
 is-maximized=false
-width=2411
+width=2865
 
 [org/gtk/settings/color-chooser]
 custom-colors=[(0.8901960784313725, 0.54117647058823526, 1.0, 1.0), (0.77647058823529413, 0.47058823529411764, 0.8666666666666667, 1.0), (0.40392156862745099, 0.72941176470588232, 1.0, 1.0), (0.38039215686274508, 0.68627450980392157, 0.93725490196078431, 1.0), (1.0, 0.0, 0.0, 1.0), (0.86274509803921573, 0.87450980392156863, 0.89411764705882357, 1.0), (0.82745098039215681, 0.83921568627450982, 0.81176470588235294, 1.0), (0.96470588235294119, 0.97647058823529409, 1.0, 1.0)]
@@ -142,10 +156,10 @@ location-mode='path-bar'
 show-hidden=false
 show-size-column=true
 show-type-column=true
-sidebar-width=171
+sidebar-width=199
 sort-column='name'
 sort-directories-first=false
 sort-order='descending'
 type-format='category'
-window-position=(8, 31)
+window-position=(26, 23)
 window-size=(1203, 902)
