@@ -13,7 +13,7 @@
 # to be used on the receiving end to receive the files.
 # If possible, the command is also sent to the clipboard.
 
-TMP_FILE=send.$$.tar
+TMP_FILE=/tmp/send.$$.tar
 # Optional temp dir for diffs mode
 TMP_DIR=""
 
