@@ -133,7 +133,7 @@ function check_x()
     if [ -z "$DISPLAY" ]; then
       echo "DISPLAY needs to be set"
       return 1
-    elif [[ $WSLENV && $DISPLAY ]]; then
+    elif [[ $WSLENV && $DISPLAY = :0 ]]; then
       xset q > /dev/null   
     else
 	  display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
