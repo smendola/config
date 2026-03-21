@@ -35,6 +35,11 @@ ide() {
   rubymine > /tmp/rubymine.out 2>&1 &!
 }
 
+alias clause=claude
+claude() {
+  command claude --channels plugin:telegram@claude-plugins-official "$@"
+}
+
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
 export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
 export PORT=3000

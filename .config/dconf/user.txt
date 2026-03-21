@@ -23,6 +23,8 @@ warn-vte-config-issue=false
 window-style='normal'
 
 [com/gexperts/Tilix/keybindings]
+terminal-maximize='<Primary><Shift>Return'
+terminal-reset-and-clear='<Primary><Shift>l'
 terminal-zoom-in='<Primary>equal'
 
 [com/gexperts/Tilix/profiles]

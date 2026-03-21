@@ -235,7 +235,7 @@ eval $(dircolors $HOME/bin/dircolors.txt)
 eval "$(direnv hook zsh)"
 
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-  echo "vte init for tilix"
+  # echo "vte init for tilix"
   source /etc/profile.d/vte.sh
 fi
 
@@ -251,3 +251,10 @@ export SDKMAN_DIR="/home/dev/.sdkman"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
+
+# bun completions
+[ -s "/home/dev/.bun/_bun" ] && source "/home/dev/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
