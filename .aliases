@@ -407,3 +407,10 @@ project_root() {
 cd_proj_root() {
   cd $(project_root)
 }
+
+xscale() {
+  local scale=$1
+  shift
+  GDK_SCALE=1 GDK_DPI_SCALE=${scale} "$@"
+}
+
