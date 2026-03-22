@@ -249,3 +249,10 @@ export SDKMAN_DIR="/home/dev/.sdkman"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
+
+# bun completions
+[ -s "/home/sal/.bun/_bun" ] && source "/home/sal/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

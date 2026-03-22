@@ -133,21 +133,22 @@ function check_x()
     if [ -z "$DISPLAY" ]; then
       echo "DISPLAY needs to be set"
       return 1
+    elif [[ $WSLENV && $DISPLAY = :0 ]]; then
+      xset q > /dev/null   
+    else
+	  display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
+	  display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
+	  host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
+	  host=${host:-localhost}      # if host is empty, use localhost
+	  port=$((6000 + display_number))
+
+	  if nc -w1 $host $port && xset q > /dev/null; then
+		return 0
+	  fi
+ 
+      echo "Problem with display? ($DISPLAY)" 2>&1
     fi
 
-    # display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
-    # display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
-    # host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
-    # host=${host:-localhost}      # if host is empty, use localhost
-    # port=$((6000 + display_number))
-
-    # if nc -w1 $host $port && xset q > /dev/null; then
-    #   return 0
-    # fi
-
-    xset q > /dev/null 2>&1 && return 0
-
-    echo "Problem with display? ($DISPLAY)" 2>&1
 }
 
 function fixtty() {
@@ -246,6 +247,7 @@ ar()
 	accurev "$@"
 }
 
+# note; use ansifilter instead.
 alias stripansi='perl -ple "s/\033\[(?:\d*(?:;\d+)*)*m//g;"'
 
 gdiff()
@@ -403,3 +405,24 @@ reify() {
     echo "Not in detached HEAD state. Currently on branch: $current_branch"
   fi
 }
+
+project_root() {
+  local dir=$PWD
+  while [[ $dir != / ]]; do
+    [[ -e $dir/.git || -e $dir/.project_root ]] && { echo $dir; return; }
+    dir=${dir:h}
+  done
+  echo "project_root: not found" >&2
+  return 1
+}
+
+cd_proj_root() {
+  cd $(project_root)
+}
+
+xscale() {
+  local scale=$1
+  shift
+  GDK_SCALE=1 GDK_DPI_SCALE=${scale} "$@"
+}
+

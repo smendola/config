@@ -7,8 +7,11 @@ lock-on-suspend=true
 
 [apps/update-manager]
 first-run=false
-launch-count=7
-launch-time=int64 1741672720
+launch-count=10
+launch-time=int64 1772593392
+show-details=true
+window-height=400
+window-width=586
 
 [com/gexperts/Tilix]
 accelerators-enabled=true
@@ -27,18 +30,21 @@ recent-session-files=['/home/sal/ai/agents/booking_agent_v2/session_log.txt.json
 sidebar-on-right=false
 tab-position='top'
 terminal-title-show-when-single=false
-terminal-title-style='normal'
-theme-variant='system'
-use-tabs=true
+terminal-title-style='small'
+theme-variant='dark'
+use-tabs=false
 warn-vte-config-issue=false
 window-style='normal'
 
 [com/gexperts/Tilix/keybindings]
-session-switch-to-next-terminal='<Shift>F12'
-session-switch-to-previous-terminal='<Primary><Shift>F12'
+session-switch-to-next-terminal='<Primary>plus'
+session-switch-to-previous-terminal='<Primary>underscore'
+terminal-maximize='<Primary><Shift>Return'
 terminal-reset-and-clear='<Primary><Shift>l'
 terminal-zoom-in='<Primary>equal'
 win-fullscreen='<Alt>Return'
+win-switch-to-next-session='<Alt>equal'
+win-switch-to-previous-session='<Alt>minus'
 win-view-sidebar='<Primary>F12'
 
 [com/gexperts/Tilix/profiles]
@@ -131,7 +137,7 @@ use-theme-colors=false
 visible-name='Default'
 
 [com/ubuntu/update-notifier]
-release-check-time=uint32 1740872105
+release-check-time=uint32 1772593387
 
 [desktop/ibus/general]
 preload-engines=['xkb:us::eng']
@@ -150,16 +156,16 @@ window-selected-page='performance-page'
 window-width=1046
 
 [org/blueman/general]
-window-properties=[566, 350, 713, 497]
+window-properties=[566, 350, 1339, 810]
 
 [org/blueman/plugins/powermanager]
 auto-power-on=@mb true
 
 [org/blueman/plugins/recentconns]
-recent-connections=[{'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A3', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1743868819.7463095', 'device': '/org/bluez/hci0/dev_D5_C0_DE_87_71_A3'}]
+recent-connections=[{'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A3', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1747626035.9656827', 'device': '/org/bluez/hci0/dev_D5_C0_DE_87_71_A3'}, {'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A5', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1747626121.5340886'}]
 
 [org/cinnamon/desktop/background]
-picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-a9a33b333073a177f6002d481cfe12a5.jpg'
 
 [org/gnome/Characters]
 recent-characters=['🟧', '🟠', '🟣', '🔴', '💥']
@@ -168,6 +174,22 @@ recent-characters=['🟧', '🟠', '🟣', '🔴', '💥']
 active-chart='treemap'
 is-maximized=false
 window-size=(1425, 600)
+
+[org/gnome/calculator]
+accuracy=9
+angle-units='degrees'
+base=10
+button-mode='basic'
+number-format='automatic'
+show-thousands=false
+show-zeroes=false
+source-currency=''
+source-units='degree'
+target-currency=''
+target-units='radian'
+window-maximized=false
+window-size=(386, 504)
+word-size=64
 
 [org/gnome/control-center]
 last-panel='keyboard'
@@ -216,8 +238,8 @@ apps=['htop.desktop', 'nvtop.desktop', 'org.gnome.PowerStats.desktop']
 name='System'
 
 [org/gnome/desktop/background]
-picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
-picture-uri-dark='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-a9a33b333073a177f6002d481cfe12a5.jpg'
+picture-uri-dark='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-a9a33b333073a177f6002d481cfe12a5.jpg'
 
 [org/gnome/desktop/input-sources]
 sources=[('xkb', 'us')]
@@ -231,7 +253,7 @@ enable-animations=true
 enable-hot-corners=false
 font-name='Noto Sans,  10'
 gtk-theme='PRO-dark-XFCE-edition II-1'
-icon-theme='Win11'
+icon-theme='elementary-xfce'
 monospace-font-name='Meslo LG S 10'
 scaling-factor=uint32 1
 text-scaling-factor=1.0
@@ -292,7 +314,7 @@ old-files-age=uint32 30
 recent-files-max-age=-1
 
 [org/gnome/desktop/screensaver]
-picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-a9a33b333073a177f6002d481cfe12a5.jpg'
 
 [org/gnome/desktop/search-providers]
 sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop']
@@ -311,6 +333,18 @@ button-layout='icon:minimize,maximize,close'
 [org/gnome/evolution-data-server]
 migrated=true
 
+[org/gnome/file-roller/listing]
+list-mode='as-folder'
+name-column-width=229
+show-path=false
+sort-method='name'
+sort-type='ascending'
+
+[org/gnome/file-roller/ui]
+sidebar-width=200
+window-height=480
+window-width=600
+
 [org/gnome/gnome-screenshot]
 delay=0
 include-pointer=true
@@ -318,18 +352,18 @@ last-save-directory='file:///home/sal/Pictures'
 
 [org/gnome/gnome-system-monitor]
 cpu-stacked-area-chart=true
-current-tab='processes'
+current-tab='disks'
 graph-update-interval=250
 resources-memory-in-iec=true
 show-dependencies=false
 show-whose-processes='user'
 window-height=945
-window-width=910
+window-width=1181
 
 [org/gnome/gnome-system-monitor/disktreenew]
 col-6-visible=true
 col-6-width=0
-columns-order=[6]
+columns-order=[5]
 sort-col=1
 sort-order=0
 
@@ -343,17 +377,19 @@ col-6-visible=false
 col-6-width=0
 
 [org/gnome/meld]
-enable-space-drawer=true
+custom-font='Hack 10'
+enable-space-drawer=false
 highlight-current-line=true
 highlight-syntax=true
 prefer-dark-theme=false
 show-line-numbers=true
-wrap-mode='char'
+use-system-font=false
+wrap-mode='none'
 
 [org/gnome/meld/window-state]
-height=1384
+height=1036
 is-maximized=false
-width=2550
+width=1910
 
 [org/gnome/nautilus/preferences]
 default-folder-viewer='icon-view'
@@ -387,6 +423,7 @@ info-stats-type='discharge-accuracy'
 night-light-enabled=false
 
 [org/gnome/settings-daemon/plugins/power]
+power-button-action='suspend'
 sleep-inactive-ac-timeout=1800
 sleep-inactive-ac-type='nothing'
 
@@ -496,8 +533,11 @@ sort-column='name'
 sort-directories-first=true
 sort-order='ascending'
 type-format='category'
-window-position=(295, 0)
-window-size=(1203, 863)
+window-position=(2281, 657)
+window-size=(1203, 845)
+
+[org/mate/engrampa/dialogs/batch-add]
+default-extension='.zip'
 
 [org/mate/engrampa/dialogs/extract]
 overwrite=true
@@ -505,6 +545,7 @@ recreate-folders=true
 skip-newer=false
 
 [org/mate/engrampa/general]
+encrypt-header=false
 unar-open-zip=false
 
 [org/mate/engrampa/listing]
@@ -520,13 +561,13 @@ window-height=480
 window-width=600
 
 [org/nemo/window-state]
-geometry='800x550+557+292'
+geometry='800x550+597+316'
 maximized=false
 sidebar-bookmark-breakpoint=5
 start-with-sidebar=true
 
 [org/xfce/mousepad/state/application]
-session=['1;;+file:///home/sal/Downloads/io.missioncenter.MissionCenter.flatpakref']
+session=['1;;+file:///home/sal/Desktop/OrcaSlicer.desktop']
 
 [org/xfce/mousepad/state/window]
 fullscreen=false
