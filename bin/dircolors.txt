@@ -128,7 +128,7 @@ STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 # .cson 35
 # .json 35
 
-# archives or compressed (bright red)
+# archives or compressed (red)
 .tar 31
 .tgz 31
 .arj 31
