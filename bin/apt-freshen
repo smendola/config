@@ -1,0 +1,77 @@
+#!/bin/bash
+# apt-freshen <package>
+# Update only the apt source a package comes from, then upgrade it.
+set -euo pipefail
+
+pkg="${1:?Usage: apt-freshen <package>}"
+
+if ! policy=$(apt-cache policy "$pkg" 2>/dev/null) || [[ -z "$policy" ]]; then
+    echo "error: '$pkg' not found in apt cache" >&2
+    exit 1
+fi
+
+installed=$(awk '/Installed:/{print $2}' <<< "$policy")
+candidate=$(awk '/Candidate:/{print $2}' <<< "$policy")
+
+if [[ "$candidate" == "(none)" ]]; then
+    echo "error: no candidate version for '$pkg'" >&2
+    exit 1
+fi
+
+echo "$pkg: installed=$installed  candidate=$candidate"
+
+# Find the first repo URL from the version table (candidate version is listed first)
+repo_url=$(awk '/Version table:/{found=1; next}
+               found && /https?:\/\//{match($0,/https?:\/\/[^ ]*/); print substr($0,RSTART,RLENGTH); exit}' \
+           <<< "$policy")
+
+if [[ -z "$repo_url" ]]; then
+    echo "No remote repository found (package may be local-only)"
+else
+    echo "Repository: $repo_url"
+
+    # Find the source file containing this URL
+    source_file=""
+    for f in /etc/apt/sources.list \
+              /etc/apt/sources.list.d/*.list \
+              /etc/apt/sources.list.d/*.sources; do
+        [[ -f "$f" ]] || continue
+        if grep -q "$repo_url" "$f" 2>/dev/null; then
+            source_file="$f"
+            break
+        fi
+    done
+
+    # Fall back to hostname match (handles URL path differences)
+    if [[ -z "$source_file" ]]; then
+        hostname=$(awk -F/ '{print $3}' <<< "$repo_url")
+        echo "Exact URL not matched; trying hostname: $hostname"
+        for f in /etc/apt/sources.list \
+                  /etc/apt/sources.list.d/*.list \
+                  /etc/apt/sources.list.d/*.sources; do
+            [[ -f "$f" ]] || continue
+            if grep -q "$hostname" "$f" 2>/dev/null; then
+                source_file="$f"
+                break
+            fi
+        done
+    fi
+
+    if [[ -n "$source_file" ]]; then
+        echo "Refreshing index from: $source_file"
+        sudo apt-get update \
+            -o "Dir::Etc::sourcelist=${source_file#/etc/apt/}" \
+            -o "Dir::Etc::sourceparts=-" \
+            -o "APT::Get::List-Cleanup=0"
+    else
+        echo "Warning: could not find source file; skipping targeted update"
+    fi
+fi
+
+if [[ "$installed" == "(none)" ]]; then
+    echo "Installing $pkg..."
+    sudo apt-get install "$pkg"
+else
+    echo "Upgrading $pkg..."
+    sudo apt-get install --only-upgrade "$pkg"
+fi

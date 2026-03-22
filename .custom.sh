@@ -1,6 +1,6 @@
 # Force software rendering with llvmpipe
-#export GDK_SCALE=1 
-#export GDK_DPI_SCALE=1.25
+export GDK_SCALE=1 
+export GDK_DPI_SCALE=${GDK_DPI_SCALE:-1.25}
 export LIBGL_ALWAYS_SOFTWARE=1
 unset LIBGL_ALWAYS_INDIRECT
 unset __NV_PRIME_RENDER_OFFLOAD
@@ -33,6 +33,11 @@ ide() {
   pkill -ABRT -f RubyMine
   # &! "disowns" the process
   rubymine > /tmp/rubymine.out 2>&1 &!
+}
+
+alias clause=claude
+claude() {
+  command claude --channels plugin:telegram@claude-plugins-official "$@"
 }
 
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf

@@ -1,3 +1,15 @@
+[apps/light-locker]
+idle-hint=false
+late-locking=false
+lock-after-screensaver=uint32 5
+lock-on-lid=false
+lock-on-suspend=true
+
+[apps/update-manager]
+first-run=false
+launch-count=7
+launch-time=int64 1741672720
+
 [ca/desrt/dconf-editor]
 saved-pathbar-path='/system/proxy/'
 saved-view='/'
@@ -6,23 +18,38 @@ window-is-maximized=false
 window-width=1037
 
 [com/gexperts/Tilix]
+accelerators-enabled=true
 control-scroll-zoom=true
 copy-on-select=true
 enable-wide-handle=true
+paste-strip-first-char=true
 prompt-on-close=true
 prompt-on-delete-profile=true
+quake-height-percent=30
+quake-hide-headerbar=true
+quake-hide-lose-focus=true
 quake-specific-monitor=0
 quake-tab-position='top'
-recent-session-files=['/home/dev/split1.json']
+quake-window-position='bottom'
+recent-session-files=['quad.json', '/home/dev/quad.json', '/home/dev/split1.json']
 sidebar-on-right=false
 tab-position='top'
-terminal-title-style='normal'
-theme-variant='dark'
-use-tabs=true
+terminal-title-show-when-single=false
+terminal-title-style='small'
+theme-variant='light'
+use-tabs=false
+warn-vte-config-issue=false
 window-style='normal'
 
 [com/gexperts/Tilix/keybindings]
+session-switch-to-next-terminal='<Shift>F12'
+session-switch-to-previous-terminal='<Primary><Shift>F12'
+terminal-file-browser='<Primary><Alt>bar'
+terminal-maximize='<Primary><Shift>Return'
+terminal-reset-and-clear='<Primary><Shift>l'
 terminal-zoom-in='<Primary>equal'
+win-fullscreen='<Alt>Return'
+win-view-sidebar='<Primary>F12'
 
 [com/gexperts/Tilix/profiles]
 list=['2b7c4080-0ddd-46c5-8f23-563fd3ba789d', '192ee3ff-1a4f-4d26-a179-216976df780d']
@@ -59,7 +86,7 @@ dim-transparency-percent=16
 draw-margin=80
 encoding='UTF-8'
 exit-action='close'
-font='Meslo LG S 14'
+font='Meslo LG S 12'
 foreground-color='#F8F8F2'
 highlight-background-color='#000000'
 highlight-colors-set=false
@@ -87,6 +114,7 @@ visible-name='htop'
 
 [com/gexperts/Tilix/profiles/2b7c4080-0ddd-46c5-8f23-563fd3ba789d]
 background-color='#27272C2C3434'
+badge-color='#AC7EA8'
 badge-color-set=false
 badge-text=''
 badge-use-system-font=false
@@ -100,7 +128,7 @@ cursor-colors-set=true
 cursor-foreground-color='#F6F6F5F5F4F4'
 cursor-shape='block'
 dim-transparency-percent=16
-font='Meslo LG S 13'
+font='Meslo LG S 12'
 foreground-color='#F8F8F2'
 highlight-colors-set=false
 login-shell=true
@@ -112,25 +140,375 @@ use-system-font=false
 use-theme-colors=false
 visible-name='Default'
 
+[com/ubuntu/update-notifier]
+release-check-time=uint32 1740872105
+
+[desktop/ibus/general]
+preload-engines=['xkb:us::eng']
+version='1.5.29'
+
+[desktop/ibus/panel/emoji]
+favorites=['🌐']
+
+[io/missioncenter/MissionCenter]
+performance-page-gpu-encode-decode-usage-visible=false
+performance-selected-page='gpu-0000:01:00.0'
+performance-sidebar-hidden-graphs='fan-4-1;fan-4-2;net-enp3s0'
+performance-sidebar-order='cpu;gpu-0000:01:00.0;memory;disk-nvme0n1;disk-nvme1n1;disk-sda;net-enp3s0;net-wlp4s0;fan-4-1;fan-4-2'
+window-height=630
+window-selected-page='performance-page'
+window-width=1046
+
+[org/blueman/general]
+window-properties=[566, 350, 713, 497]
+
+[org/blueman/plugins/powermanager]
+auto-power-on=@mb true
+
+[org/blueman/plugins/recentconns]
+recent-connections=[{'adapter': 'C0:BF:BE:BC:32:09', 'address': 'D5:C0:DE:87:71:A3', 'alias': 'MX Keys Mini B', 'icon': 'input-keyboard', 'name': 'Audio and input profiles', 'uuid': '00000000-0000-0000-0000-000000000000', 'time': '1743868819.7463095', 'device': '/org/bluez/hci0/dev_D5_C0_DE_87_71_A3'}]
+
+[org/cinnamon/desktop/background]
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+
+[org/gnome/Characters]
+recent-characters=['🟧', '🟠', '🟣', '🔴', '💥']
+
 [org/gnome/baobab/ui]
+active-chart='treemap'
+is-maximized=false
 window-size=(1573, 600)
 window-state=128
+
+[org/gnome/control-center]
+last-panel='keyboard'
+window-state=(980, 640, false)
+
+[org/gnome/desktop/a11y/applications]
+screen-reader-enabled=false
+
+[org/gnome/desktop/app-folders]
+folder-children=['Utilities', 'YaST', 'Pardus', 'cc374423-e0bc-41d0-9b7c-4da9e3c2e0c6', '9448d673-e69e-4a3c-8a15-a8e4c76ada39', 'af110ab6-e582-4b43-9dcc-d458a3b4fd4d', '1f576c3c-aab8-4edd-804c-4a6a6c373a68', '66a1f5c3-5a7e-4a3c-9bdf-d70a2c9bc2ae']
+
+[org/gnome/desktop/app-folders/folders/1f576c3c-aab8-4edd-804c-4a6a6c373a68]
+apps=['org.gnome.Terminal.desktop', 'termius-app_termius-app.desktop']
+name='Unnamed Folder'
+
+[org/gnome/desktop/app-folders/folders/66a1f5c3-5a7e-4a3c-9bdf-d70a2c9bc2ae]
+apps=['update-manager.desktop', 'snap-store_snap-store.desktop', 'software-properties-gtk.desktop', 'gnome-session-properties.desktop', 'gdmap.desktop', 'gnome-language-selector.desktop', 'org.gnome.Extensions.desktop']
+name='System'
+
+[org/gnome/desktop/app-folders/folders/9448d673-e69e-4a3c-8a15-a8e4c76ada39]
+apps=['software-properties-drivers.desktop', 'firmware-updater_firmware-updater.desktop', 'nvidia-settings.desktop']
+name='Unnamed Folder'
+
+[org/gnome/desktop/app-folders/folders/Pardus]
+categories=['X-Pardus-Apps']
+name='X-Pardus-Apps.directory'
+translate=true
+
+[org/gnome/desktop/app-folders/folders/Utilities]
+apps=['gnome-abrt.desktop', 'gnome-system-log.desktop', 'nm-connection-editor.desktop', 'org.gnome.baobab.desktop', 'org.gnome.Connections.desktop', 'org.gnome.DejaDup.desktop', 'org.gnome.Dictionary.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.Evince.desktop', 'org.gnome.FileRoller.desktop', 'org.gnome.fonts.desktop', 'org.gnome.Loupe.desktop', 'org.gnome.seahorse.Application.desktop', 'org.gnome.tweaks.desktop', 'org.gnome.Usage.desktop', 'vinagre.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.clocks.desktop', 'org.gnome.eog.desktop', 'display-im6.q16.desktop', 'org.gnome.Meld.desktop']
+categories=['X-GNOME-Utilities']
+name='X-GNOME-Utilities.directory'
+translate=true
+
+[org/gnome/desktop/app-folders/folders/YaST]
+categories=['X-SuSE-YaST']
+name='suse-yast.directory'
+translate=true
+
+[org/gnome/desktop/app-folders/folders/af110ab6-e582-4b43-9dcc-d458a3b4fd4d]
+apps=['micro.desktop', 'vim.desktop', 'org.gnome.TextEditor.desktop']
+name='Accessories'
+
+[org/gnome/desktop/app-folders/folders/cc374423-e0bc-41d0-9b7c-4da9e3c2e0c6]
+apps=['htop.desktop', 'nvtop.desktop', 'org.gnome.PowerStats.desktop']
+name='System'
+
+[org/gnome/desktop/background]
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+picture-uri-dark='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+
+[org/gnome/desktop/input-sources]
+sources=[('xkb', 'us')]
+xkb-options=@as []
+
+[org/gnome/desktop/interface]
+color-scheme='default'
+cursor-size=24
+cursor-theme='Win10OS-cursors'
+enable-animations=true
+enable-hot-corners=false
+font-name='Noto Sans,  10'
+gtk-theme='PRO-dark-XFCE-edition II-1'
+icon-theme='Win11'
+monospace-font-name='Meslo LG S 10'
+scaling-factor=uint32 1
+text-scaling-factor=1.0
+toolbar-style='text'
+
+[org/gnome/desktop/notifications]
+application-children=['gnome-power-panel', 'org-gnome-terminal-preferences', 'apport-gtk', 'google-chrome', 'org-gnome-baobab', 'firefox-firefox', 'org-gnome-characters', 'mailspring-mailspring', 'whatsapp-electron-whatsapp-electron', 'com-teamviewer-teamviewer-host', 'com-teamviewer-teamviewer', 'thunar']
+
+[org/gnome/desktop/notifications/application/apport-gtk]
+application-id='apport-gtk.desktop'
+
+[org/gnome/desktop/notifications/application/com-teamviewer-teamviewer-host]
+application-id='com.teamviewer.TeamViewer-Host.desktop'
+
+[org/gnome/desktop/notifications/application/com-teamviewer-teamviewer]
+application-id='com.teamviewer.TeamViewer.desktop'
+
+[org/gnome/desktop/notifications/application/firefox-firefox]
+application-id='firefox_firefox.desktop'
+
+[org/gnome/desktop/notifications/application/gnome-power-panel]
+application-id='gnome-power-panel.desktop'
+
+[org/gnome/desktop/notifications/application/google-chrome]
+application-id='google-chrome.desktop'
+
+[org/gnome/desktop/notifications/application/mailspring-mailspring]
+application-id='mailspring_mailspring.desktop'
+
+[org/gnome/desktop/notifications/application/org-gnome-baobab]
+application-id='org.gnome.baobab.desktop'
+
+[org/gnome/desktop/notifications/application/org-gnome-characters]
+application-id='org.gnome.Characters.desktop'
+
+[org/gnome/desktop/notifications/application/org-gnome-terminal-preferences]
+application-id='org.gnome.Terminal.Preferences.desktop'
+
+[org/gnome/desktop/notifications/application/thunar]
+application-id='thunar.desktop'
+
+[org/gnome/desktop/notifications/application/whatsapp-electron-whatsapp-electron]
+application-id='whatsapp-electron_whatsapp-electron.desktop'
+
+[org/gnome/desktop/peripherals/keyboard]
+numlock-state=true
+
+[org/gnome/desktop/peripherals/mouse]
+accel-profile='flat'
+natural-scroll=false
+speed=0.0
+
+[org/gnome/desktop/peripherals/touchpad]
+two-finger-scrolling-enabled=true
+
+[org/gnome/desktop/privacy]
+old-files-age=uint32 30
+recent-files-max-age=-1
+
+[org/gnome/desktop/screensaver]
+picture-uri='file:///home/sal/.config/variety/wallpaper/wallpaper-clock-5f4a2893c83e98a557683b2a418b8e14.jpg'
+
+[org/gnome/desktop/search-providers]
+sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop']
+
+[org/gnome/desktop/session]
+idle-delay=uint32 900
+
+[org/gnome/desktop/wm/keybindings]
+maximize=@as []
+panel-run-dialog=['<Super>r']
+unmaximize=@as []
+
+[org/gnome/desktop/wm/preferences]
+button-layout='icon:minimize,maximize,close'
+
+[org/gnome/evolution-data-server]
+migrated=true
+
+[org/gnome/gedit/plugins]
+active-plugins=['filebrowser', 'spell', 'sort', 'modelines', 'docinfo', 'openlinks']
+
+[org/gnome/gedit/preferences/ui]
+show-tabs-mode='auto'
+
+[org/gnome/gedit/state/window]
+bottom-panel-size=140
+side-panel-active-page='GeditWindowDocumentsPanel'
+side-panel-size=200
+size=(896, 700)
+state=0
+
+[org/gnome/gnome-screenshot]
+delay=0
+include-pointer=true
+last-save-directory='file:///home/sal/Pictures'
+
+[org/gnome/gnome-system-monitor]
+cpu-stacked-area-chart=true
+current-tab='processes'
+graph-update-interval=250
+resources-memory-in-iec=true
+show-dependencies=false
+show-whose-processes='user'
+window-height=945
+window-width=910
+
+[org/gnome/gnome-system-monitor/disktreenew]
+col-6-visible=true
+col-6-width=0
+columns-order=[6]
+sort-col=1
+sort-order=0
+
+[org/gnome/gnome-system-monitor/proctree]
+col-0-visible=true
+col-0-width=265
+col-3-visible=true
+col-3-width=0
+col-4-visible=true
+col-6-visible=false
+col-6-width=0
 
 [org/gnome/meld]
 custom-font='Meslo LG S 12'
 draw-spaces=@as []
+enable-space-drawer=true
 highlight-current-line=true
 highlight-syntax=true
-ignore-blank-lines=false
+ignore-blank-lines=true
+prefer-dark-theme=false
 show-line-numbers=true
-text-filters=[('CVS/SVN keywords', false, '\\$\\w+(:[^\\n$]+)?\\$'), ('C++ comment', false, '//.*'), ('C comment', false, '/\\*.*?\\*/'), ('All whitespace', false, '[ \\t\\r\\f\\v]*'), ('Leading whitespace', true, '^[ \\t\\r\\f\\v]*'), ('Trailing whitespace', false, '[ \\t\\r\\f\\v]*$'), ('Script comment', false, '#.*'), ('wp', false, 'webpacker'), ('fe', false, 'frontend')]
+text-filters=[('CVS/SVN keywords', false, '\\$\\w+(:[^\\n$]+)?\\$'), ('C++ comment', false, '//.*'), ('C comment', false, '/\\*.*?\\*/'), ('All whitespace', true, '[ \\t\\r\\f\\v]*'), ('Leading whitespace', true, '^[ \\t\\r\\f\\v]*'), ('Trailing whitespace', false, '[ \\t\\r\\f\\v]*$'), ('Script comment', false, '#.*'), ('wp', false, 'webpacker'), ('fe', false, 'frontend')]
 use-system-font=false
 wrap-mode='char'
 
 [org/gnome/meld/window-state]
 height=1587
 is-maximized=false
-width=2411
+width=2865
+
+[org/gnome/nautilus/preferences]
+default-folder-viewer='icon-view'
+migrated-gtk-settings=true
+search-filter-time-type='last_modified'
+
+[org/gnome/nautilus/window-state]
+initial-size=(890, 550)
+
+[org/gnome/nm-applet/eap/48d9fb00-9d1f-4db6-ae15-a7327a2cc35a]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
+[org/gnome/portal/filechooser/com.github.alexkdeveloper.desktop-files-creator]
+last-folder-path='/usr/share/icons/hicolor/64x64/apps'
+
+[org/gnome/portal/filechooser/com.google.Chrome]
+last-folder-path='/home/sal/Downloads'
+
+[org/gnome/portal/filechooser/snap.firefox]
+last-folder-path='/home/sal/Downloads'
+
+[org/gnome/power-manager]
+info-history-time=1800
+info-history-type='charge'
+info-last-device='/org/freedesktop/UPower/devices/battery_hidpp_battery_2'
+info-page-number=1
+info-stats-type='discharge-accuracy'
+
+[org/gnome/settings-daemon/plugins/color]
+night-light-enabled=false
+
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-ac-timeout=1800
+sleep-inactive-ac-type='nothing'
+
+[org/gnome/shell]
+app-picker-layout=[{'9448d673-e69e-4a3c-8a15-a8e4c76ada39': <{'position': <0>}>, '66a1f5c3-5a7e-4a3c-9bdf-d70a2c9bc2ae': <{'position': <1>}>, 'google-chrome.desktop': <{'position': <2>}>, '1f576c3c-aab8-4edd-804c-4a6a6c373a68': <{'position': <3>}>, 'Utilities': <{'position': <4>}>, 'af110ab6-e582-4b43-9dcc-d458a3b4fd4d': <{'position': <5>}>, 'cc374423-e0bc-41d0-9b7c-4da9e3c2e0c6': <{'position': <6>}>}, {'org.remmina.Remmina.desktop': <{'position': <0>}>, 'solaar.desktop': <{'position': <1>}>, 'variety.desktop': <{'position': <2>}>, 'wslview.desktop': <{'position': <3>}>, 'docker-desktop.desktop': <{'position': <4>}>}]
+command-history=['r', 'help', '?', 'ls', 'terminal', 'terminall', 'tilix', 'terminator', '/opt/google/chrome/google-chrome --profile-directory=Default --ignore-profile-directory-if-not-exists --app "https://mail.google.com/chat/u/0/#chat/home"', '/opt/google/chrome/google-chrome --profile-directory=Default --ignore-profile-directory-if-not-exists --app="https://mail.google.com/chat/u/0/#chat/home"']
+disable-user-extensions=false
+disabled-extensions=@as []
+enabled-extensions=['ubuntu-dock@ubuntu.com', 'tiling-assistant@ubuntu.com', 'nvidiautil@ethanwharris']
+favorite-apps=['google-chrome.desktop', 'firefox_firefox.desktop', 'thunar.desktop', 'org.gnome.Nautilus.desktop', 'nemo.desktop', 'org.gnome.Settings.desktop', 'terminator.desktop', 'com.gexperts.Tilix.desktop', 'org.gnome.SystemMonitor.desktop', 'io.missioncenter.MissionCenter.desktop', 'msty.desktop', 'lmstudio.desktop', 'mailspring_mailspring.desktop', 'Cursor.desktop', 'whatsapp-electron_whatsapp-electron.desktop', 'com.teamviewer.TeamViewer.desktop', 'chrome-Chat.desktop']
+last-selected-power-profile='performance'
+welcome-dialog-last-shown-version='46.0'
+
+[org/gnome/shell/extensions/dash-to-dock]
+background-opacity=0.80000000000000004
+dash-max-icon-size=30
+dock-position='BOTTOM'
+extend-height=true
+height-fraction=0.90000000000000002
+preferred-monitor=-2
+preferred-monitor-by-connector='HDMI-1'
+preview-size-scale=0.0
+show-apps-at-top=true
+show-mounts=false
+
+[org/gnome/shell/extensions/tiling-assistant]
+activate-layout0=@as []
+activate-layout1=@as []
+activate-layout2=@as []
+activate-layout3=@as []
+active-window-hint=1
+active-window-hint-color='rgb(211,70,21)'
+auto-tile=@as []
+center-window=@as []
+debugging-free-rects=@as []
+debugging-show-tiled-rects=@as []
+default-move-mode=0
+dynamic-keybinding-behavior=0
+import-layout-examples=false
+last-version-installed=46
+restore-window=['<Super>Down']
+search-popup-layout=@as []
+tile-bottom-half=['<Super>KP_2']
+tile-bottom-half-ignore-ta=@as []
+tile-bottomleft-quarter=['<Super>KP_1']
+tile-bottomleft-quarter-ignore-ta=@as []
+tile-bottomright-quarter=['<Super>KP_3']
+tile-bottomright-quarter-ignore-ta=@as []
+tile-edit-mode=@as []
+tile-left-half=['<Super>Left', '<Super>KP_4']
+tile-left-half-ignore-ta=@as []
+tile-maximize=['<Super>Up', '<Super>KP_5']
+tile-maximize-horizontally=@as []
+tile-maximize-vertically=@as []
+tile-right-half=['<Super>Right', '<Super>KP_6']
+tile-right-half-ignore-ta=@as []
+tile-top-half=['<Super>KP_8']
+tile-top-half-ignore-ta=@as []
+tile-topleft-quarter=['<Super>KP_7']
+tile-topleft-quarter-ignore-ta=@as []
+tile-topright-quarter=['<Super>KP_9']
+tile-topright-quarter-ignore-ta=@as []
+tiling-popup-all-workspace=true
+toggle-always-on-top=@as []
+toggle-tiling-popup=@as []
+
+[org/gnome/shell/keybindings]
+toggle-application-view=['<Control>Escape']
+
+[org/gnome/shell/world-clocks]
+locations=@av []
+
+[org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+background-color='rgb(44,41,41)'
+bold-is-bright=true
+foreground-color='rgb(214,213,213)'
+palette=['rgb(7,54,66)', 'rgb(220,50,47)', 'rgb(133,153,0)', 'rgb(181,137,0)', 'rgb(38,139,210)', 'rgb(211,54,130)', 'rgb(42,161,152)', 'rgb(238,232,213)', 'rgb(0,43,54)', 'rgb(203,75,22)', 'rgb(88,110,117)', 'rgb(101,123,131)', 'rgb(131,148,150)', 'rgb(108,113,196)', 'rgb(147,161,161)', 'rgb(253,246,227)']
+use-theme-colors=false
+
+[org/gtk/gtk4/settings/color-chooser]
+selected-color=(true, 0.87843137979507446, 0.10588235408067703, 0.14117647707462311, 1.0)
+
+[org/gtk/gtk4/settings/file-chooser]
+date-format='regular'
+location-mode='path-bar'
+show-hidden=false
+sidebar-width=140
+sort-column='name'
+sort-directories-first=true
+sort-order='ascending'
+type-format='category'
+view-type='list'
+window-size=(819, 372)
 
 [org/gtk/settings/color-chooser]
 custom-colors=[(0.8901960784313725, 0.54117647058823526, 1.0, 1.0), (0.77647058823529413, 0.47058823529411764, 0.8666666666666667, 1.0), (0.40392156862745099, 0.72941176470588232, 1.0, 1.0), (0.38039215686274508, 0.68627450980392157, 0.93725490196078431, 1.0), (1.0, 0.0, 0.0, 1.0), (0.86274509803921573, 0.87450980392156863, 0.89411764705882357, 1.0), (0.82745098039215681, 0.83921568627450982, 0.81176470588235294, 1.0), (0.96470588235294119, 0.97647058823529409, 1.0, 1.0)]
@@ -142,10 +520,45 @@ location-mode='path-bar'
 show-hidden=false
 show-size-column=true
 show-type-column=true
-sidebar-width=171
+sidebar-width=199
 sort-column='name'
 sort-directories-first=false
-sort-order='descending'
+sort-order='ascending'
 type-format='category'
-window-position=(8, 31)
+window-position=(2743, 180)
 window-size=(1203, 902)
+
+[org/mate/engrampa/dialogs/extract]
+overwrite=true
+recreate-folders=true
+skip-newer=false
+
+[org/mate/engrampa/general]
+unar-open-zip=false
+
+[org/mate/engrampa/listing]
+list-mode='as-folder'
+name-column-width=250
+show-path=false
+sort-method='name'
+sort-type='ascending'
+
+[org/mate/engrampa/ui]
+sidebar-width=200
+window-height=480
+window-width=600
+
+[org/nemo/window-state]
+geometry='800x550+557+292'
+maximized=false
+sidebar-bookmark-breakpoint=5
+start-with-sidebar=true
+
+[org/xfce/mousepad/state/application]
+session=['1;;+file:///home/sal/Downloads/io.missioncenter.MissionCenter.flatpakref']
+
+[org/xfce/mousepad/state/window]
+fullscreen=false
+height=uint32 480
+maximized=false
+width=uint32 873
