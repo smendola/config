@@ -129,38 +129,38 @@ STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 # .json 35
 
 # archives or compressed (bright red)
-.tar 1;31
-.tgz 1;31
-.arj 1;31
-.taz 1;31
-.lzh 1;31
-.lzma 1;31
-.tlz 1;31
-.txz 1;31
-.zip 1;31
-.z 1;31
-.Z 1;31
-.dz 1;31
-.gz 1;31
-.lz 1;31
-.xz 1;31
-.bz2 1;31
-.bz 1;31
-.tbz 1;31
-.tbz2 1;31
-.tz 1;31
-.deb 1;31
-.rpm 1;31
-.jar 1;31
-.war 1;31
-.ear 1;31
-.sar 1;31
-.rar 1;31
-.ace 1;31
-.zoo 1;31
-.cpio 1;31
-.7z 1;31
-.rz 1;31
+.tar 31
+.tgz 31
+.arj 31
+.taz 31
+.lzh 31
+.lzma 31
+.tlz 31
+.txz 31
+.zip 31
+.z 31
+.Z 31
+.dz 31
+.gz 31
+.lz 31
+.xz 31
+.bz2 31
+.bz 31
+.tbz 31
+.tbz2 31
+.tz 31
+.deb 31
+.rpm 31
+.jar 31
+.war 31
+.ear 31
+.sar 31
+.rar 31
+.ace 31
+.zoo 31
+.cpio 31
+.7z 31
+.rz 31
 
 # image formats
 # .jpg 1;35
