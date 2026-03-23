@@ -101,6 +101,8 @@ PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 ###############################################################
 [ -f ~/.aliases ] && . ~/.aliases
 
+## load any secret keys
+[ -f ~/.credentials ] && . ~/.credentials
 
 export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
