@@ -40,6 +40,8 @@ claude() {
   command claude --channels plugin:telegram@claude-plugins-official "$@"
 }
 
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
 export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
 export PORT=3000
