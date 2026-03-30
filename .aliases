@@ -63,6 +63,8 @@ function gi() {
   fi
 }
 
+alias unmanaged="git ls-files --others --exclude-standard"
+
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
   # The equivalent (and not as good) for xemacs is gnuclient
@@ -425,4 +427,30 @@ xscale() {
   shift
   GDK_SCALE=1 GDK_DPI_SCALE=${scale} "$@"
 }
+
+
+wta() {
+  local branch=${1}
+  local dir=~/wt/${branch/\//-}
+  if git show-ref --verify --quiet refs/heads/$branch; then
+    git worktree add $dir $branch
+  else
+    git worktree add -b $branch $dir
+  fi
+}
+
+wtr() {
+  if [[ $1 == -f ]]; then
+    rm -rf $2
+    git worktree prune
+  else
+    git worktree remove $1
+  fi
+}
+_wtr() {
+  local -a worktrees
+  worktrees=(${(f)"$(git worktree list --porcelain | awk '/^worktree /{print $2}' | tail -n +2)"})
+  _describe 'worktree' worktrees
+}
+compdef _wtr wtr
 
