@@ -209,6 +209,7 @@ then
 # place this after nvm initialization!
 autoload -U add-zsh-hook
 load-nvmrc() {
+  command -v tr &>/dev/null || return
   local node_version="$(nvm version)"
   local nvmrc_path="$(nvm_find_nvmrc)"
 
@@ -233,6 +234,8 @@ export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
+# Move direnv's chpwd hook to the end so it runs after rvm/nvm hooks
+chpwd_functions=( ${chpwd_functions[@]:#_direnv_hook} _direnv_hook )
 
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   #echo "vte init for tilix"
