@@ -429,6 +429,22 @@ xscale() {
 }
 
 
+wtg() {
+   local branch=${1}
+   local path=$(git worktree list --porcelain | awk '/^worktree /{wt=$2} /^branch refs\/heads\/'"$branch"'$/{print wt}')
+   if [[ -n $path ]]; then
+     cd $path
+   else
+     echo "no worktree for branch $branch"
+   fi
+}
+_wtg() {
+  local -a branches
+  branches=(${(f)"$(git worktree list --porcelain 2>/dev/null | awk '/^branch /{sub(".*refs/heads/",""); print}')"})
+  _describe 'worktree branch' branches
+}
+compdef _wtg wtg
+
 wta() {
   local branch=${1}
   local dir=~/wt/${branch/\//-}
@@ -454,3 +470,10 @@ _wtr() {
 }
 compdef _wtr wtr
 
+wt+() {
+  wta "$@"
+}
+
+wt-() {
+  wtr "$@"
+}
