@@ -431,7 +431,7 @@ xscale() {
 
 wtg() {
    local branch=${1}
-   local path=$(git worktree list --porcelain | awk '/^worktree /{wt=$2} /^branch refs\/heads\/'"$branch"'$/{print wt}')
+   local path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{wt=$2} $2==b{print wt}')
    if [[ -n $path ]]; then
      cd $path
    else
