@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# clawmux - opinionated tmux attach/create helper for OpenClaw operator workflow
+#
+# Goals:
+# - One short command to attach to the “right” tmux session.
+# - Uses an isolated socket so it doesn’t collide with your normal tmux.
+# - Creates the session if missing, but DOES NOT send any commands into the pane.
+# - Can print a standard “how to work with me over tmux” prompt you can paste into any AI chat.
+
+usage() {
+  cat <<'EOF'
+clawmux - attach to (or create) an OpenClaw tmux session
+
+Usage:
+  clawmux [topic]
+  clawmux prompt [topic]
+  clawmux --prompt [topic]
+  clawmux ls
+  clawmux kill [topic]
+  clawmux type ARGS    # proxies: tmux -S <sock> send-keys ARGS
+  clawmux look ARGS    # proxies: tmux -S <sock> capture-pane ARGS
+
+Behavior:
+  - Uses socket: $OPENCLAW_TMUX_SOCKET (or derived from $OPENCLAW_TMUX_SOCKET_DIR)
+  - Session name:
+      topic omitted -> openclaw
+      topic given   -> openclaw-<topic>
+  - Creates session if missing.
+  - Default action attaches.
+  - Never seeds commands into the session.
+
+Notes on prompts:
+  - `clawmux prompt [topic]` prints instructions ONLY.
+  - `clawmux --prompt [topic]` prints instructions, ensures the session exists, then
+    waits for Enter and ATTACHES (so you can copy/paste first).
+
+Examples:
+  clawmux
+  clawmux gog
+  clawmux --prompt
+  clawmux --prompt gog
+
+Env:
+  OPENCLAW_TMUX_SOCKET_DIR   (default: /tmp/openclaw-tmux-sockets)
+  OPENCLAW_TMUX_SOCKET       (default: <dir>/openclaw.sock)
+  OPENCLAW_TMUX_PREFIX       (default: openclaw)
+EOF
+}
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1" >&2; exit 127; }
+}
+
+sanitize_topic() {
+  # lowercase, keep alnum + dash, convert spaces/underscores to dash
+  local t
+  t="$1"
+  t="${t,,}"
+  t="${t// /-}"
+  t="${t//_/-}"
+  # strip invalid chars
+  t="$(printf '%s' "$t" | tr -cd 'a-z0-9-')"
+  # collapse multiple dashes
+  t="$(printf '%s' "$t" | sed -E 's/-+/-/g; s/^-//; s/-$//')"
+  printf '%s' "$t"
+}
+
+socket_path() {
+  local dir socket
+  dir="${OPENCLAW_TMUX_SOCKET_DIR:-${CLAWDBOT_TMUX_SOCKET_DIR:-/tmp/openclaw-tmux-sockets}}"
+  mkdir -p "$dir"
+  socket="${OPENCLAW_TMUX_SOCKET:-$dir/openclaw.sock}"
+  printf '%s' "$socket"
+}
+
+session_name() {
+  local prefix topic
+  prefix="${OPENCLAW_TMUX_PREFIX:-openclaw}"
+  topic="${1:-}"
+  if [[ -z "$topic" ]]; then
+    printf '%s' "$prefix"
+  else
+    printf '%s-%s' "$prefix" "$(sanitize_topic "$topic")"
+  fi
+}
+
+ensure_session() {
+  local sock session
+  sock="$1"
+  session="$2"
+  if ! tmux -S "$sock" has-session -t "$session" 2>/dev/null; then
+    tmux -S "$sock" new-session -d -s "$session" -n shell
+  fi
+}
+
+print_prompt() {
+  local topic session sock
+  topic="${1:-}"
+  sock="$(socket_path)"
+  session="$(session_name "$topic")"
+
+  cat <<EOF
+I want to collaborate via tmux.
+
+While we are both in the session please do not ask me to copy/paste commands to execute;
+rather, inject them into the tmux session yourself.
+** Ask before issuing destructive/irreversible actions**
+
+Always keep me informed about what you are doing/intend to do in the tmux session;
+you can do this by sending output to the chat, or comments to the tmux session, e.g.
+``# Now let's install those four libraries that were missing\`
+
+My tmux details:
+- socket: $sock
+- session: $session
+- primary pane target: $session:0.0
+
+To attach on my side (after creating it):
+- clawmux${topic:+ $topic}
+
+Shortcuts for interacting with this session (no need to pass -S sockpath):
+- Send keys:      clawmux type [-t $session:0.0] 'your command' Enter
+- Capture output: clawmux look [-t $session:0.0]
+
+Notes:
+- This uses an isolated tmux socket, so running "tmux ls" (without -S) may NOT show this session.
+- To list sessions on the correct socket, run: clawmux ls
+
+I will:
+- run: \`clawmux${topic:+ $topic}\`
+- then tell you "ok go" or “look now” when the pane is ready.
+EOF
+}
+
+main() {
+  need tmux
+
+  local cmd topic sock session
+  cmd="${1:-}"
+
+  case "$cmd" in
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    prompt)
+      topic="${2:-}"
+      print_prompt "$topic"
+      exit 0
+      ;;
+    --prompt)
+      topic="${2:-}"
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      ensure_session "$sock" "$session"
+      print_prompt "$topic"
+      # After printing, wait for a keypress, then attach (so the prompt can be copy/pasted first).
+      if [[ -t 0 || -t 1 ]] && [[ -r /dev/tty ]]; then
+        echo ""
+        read -r -p "Press Enter to attach to $session (Ctrl+C to cancel): " _ </dev/tty || true
+      else
+        echo "" >&2
+        echo "(No TTY available to wait for Enter; attaching now.)" >&2
+      fi
+      exec tmux -S "$sock" attach -t "$session"
+      ;;
+    send-keys|type)
+      shift
+      sock="$(socket_path)"
+      tmux -S "$sock" send-keys "$@"
+      exit 0
+      ;;
+    capture-pane|look)
+      shift
+      sock="$(socket_path)"
+      tmux -S "$sock" capture-pane -p "$@"
+      exit 0
+      ;;
+    ls)
+      sock="$(socket_path)"
+      tmux -S "$sock" list-sessions 2>/dev/null || echo "(no sessions on $sock)"
+      exit 0
+      ;;
+    kill)
+      topic="${2:-}"
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      tmux -S "$sock" kill-session -t "$session" 2>/dev/null || true
+      exit 0
+      ;;
+    "")
+      topic=""
+      ;;
+    *)
+      topic="$cmd"
+      ;;
+  esac
+
+  sock="$(socket_path)"
+  session="$(session_name "$topic")"
+  ensure_session "$sock" "$session"
+
+  exec tmux -S "$sock" attach -t "$session"
+}
+
+main "$@"
