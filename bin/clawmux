@@ -19,6 +19,8 @@ Usage:
   clawmux --prompt [topic]
   clawmux ls
   clawmux kill [topic]
+  clawmux type ARGS    # proxies: tmux -S <sock> send-keys ARGS
+  clawmux look ARGS    # proxies: tmux -S <sock> capture-pane ARGS
 
 Behavior:
   - Uses socket: $OPENCLAW_TMUX_SOCKET (or derived from $OPENCLAW_TMUX_SOCKET_DIR)
@@ -118,6 +120,10 @@ My tmux details:
 To attach on my side (after creating it):
 - clawmux${topic:+ $topic}
 
+Shortcuts for interacting with this session (no need to pass -S sockpath):
+- Send keys:      clawmux type [-t $session:0.0] 'your command' Enter
+- Capture output: clawmux look [-t $session:0.0]
+
 Notes:
 - This uses an isolated tmux socket, so running "tmux ls" (without -S) may NOT show this session.
 - To list sessions on the correct socket, run: clawmux ls
@@ -159,6 +165,18 @@ main() {
         echo "(No TTY available to wait for Enter; attaching now.)" >&2
       fi
       exec tmux -S "$sock" attach -t "$session"
+      ;;
+    send-keys|type)
+      shift
+      sock="$(socket_path)"
+      tmux -S "$sock" send-keys "$@"
+      exit 0
+      ;;
+    capture-pane|look)
+      shift
+      sock="$(socket_path)"
+      tmux -S "$sock" capture-pane -p "$@"
+      exit 0
       ;;
     ls)
       sock="$(socket_path)"
