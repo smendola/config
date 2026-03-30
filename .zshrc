@@ -94,11 +94,6 @@ export TIME="${ESC}[1;33mElapsed: %E${ESC}[0m"
 # +++file-or-func:11>
 PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 
-###############################################################
-### LOAD ALL STANDARD ALIASES AND FUNCTIONS
-###############################################################
-[ -f ~/.aliases ] && . ~/.aliases
-
 ## load any secret keys
 [ -f ~/.credentials ] && . ~/.credentials
 
@@ -173,6 +168,11 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+
+###############################################################
+### LOAD ALL STANDARD ALIASES AND FUNCTIONS
+###############################################################
+[ -f ~/.aliases ] && . ~/.aliases
 
 # This needs to be set after oh-my-zsh is loaded, or else
 # it gets unset
