@@ -88,19 +88,7 @@ kc() {
 }
 
 reset_test() {
-  (
-    set -ex
-	export RAILS_ENV=test
-
-	# Do not combine any of these; there are reasons
-	rails db:drop
-	rails db:create
-	rails db:migrate
-
-	git co db/schema.rb
-
-	rails db:seed
-  )
+  RAILS_ENV=test rails db:drop db:create
 }
 
 reset() {
