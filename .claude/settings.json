@@ -20,7 +20,11 @@
       "Bash(wc:*)",
       "Bash(file:*)",
       "Bash(stat:*)",
+      "Bash(bundle:*)",
+      "Bash(clawmux:*)",
       "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
       "mcp__plugin_telegram_telegram__reply",
       "mcp__plugin_telegram_telegram__react",
       "mcp__plugin_telegram_telegram__edit_message"
@@ -38,5 +42,6 @@
       }
     }
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true
 }
