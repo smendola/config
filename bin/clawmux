@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "${HOME}/bin/ansi_color.sh"
+
 # clawmux - opinionated tmux attach/create helper for OpenClaw operator workflow
 #
 # Goals:
@@ -12,15 +14,6 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 clawmux - attach to (or create) an OpenClaw tmux session
-
-Usage:
-  clawmux [topic]
-  clawmux prompt [topic]
-  clawmux --prompt [topic]
-  clawmux ls
-  clawmux kill [topic]
-  clawmux type ARGS    # proxies: tmux -S <sock> send-keys ARGS
-  clawmux look ARGS    # proxies: tmux -S <sock> capture-pane ARGS
 
 Behavior:
   - Uses socket: $OPENCLAW_TMUX_SOCKET (or derived from $OPENCLAW_TMUX_SOCKET_DIR)
@@ -35,12 +28,6 @@ Notes on prompts:
   - `clawmux prompt [topic]` prints instructions ONLY.
   - `clawmux --prompt [topic]` prints instructions, ensures the session exists, then
     waits for Enter and ATTACHES (so you can copy/paste first).
-
-Examples:
-  clawmux
-  clawmux gog
-  clawmux --prompt
-  clawmux --prompt gog
 
 Env:
   OPENCLAW_TMUX_SOCKET_DIR   (default: /tmp/openclaw-tmux-sockets)
@@ -90,12 +77,12 @@ ensure_session() {
   local sock session
   sock="$1"
   session="$2"
-  if ! tmux -S "$sock" has-session -t "$session" 2>/dev/null; then
-    tmux -S "$sock" new-session -d -s "$session" -n shell
+  if ! tmux -S "$sock" has-session -t "${session}" 2>/dev/null; then
+    tmux -S "$sock" new-session -d -s "${session}" -n shell
   fi
 }
 
-print_prompt() {
+prompt_text() {
   local topic session sock
   topic="${1:-}"
   sock="$(socket_path)"
@@ -110,28 +97,52 @@ rather, inject them into the tmux session yourself.
 
 Always keep me informed about what you are doing/intend to do in the tmux session;
 you can do this by sending output to the chat, or comments to the tmux session, e.g.
-``# Now let's install those four libraries that were missing\`
+> # Now let's install those four libraries that were missing
 
 My tmux details:
 - socket: $sock
-- session: $session
-- primary pane target: $session:0.0
+- session: ${session}
+- primary pane target: ${session}:0.0
 
-To attach on my side (after creating it):
-- clawmux${topic:+ $topic}
+The utility program \`clawmux\` will facilitate this this interaction.
 
 Shortcuts for interacting with this session (no need to pass -S sockpath):
-- Send keys:      clawmux type [-t $session:0.0] 'your command' Enter
-- Capture output: clawmux look [-t $session:0.0]
+- Send command:   clawmux send-command [-t ${session}:0.0] 'bundle install'
+- Send keys:      clawmux send-keys [-t ${session}:0.0] C-x C-c
+- Capture output: clawmux capture-pane [-t ${session}:0.0]
 
-Notes:
-- This uses an isolated tmux socket, so running "tmux ls" (without -S) may NOT show this session.
-- To list sessions on the correct socket, run: clawmux ls
+Synchronization (ready/await):
+  Do not use "sleep" to await long running commands (> 8sec only); instead:
+  - Inject commands ending with \`; clawmux ready\` into the pane.
+  - Then locally (not in tmux) run \`clawmux await ${session}\` which blocks until \`ready\` fires.
+    This command uses tmux wait-for internally — no polling, no flag files.
+  - Only do this if you would otherwise be tempted to use sleep; not on every quick command
+
+Examples (AI agent side):
+  clawmux send-keys -t ${session}:0.0 'make build; clawmux ready' Enter
+  clawmux await proxy-debug-session --timeout 120 # deal with potential hangs
+  clawmux capture-pane -t ${session}:0.0 # see the results of the build
 
 I will:
 - run: \`clawmux${topic:+ $topic}\`
-- then tell you "ok go" or “look now” when the pane is ready.
+- then tell you “ok go” or words to that effect when the pane is ready.
 EOF
+}
+
+copy_prompt_to_clipboard() {
+  local prompt
+  prompt="$1"
+
+  (echo "$prompt" | xsel -i -b 2>/dev/null && echo "${Green}(Sent to clipboard)${Color_Off}") || ( echo "${Red}(No clipboard)${Color_Off}" )
+}
+
+print_prompt() {
+  local prompt
+  prompt="$(prompt_text "$1")"
+  printf '%s' "$Yellow"
+  printf '%s\n' "$prompt"
+  printf '%s\n' "$Color_Off"
+  copy_prompt_to_clipboard "$prompt"
 }
 
 main() {
@@ -154,17 +165,23 @@ main() {
       topic="${2:-}"
       sock="$(socket_path)"
       session="$(session_name "$topic")"
-      ensure_session "$sock" "$session"
+      ensure_session "$sock" "${session}"
       print_prompt "$topic"
       # After printing, wait for a keypress, then attach (so the prompt can be copy/pasted first).
       if [[ -t 0 || -t 1 ]] && [[ -r /dev/tty ]]; then
         echo ""
-        read -r -p "Press Enter to attach to $session (Ctrl+C to cancel): " _ </dev/tty || true
+        read -r -p "Press Enter to attach to ${session} (Ctrl+C to cancel): " _ </dev/tty || true
       else
         echo "" >&2
         echo "(No TTY available to wait for Enter; attaching now.)" >&2
       fi
-      exec tmux -S "$sock" attach -t "$session"
+      exec tmux -S "$sock" attach -t "${session}"
+      ;;
+    send-command)
+      shift
+      sock="$(socket_path)"
+      tmux -S "$sock" send-keys "$@" Enter
+      exit 0
       ;;
     send-keys|type)
       shift
@@ -178,6 +195,51 @@ main() {
       tmux -S "$sock" capture-pane -p "$@"
       exit 0
       ;;
+    ready)
+      # Called from inside a tmux pane; infer socket and session automatically.
+      if [[ -z "${TMUX:-}" ]]; then
+        echo "clawmux ready: not inside a tmux session (\$TMUX not set)" >&2
+        exit 1
+      fi
+      local inferred_sock inferred_session channel flag
+      inferred_sock="${TMUX%%,*}"
+      inferred_session="$(tmux display-message -p '#S')"
+      channel="${inferred_session}-ready"
+      flag="/tmp/openclaw-ready-${inferred_session}"
+      touch "$flag"
+      tmux -S "$inferred_sock" wait-for -S "$channel"
+      exit 0
+      ;;
+    await)
+      topic="${2:-}"
+      if [[ -z "$topic" ]]; then
+        echo "Usage: clawmux await SESSION [--timeout N]" >&2
+        exit 1
+      fi
+      local timeout_sec=60
+      if [[ "${3:-}" == "--timeout" ]]; then
+        timeout_sec="${4:?--timeout requires a value}"
+      fi
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      channel="${session}-ready"
+      flag="/tmp/openclaw-ready-${session}"
+      # If ready already fired before we got here, the flag file will exist.
+      if [[ -f "$flag" ]]; then
+        rm -f "$flag"
+        exit 0
+      fi
+      if command -v timeout >/dev/null 2>&1; then
+        timeout "$timeout_sec" tmux -S "$sock" wait-for "$channel" || {
+          echo "clawmux await: timed out after ${timeout_sec}s waiting for $channel" >&2
+          exit 1
+        }
+      else
+        tmux -S "$sock" wait-for "$channel"
+      fi
+      rm -f "$flag"
+      exit 0
+      ;;
     ls)
       sock="$(socket_path)"
       tmux -S "$sock" list-sessions 2>/dev/null || echo "(no sessions on $sock)"
@@ -187,7 +249,7 @@ main() {
       topic="${2:-}"
       sock="$(socket_path)"
       session="$(session_name "$topic")"
-      tmux -S "$sock" kill-session -t "$session" 2>/dev/null || true
+      tmux -S "$sock" kill-session -t "${session}" 2>/dev/null || true
       exit 0
       ;;
     "")
@@ -200,9 +262,9 @@ main() {
 
   sock="$(socket_path)"
   session="$(session_name "$topic")"
-  ensure_session "$sock" "$session"
+  ensure_session "$sock" "${session}"
 
-  exec tmux -S "$sock" attach -t "$session"
+  exec tmux -S "$sock" attach -t "${session}"
 }
 
 main "$@"

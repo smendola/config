@@ -477,3 +477,8 @@ wt+() {
 wt-() {
   wtr "$@"
 }
+
+q() {
+  kiro-cli chat --trust-tools=fs_read,code "$@"
+}
+
