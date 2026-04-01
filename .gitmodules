@@ -1,4 +1,0 @@
-[submodule ".oh-my-zsh"]
-	path = .oh-my-zsh
-	url = https://github.com/smendola/.oh-my-zsh.git
-	branch = main
