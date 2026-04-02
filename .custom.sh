@@ -459,6 +459,7 @@ co-s() {(
   git co release-web
 )}
 
+unalias gp || true
 gp() {
   git co .idea
   git pull --recurse-submodules
