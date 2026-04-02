@@ -38,6 +38,7 @@ ide() {
 alias clause=claude
 claude() {
   command claude --channels plugin:telegram@claude-plugins-official "$@"
+  unkitty
 }
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -673,6 +674,8 @@ expand-env ()
        echo "aurora-${app/aurora-//}"
   esac
 }
+
+precmd_functions+=(unkitty)
 
 #alias cursor='PYTHONPATH=$(python -c "import site; print(site.getsitepackages()[0])") ~/Applications/cursor.AppImage --no-sandbox'
 
