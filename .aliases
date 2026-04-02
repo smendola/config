@@ -518,3 +518,15 @@ q() {
   kiro-cli chat --trust-tools=fs_read,code "$@"
 }
 
+# kitty is a special tty mode
+unkitty() {
+  printf '\e[>0u' && stty sane
+}
+
+tit() {
+  if [[ $1 = status ]]; then
+    echo "Sagging"
+  else
+    git "$@"
+  fi
+}
