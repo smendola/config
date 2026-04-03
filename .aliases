@@ -175,6 +175,15 @@ function dots () {
   )
 }
 
+git() {
+  if [[ $(pwd) = $HOME && $1 != clone ]]
+  then
+    command git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
+  else
+    command git "$@"
+  fi
+}
+
 function syncdots()
 {
     (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
