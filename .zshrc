@@ -96,11 +96,8 @@ export TIME="${ESC}[1;33mElapsed: %E${ESC}[0m"
 # +++file-or-func:11>
 PS4="+%{%F{green}%}%N%{$reset_color%}:%{%F{yellow}%}%i%{%f%}> "
 
-###############################################################
-### LOAD ALL STANDARD ALIASES AND FUNCTIONS
-###############################################################
-[ -f ~/.aliases ] && . ~/.aliases
-
+## load any secret keys
+[ -f ~/.credentials ] && . ~/.credentials
 
 export LESSOPEN='|lesspipe.sh %s'
 #export LESS=''
@@ -162,10 +159,11 @@ function cls() {
 
 histchars='!;#'
 
+ZSH_CUSTOM=$HOME/.oh-my-zsh-custom
 ZSH=$HOME/.oh-my-zsh
 if [[ -f $ZSH/oh-my-zsh.sh ]]
 then
-    plugins=(DISABLED-git DISABLED-mvn pip dircycle encode64 urltools)
+    plugins=(git pip dircycle encode64 urltools)
     # Path to your oh-my-zsh configuration.
     ZSH_THEME="sm"
     MYBG=012
@@ -173,6 +171,11 @@ then
 else
     echo "*** Oh-my-zsh is not present"
 fi
+
+###############################################################
+### LOAD ALL STANDARD ALIASES AND FUNCTIONS
+###############################################################
+[ -f ~/.aliases ] && . ~/.aliases
 
 # This needs to be set after oh-my-zsh is loaded, or else
 # it gets unset
@@ -209,6 +212,7 @@ then
 # place this after nvm initialization!
 autoload -U add-zsh-hook
 load-nvmrc() {
+  command -v tr &>/dev/null || return
   local node_version="$(nvm version)"
   local nvmrc_path="$(nvm_find_nvmrc)"
 
@@ -233,6 +237,8 @@ export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
 
 eval "$(direnv hook zsh)"
+# Move direnv's chpwd hook to the end so it runs after rvm/nvm hooks
+chpwd_functions=( ${chpwd_functions[@]:#_direnv_hook} _direnv_hook )
 
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   # echo "vte init for tilix"

@@ -33,17 +33,19 @@ while true; do
     fi
 done
 
+
 rm -rf config .config.git .oh-my-zsh
 
 git config --global --add core.autocrlf false
 git clone -b $BRANCH https://smendola@github.com/smendola/config.git
 (cd config && tar cf - .) | tar xf -
 mv .git .config.git
-dots submodule update --init
 
 sudo apt-get install -y zsh
-chsh $USER -s /usr/bin/zsh
 
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+chsh $USER -s /usr/bin/zsh
 
 # install Meslo fonts
 mkdir -p ~/.local/share/fonts

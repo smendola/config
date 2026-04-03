@@ -20,6 +20,33 @@ alias type='builtin type -f'
 alias undos=dos2unix
 alias du='du -h'
 
+# Safe exec: verify command exists before replacing the shell process
+exec() {
+  # Parse zsh exec flags to find the actual command name:
+  #   -l        login shell
+  #   -c        clear environment
+  #   -a name   set argv[0] (consumes an extra argument)
+  #   --        end of flags
+  local -a a=("$@")
+  local i cmd
+  for (( i = 1; i <= $#a; i++ )); do
+    case ${a[i]} in
+      --)  (( i++ )); cmd=${a[i]}; break ;;
+      -a)  (( i++ ))                     ;;  # skip -a's value
+      -a*) ;;                                # -aFOO form, no extra arg
+      -*)  ;;                                # -l, -c, etc.
+      *)   cmd=${a[i]}; break               ;;
+    esac
+  done
+
+  if [[ -n $cmd ]] && ! command -v "$cmd" &>/dev/null; then
+    print -u2 "exec: $cmd: not found"
+    return 127
+  fi
+
+  builtin exec "$@"
+}
+
 alias ts=tailscale
 
 trace() ( set -x; "$@" )
@@ -62,6 +89,8 @@ function gi() {
     command gi "$@"
   fi
 }
+
+alias unmanaged="git ls-files --others --exclude-standard"
 
 function ec() {
   # Note: emacsclient goes with emacs, NOT xemacs
@@ -435,3 +464,69 @@ xscale() {
   GDK_SCALE=1 GDK_DPI_SCALE=${scale} "$@"
 }
 
+
+wtg() {
+   local branch=${1}
+   local path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{wt=$2} $2==b{print wt}')
+   if [[ -n $path ]]; then
+     cd $path
+   else
+     echo "no worktree for branch $branch"
+   fi
+}
+_wtg() {
+  local -a branches
+  branches=(${(f)"$(git worktree list --porcelain 2>/dev/null | awk '/^branch /{sub(".*refs/heads/",""); print}')"})
+  _describe 'worktree branch' branches
+}
+compdef _wtg wtg
+
+wta() {
+  local branch=${1}
+  local dir=~/wt/${branch/\//-}
+  if git show-ref --verify --quiet refs/heads/$branch; then
+    git worktree add $dir $branch
+  else
+    git worktree add -b $branch $dir
+  fi
+}
+
+wtr() {
+  if [[ $1 == -f ]]; then
+    rm -rf $2
+    git worktree prune
+  else
+    git worktree remove $1
+  fi
+}
+_wtr() {
+  local -a worktrees
+  worktrees=(${(f)"$(git worktree list --porcelain | awk '/^worktree /{print $2}' | tail -n +2)"})
+  _describe 'worktree' worktrees
+}
+compdef _wtr wtr
+
+wt+() {
+  wta "$@"
+}
+
+wt-() {
+  wtr "$@"
+}
+
+q() {
+  kiro-cli chat --trust-tools=fs_read,code "$@"
+}
+
+# kitty is a special tty mode
+unkitty() {
+  printf '\e[>0u' && stty sane
+}
+
+tit() {
+  if [[ $1 = status ]]; then
+    echo "Sagging"
+  else
+    git "$@"
+  fi
+}

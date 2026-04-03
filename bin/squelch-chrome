@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+# 1. Wrapper that silences chrome output
+cat > ~/bin/google-chrome << 'EOF'
+#!/bin/bash
+/usr/bin/google-chrome "$@" > /tmp/chrome.log 2>&1
+EOF
+chmod +x ~/bin/google-chrome
+
+# 2. Local .desktop file pointing to wrapper
+mkdir -p ~/.local/share/applications
+sed 's|Exec=/usr/bin/google-chrome-stable|Exec='"$HOME"'/bin/google-chrome|g' \
+  /usr/share/applications/google-chrome.desktop \
+  > ~/.local/share/applications/google-chrome.desktop
+update-desktop-database ~/.local/share/applications/
+
+# 3. Register as default handler
+xdg-mime default google-chrome.desktop x-scheme-handler/http
+xdg-mime default google-chrome.desktop x-scheme-handler/https
+
+echo "Done. xdg-open will now open Chrome silently."

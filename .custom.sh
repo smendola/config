@@ -38,7 +38,10 @@ ide() {
 alias clause=claude
 claude() {
   command claude --channels plugin:telegram@claude-plugins-official "$@"
+  unkitty
 }
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
 export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
@@ -86,19 +89,7 @@ kc() {
 }
 
 reset_test() {
-  (
-    set -ex
-	export RAILS_ENV=test
-
-	# Do not combine any of these; there are reasons
-	rails db:drop
-	rails db:create
-	rails db:migrate
-
-	git co db/schema.rb
-
-	rails db:seed
-  )
+  RAILS_ENV=test rails db:drop db:create
 }
 
 reset() {
@@ -468,6 +459,7 @@ co-s() {(
   git co release-web
 )}
 
+unalias gp || true
 gp() {
   git co .idea
   git pull --recurse-submodules
@@ -683,6 +675,8 @@ expand-env ()
        echo "aurora-${app/aurora-//}"
   esac
 }
+
+precmd_functions+=(unkitty)
 
 #alias cursor='PYTHONPATH=$(python -c "import site; print(site.getsitepackages()[0])") ~/Applications/cursor.AppImage --no-sandbox'
 
