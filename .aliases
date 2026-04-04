@@ -205,7 +205,7 @@ function dots () {
 }
 
 git() {
-  if [[ $(pwd) = $HOME ]]
+  if [[ $(pwd) = $HOME && $1 != clone ]]
   then
     command git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
   else
