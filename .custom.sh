@@ -74,16 +74,6 @@ c() {(
   test -f Procfile || return 1
   rails c
 )}
-ksrv() {(
-  cd_proj_root
-  test -f Procfile || return 1
-  bin/ksrv
-)}
-kserv() {(
-  cd_proj_root
-  test -f Procfile || return 1
-  bin/ksrv
-)}
 kc() {
   spring stop && sleep 2 && pkill -f spring
   pkill -f 'rails c' && sleep 3
