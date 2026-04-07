@@ -9,7 +9,7 @@ unset __VK_LAYER_NV_optimus
 unset MESA_GL_VERSION_OVERRIDE
 unset VGL_DISPLAY
 
-MYBG=056
+export MYBG=056 # export necessary to play nice with direnv
 export EDITOR=micro
 export SUDO_EDITOR=micro
 WIN_PROFILE_DIR="$(wslpath -u $(cd /mnt/c; /mnt/c/windows/system32/cmd.exe /c 'echo %USERPROFILE%' | tr -d '\r'))"
@@ -36,6 +36,10 @@ ide() {
 }
 
 alias clause=claude
+dsp() {
+  claude --dangerously-skip-permissions "$@"
+}
+
 claude() {
   command claude --channels plugin:telegram@claude-plugins-official "$@"
   unkitty
@@ -69,16 +73,6 @@ c() {(
   cd_proj_root
   test -f Procfile || return 1
   rails c
-)}
-ksrv() {(
-  cd_proj_root
-  test -f Procfile || return 1
-  bin/ksrv
-)}
-kserv() {(
-  cd_proj_root
-  test -f Procfile || return 1
-  bin/ksrv
 )}
 kc() {
   spring stop && sleep 2 && pkill -f spring
