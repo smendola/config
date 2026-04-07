@@ -36,6 +36,10 @@ ide() {
 }
 
 alias clause=claude
+dsp() {
+  claude --dangerously-skip-permissions "$@"
+}
+
 claude() {
   command claude --channels plugin:telegram@claude-plugins-official "$@"
   unkitty

@@ -447,7 +447,7 @@ reify() {
 project_root() {
   local dir=$PWD
   while [[ $dir != / ]]; do
-    [[ -e $dir/.git || -e $dir/.project_root ]] && { echo $dir; return; }
+    [[ -e $dir/.git || -e $dir/.project-root ]] && { echo $dir; return; }
     dir=${dir:h}
   done
   echo "project_root: not found" >&2
@@ -515,7 +515,7 @@ wt-() {
 }
 
 q() {
-  kiro-cli chat --trust-tools=fs_read,code "$@"
+  kiro-cli chat --tui --trust-tools=fs_read,code "$@"
 }
 
 # kitty is a special tty mode
