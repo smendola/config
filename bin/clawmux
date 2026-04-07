@@ -21,13 +21,13 @@ Behavior:
       topic omitted -> openclaw
       topic given   -> openclaw-<topic>
   - Creates session if missing.
-  - Default action attaches.
+  - Default action: prints prompt, ensures session exists, waits for Enter, then attaches.
   - Never seeds commands into the session.
 
 Notes on prompts:
-  - `clawmux prompt [topic]` prints instructions ONLY.
-  - `clawmux --prompt [topic]` prints instructions, ensures the session exists, then
-    waits for Enter and ATTACHES (so you can copy/paste first).
+  - `clawmux [topic]`    prints prompt, waits for Enter, then attaches.
+  - `clawmux -q [topic]` attaches quietly (no prompt).
+  - `clawmux prompt [topic]` prints instructions ONLY (no attach).
 
 Env:
   OPENCLAW_TMUX_SOCKET_DIR   (default: /tmp/openclaw-tmux-sockets)
@@ -161,22 +161,7 @@ main() {
       print_prompt "$topic"
       exit 0
       ;;
-    --prompt)
-      topic="${2:-}"
-      sock="$(socket_path)"
-      session="$(session_name "$topic")"
-      ensure_session "$sock" "${session}"
-      print_prompt "$topic"
-      # After printing, wait for a keypress, then attach (so the prompt can be copy/pasted first).
-      if [[ -t 0 || -t 1 ]] && [[ -r /dev/tty ]]; then
-        echo ""
-        read -r -p "Press Enter to attach to ${session} (Ctrl+C to cancel): " _ </dev/tty || true
-      else
-        echo "" >&2
-        echo "(No TTY available to wait for Enter; attaching now.)" >&2
-      fi
-      exec tmux -S "$sock" attach -t "${session}"
-      ;;
+
     send-command)
       shift
       sock="$(socket_path)"
@@ -252,6 +237,13 @@ main() {
       tmux -S "$sock" kill-session -t "${session}" 2>/dev/null || true
       exit 0
       ;;
+    -q)
+      topic="${2:-}"
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      ensure_session "$sock" "$session"
+      exec tmux -S "$sock" attach -t "$session"
+      ;;
     "")
       topic=""
       ;;
@@ -262,9 +254,16 @@ main() {
 
   sock="$(socket_path)"
   session="$(session_name "$topic")"
-  ensure_session "$sock" "${session}"
-
-  exec tmux -S "$sock" attach -t "${session}"
+  ensure_session "$sock" "$session"
+  print_prompt "$topic"
+  if [[ -t 0 || -t 1 ]] && [[ -r /dev/tty ]]; then
+    echo ""
+    read -r -p "Press Enter to attach to ${session} (Ctrl+C to cancel): " _ </dev/tty || true
+  else
+    echo "" >&2
+    echo "(No TTY available to wait for Enter; attaching now.)" >&2
+  fi
+  exec tmux -S "$sock" attach -t "$session"
 }
 
 main "$@"
