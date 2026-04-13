@@ -192,6 +192,8 @@ PATH=${PATH/:.:/:}
 PATH=${PATH/:.\/*:/:}
 PATH=${PATH%:}
 
+export LD_LIBRARY_PATH="$HOME/.local/lib:$LD_LIBRARY_PATH"
+
 # deprecated variable, causes warnings to stdout
 unset GREP_OPTIONS
 unset GREP_COLOR
