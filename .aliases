@@ -515,6 +515,6 @@ wt-() {
 }
 
 q() {
-  kiro-cli chat --tui --trust-tools=fs_read,code "$@"
+  kiro-cli chat --trust-tools=fs_read,code "$@"
 }
 
