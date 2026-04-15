@@ -32,7 +32,8 @@
   },
   "enabledPlugins": {
     "telegram@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true
+    "ruby-lsp@claude-plugins-official": true,
+    "postman@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {

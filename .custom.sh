@@ -24,6 +24,8 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # heroku autocomplete setup
 HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH;
 
+FAST_LOAD=1
+
 test -d ~/.rvm/scripts/rvm && source ~/.rvm/scripts/rvm
 
 path+=(/opt/RubyMine/bin)
@@ -495,6 +497,7 @@ alias rnd='react-native-debugger --no-sandbox'
 
 # path+=(/mnt/c/Users/*/AppData/Local/android/Sdk/platform-tools)
 
+alias rspec='DISABLE_SPRING=1 bundle exec rspec'
 alias rrspec="reset_test && rspec"
 
 alias ntp='sudo ntpdate pool.ntp.org'

@@ -105,12 +105,13 @@ alias s=subl
 
 alias deref=realpath
 
+# superseded
 # run commands, displaying the command at as the terminal's title,
 # e.g.
-function wt () {
-    title "$1" "$@"
-    "$@" ;# no need to use "eval"; that actually causes problems
-}
+#function wt () {
+#    title "$1" "$@"
+#    "$@" ;# no need to use "eval"; that actually causes problems
+#}
 
 function tp () {
   TITLE_PREFIX="$@"
@@ -465,6 +466,7 @@ xscale() {
 }
 
 
+alias wt=wtg
 wtg() {
    local branch=${1}
    local path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{wt=$2} $2==b{print wt}')
