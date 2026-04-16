@@ -48,7 +48,7 @@ claude() {
   unkitty
 }
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+test -d /home/linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 export AURORA_KEYSTORE_PASS=GyTpH9zq7JCybEVPWvCq6DfAPHpcf
 export RAILS_MASTER_KEY=645c50d1b278580c6a16a34cf7aa8fec
