@@ -12,7 +12,8 @@ unset VGL_DISPLAY
 export MYBG=056 # export necessary to play nice with direnv
 export EDITOR=micro
 export SUDO_EDITOR=micro
-WIN_PROFILE_DIR="$(wslpath -u $(cd /mnt/c; /mnt/c/windows/system32/cmd.exe /c 'echo %USERPROFILE%' | tr -d '\r'))"
+
+WIN_PROFILE_DIR=$(wslpath -u "$(wslvar USERPROFILE)")
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/dev/.sdkman"
@@ -38,8 +39,8 @@ ide() {
 }
 
 alias clause=claude
-dsp() {
-  claude --dangerously-skip-permissions "$@"
+claude() {
+  command claude --dangerously-skip-permissions "$@"
 }
 
 claude() {
