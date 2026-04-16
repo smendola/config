@@ -456,20 +456,6 @@ co-s() {(
   git co release-web
 )}
 
-unalias gp || true
-gp() {
-  git co .idea
-  git pull --recurse-submodules
-}
-
-gpp() {
-    echo "Synching core"
-    (cdc && trace git pull && trace git push) &&
-    echo "Synching top level"
-    trace git co -- .idea;
-    trace git pull && trace git push;
-}
-
 show-stash() {
   local n=${1:-0}
   git difftool -y "stash@{$n}~" "stash@{$n}"
