@@ -30,6 +30,7 @@
       "mcp__plugin_telegram_telegram__edit_message"
     ]
   },
+  "model": "sonnet",
   "enabledPlugins": {
     "telegram@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
@@ -52,6 +53,5 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "model": "haiku"
+  "skipDangerousModePermissionPrompt": true
 }
