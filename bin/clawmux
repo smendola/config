@@ -24,10 +24,22 @@ Behavior:
   - Default action: prints prompt, ensures session exists, waits for Enter, then attaches.
   - Never seeds commands into the session.
 
-Notes on prompts:
-  - `clawmux [topic]`    prints prompt, waits for Enter, then attaches.
-  - `clawmux -q [topic]` attaches quietly (no prompt).
-  - `clawmux prompt [topic]` prints instructions ONLY (no attach).
+Subcommands:
+  clawmux [topic]              Print prompt, create session, wait for Enter, attach.
+  clawmux -q [topic]           Attach quietly (no prompt).
+  clawmux prompt [topic]       Print instructions only (no attach).
+  clawmux send-command [-t T] CMD   Send CMD + Enter to pane.
+  clawmux send-keys [-t T] KEYS    Send raw keys to pane.
+  clawmux capture-pane [-t T]      Capture pane output.
+  clawmux run [-t T] [--timeout N] CMD
+      Send CMD to pane and block until it finishes. Uses a unique nonce
+      internally — no coordination required. This is the preferred way to
+      run long commands.
+  clawmux ready [--nonce ID]   Signal completion (called inside pane).
+  clawmux await SESSION [--timeout N]
+      Wait for a ready signal. SESSION is a literal session name, not a topic.
+  clawmux ls                   List sessions on the socket.
+  clawmux kill [topic]         Kill a session.
 
 Env:
   OPENCLAW_TMUX_SOCKET_DIR   (default: /tmp/openclaw-tmux-sockets)
@@ -111,17 +123,17 @@ Shortcuts for interacting with this session (no need to pass -S sockpath):
 - Send keys:      clawmux send-keys [-t ${session}:0.0] C-x C-c
 - Capture output: clawmux capture-pane [-t ${session}:0.0]
 
-Synchronization (ready/await):
-  Do not use "sleep" to await long running commands (> 8sec only); instead:
-  - Inject commands ending with \`; clawmux ready\` into the pane.
-  - Then locally (not in tmux) run \`clawmux await ${session}\` which blocks until \`ready\` fires.
-    This command uses tmux wait-for internally — no polling, no flag files.
-  - Only do this if you would otherwise be tempted to use sleep; not on every quick command
+Waiting for long commands (> 8sec):
+  Do not use "sleep"; use \`clawmux run\` which sends the command and blocks
+  until it finishes:
+    clawmux run [-t ${session}:0.0] [--timeout 120] 'make build'
+  This works by appending a unique completion marker to the command and using
+  tmux wait-for internally — no polling, no sleep, no coordination needed.
+  Only use this for genuinely long commands; not every quick command.
 
 Examples (AI agent side):
-  clawmux send-keys -t ${session}:0.0 'make build; clawmux ready' Enter
-  clawmux await proxy-debug-session --timeout 120 # deal with potential hangs
-  clawmux capture-pane -t ${session}:0.0 # see the results of the build
+  clawmux run -t ${session}:0.0 --timeout 120 'make build'
+  clawmux capture-pane -t ${session}:0.0   # see the results
 
 I will:
 - run: \`clawmux${topic:+ $topic}\`
@@ -181,23 +193,47 @@ main() {
       exit 0
       ;;
     ready)
-      # Called from inside a tmux pane; infer socket and session automatically.
-      if [[ -z "${TMUX:-}" ]]; then
-        echo "clawmux ready: not inside a tmux session (\$TMUX not set)" >&2
-        exit 1
+      # Called from inside a tmux pane after a command finishes.
+      # Two modes:
+      #   clawmux ready --nonce ID   (preferred — used by `clawmux run`)
+      #   clawmux ready              (legacy — signals session-based channel)
+      local nonce=""
+      if [[ "${2:-}" == "--nonce" ]]; then
+        nonce="${3:?--nonce requires a value}"
       fi
-      local inferred_sock inferred_session channel flag
-      inferred_sock="${TMUX%%,*}"
-      inferred_session="$(tmux display-message -p '#S')"
-      channel="${inferred_session}-ready"
-      flag="/tmp/openclaw-ready-${inferred_session}"
-      touch "$flag"
-      tmux -S "$inferred_sock" wait-for -S "$channel"
+
+      if [[ -n "$nonce" ]]; then
+        # Nonce mode: signal the nonce-specific channel.
+        # We need the socket path. If inside tmux, infer it; otherwise use default.
+        local ready_sock
+        if [[ -n "${TMUX:-}" ]]; then
+          ready_sock="${TMUX%%,*}"
+        else
+          ready_sock="$(socket_path)"
+        fi
+        local nonce_flag="/tmp/openclaw-nonce-${nonce}"
+        touch "$nonce_flag"
+        tmux -S "$ready_sock" wait-for -S "nonce-${nonce}" 2>/dev/null || true
+      else
+        # Legacy session-based mode.
+        if [[ -z "${TMUX:-}" ]]; then
+          echo "clawmux ready: not inside a tmux session (\$TMUX not set)" >&2
+          exit 1
+        fi
+        local inferred_sock inferred_session channel flag
+        inferred_sock="${TMUX%%,*}"
+        inferred_session="$(tmux display-message -p '#S')"
+        channel="${inferred_session}-ready"
+        flag="/tmp/openclaw-ready-${inferred_session}"
+        touch "$flag"
+        tmux -S "$inferred_sock" wait-for -S "$channel"
+      fi
       exit 0
       ;;
     await)
-      topic="${2:-}"
-      if [[ -z "$topic" ]]; then
+      # await takes a literal session name (NOT a topic).
+      session="${2:-}"
+      if [[ -z "$session" ]]; then
         echo "Usage: clawmux await SESSION [--timeout N]" >&2
         exit 1
       fi
@@ -206,9 +242,8 @@ main() {
         timeout_sec="${4:?--timeout requires a value}"
       fi
       sock="$(socket_path)"
-      session="$(session_name "$topic")"
-      channel="${session}-ready"
-      flag="/tmp/openclaw-ready-${session}"
+      local channel="${session}-ready"
+      local flag="/tmp/openclaw-ready-${session}"
       # If ready already fired before we got here, the flag file will exist.
       if [[ -f "$flag" ]]; then
         rm -f "$flag"
@@ -223,6 +258,53 @@ main() {
         tmux -S "$sock" wait-for "$channel"
       fi
       rm -f "$flag"
+      exit 0
+      ;;
+    run)
+      # Atomic send-and-wait. Generates a unique nonce, appends
+      # `; clawmux ready --nonce NONCE` to the command, sends it,
+      # then waits for that nonce to be signaled.
+      shift
+      local target="" timeout_sec=60 run_cmd=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          -t) target="$2"; shift 2 ;;
+          --timeout) timeout_sec="$2"; shift 2 ;;
+          *) run_cmd="$1"; shift; break ;;
+        esac
+      done
+      if [[ -z "$run_cmd" ]]; then
+        echo "Usage: clawmux run [-t target] [--timeout N] 'command'" >&2
+        exit 1
+      fi
+      sock="$(socket_path)"
+      local nonce
+      nonce="$(head -c 12 /dev/urandom | base64 | tr -cd 'a-zA-Z0-9' | head -c 16)"
+      local nonce_flag="/tmp/openclaw-nonce-${nonce}"
+      local full_cmd="${run_cmd}; clawmux ready --nonce ${nonce}"
+
+      # Send the command to the pane.
+      if [[ -n "$target" ]]; then
+        tmux -S "$sock" send-keys -t "$target" "$full_cmd" Enter
+      else
+        tmux -S "$sock" send-keys "$full_cmd" Enter
+      fi
+
+      # Wait for the nonce signal. Check flag first (ready may have fired already).
+      if [[ -f "$nonce_flag" ]]; then
+        rm -f "$nonce_flag"
+        exit 0
+      fi
+      if command -v timeout >/dev/null 2>&1; then
+        timeout "$timeout_sec" tmux -S "$sock" wait-for "nonce-${nonce}" || {
+          echo "clawmux run: timed out after ${timeout_sec}s" >&2
+          rm -f "$nonce_flag"
+          exit 1
+        }
+      else
+        tmux -S "$sock" wait-for "nonce-${nonce}"
+      fi
+      rm -f "$nonce_flag"
       exit 0
       ;;
     ls)
