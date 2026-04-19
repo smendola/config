@@ -39,12 +39,9 @@ ide() {
 }
 
 alias clause=claude
-claude() {
-  command claude --dangerously-skip-permissions "$@"
-}
 
 claude() {
-  command claude --channels plugin:telegram@claude-plugins-official "$@"
+  command claude --dangerously-skip-permissions --channels plugin:telegram@claude-plugins-official "$@"
   unkitty
 }
 
