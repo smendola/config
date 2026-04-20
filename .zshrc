@@ -27,6 +27,20 @@ if [[ ! -z $WSLENV ]]; then
    fi
 fi
 
+# X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
+unset X11_DPY_PORT
+[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]+:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
+
+if [[ $DISPLAY = ':0' ]]; then
+  # :0 does not necessarily mean port 6000, could be other kind of socket
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+elif [[ $X11_DPY_PORT ]]; then
+  nc -w1 ${DISPLAY/:*/} $X11_DPY_PORT && 
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+else
+  echo "RISK OF HANG HERE" && 
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
