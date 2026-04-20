@@ -3,7 +3,7 @@ set -euo pipefail
 
 source "${HOME}/bin/ansi_color.sh"
 
-# clawmux - opinionated tmux attach/create helper for OpenClaw operator workflow
+# panepal - opinionated tmux attach/create helper for panepal operator workflow
 #
 # Goals:
 # - One short command to attach to the “right” tmux session.
@@ -13,38 +13,38 @@ source "${HOME}/bin/ansi_color.sh"
 
 usage() {
   cat <<'EOF'
-clawmux - attach to (or create) an OpenClaw tmux session
+panepal - attach to (or create) a panepal tmux session
 
 Behavior:
-  - Uses socket: $OPENCLAW_TMUX_SOCKET (or derived from $OPENCLAW_TMUX_SOCKET_DIR)
+  - Uses socket: $PANEPAL_TMUX_SOCKET (or derived from $PANEPAL_TMUX_SOCKET_DIR)
   - Session name:
-      topic omitted -> openclaw
-      topic given   -> openclaw-<topic>
+      topic omitted -> panepal
+      topic given   -> panepal-<topic>
   - Creates session if missing.
   - Default action: prints prompt, ensures session exists, waits for Enter, then attaches.
   - Never seeds commands into the session.
 
 Subcommands:
-  clawmux [topic]              Print prompt, create session, wait for Enter, attach.
-  clawmux -q [topic]           Attach quietly (no prompt).
-  clawmux prompt [topic]       Print instructions only (no attach).
-  clawmux send-command [-t T] CMD   Send CMD + Enter to pane.
-  clawmux send-keys [-t T] KEYS    Send raw keys to pane.
-  clawmux capture-pane [-t T]      Capture pane output.
-  clawmux run [-t T] [--timeout N] CMD
+  panepal [-t topic]           Print prompt, create session, wait for Enter, attach.
+  panepal -q [-t topic]        Attach quietly (no prompt).
+  panepal prompt [-t topic]    Print instructions only (no attach).
+  panepal send-command [-t T] CMD   Send CMD + Enter to pane.
+  panepal send-keys [-t T] KEYS    Send raw keys to pane.
+  panepal capture-pane [-t T]      Capture pane output.
+  panepal run [-t T] [--timeout N] CMD
       Send CMD to pane and block until it finishes. Uses a unique nonce
       internally — no coordination required. This is the preferred way to
       run long commands.
-  clawmux ready [--nonce ID]   Signal completion (called inside pane).
-  clawmux await SESSION [--timeout N]
-      Wait for a ready signal. SESSION is a literal session name, not a topic.
-  clawmux ls                   List sessions on the socket.
-  clawmux kill [topic]         Kill a session.
+  panepal ready [--nonce ID]   Signal completion (called inside pane).
+  panepal await [-t topic] [--timeout N]
+      Wait for a ready signal.
+  panepal ls                   List sessions on the socket.
+  panepal kill [-t topic]      Kill a session.
 
 Env:
-  OPENCLAW_TMUX_SOCKET_DIR   (default: /tmp/openclaw-tmux-sockets)
-  OPENCLAW_TMUX_SOCKET       (default: <dir>/openclaw.sock)
-  OPENCLAW_TMUX_PREFIX       (default: openclaw)
+  PANEPAL_TMUX_SOCKET_DIR   (default: /tmp/panepal-tmux-sockets)
+  PANEPAL_TMUX_SOCKET       (default: <dir>/panepal.sock)
+  PANEPAL_TMUX_PREFIX       (default: panepal)
 EOF
 }
 
@@ -68,15 +68,15 @@ sanitize_topic() {
 
 socket_path() {
   local dir socket
-  dir="${OPENCLAW_TMUX_SOCKET_DIR:-${CLAWDBOT_TMUX_SOCKET_DIR:-/tmp/openclaw-tmux-sockets}}"
+  dir="${PANEPAL_TMUX_SOCKET_DIR:-/tmp/panepal-tmux-sockets}"
   mkdir -p "$dir"
-  socket="${OPENCLAW_TMUX_SOCKET:-$dir/openclaw.sock}"
+  socket="${PANEPAL_TMUX_SOCKET:-$dir/panepal.sock}"
   printf '%s' "$socket"
 }
 
 session_name() {
   local prefix topic
-  prefix="${OPENCLAW_TMUX_PREFIX:-openclaw}"
+  prefix="${PANEPAL_TMUX_PREFIX:-panepal}"
   topic="${1:-}"
   if [[ -z "$topic" ]]; then
     printf '%s' "$prefix"
@@ -116,27 +116,31 @@ My tmux details:
 - session: ${session}
 - primary pane target: ${session}:0.0
 
-The utility program \`clawmux\` will facilitate this this interaction.
+The utility program \`panepal\` will facilitate this this interaction.
 
 Shortcuts for interacting with this session (no need to pass -S sockpath):
-- Send command:   clawmux send-command [-t ${session}:0.0] 'bundle install'
-- Send keys:      clawmux send-keys [-t ${session}:0.0] C-x C-c
-- Capture output: clawmux capture-pane [-t ${session}:0.0]
+- Send command:   panepal send-command [-t ${session}:0.0] 'bundle install'
+- Send keys:      panepal send-keys [-t ${session}:0.0] C-x C-c
+- Capture output: panepal capture-pane [-t ${session}:0.0]
 
 Waiting for long commands (> 8sec):
-  Do not use "sleep"; use \`clawmux run\` which sends the command and blocks
+  Do not use "sleep"; use \`panepal run\` which sends the command and blocks
   until it finishes:
-    clawmux run [-t ${session}:0.0] [--timeout 120] 'make build'
+    panepal run [-t ${session}:0.0] [--timeout 120] 'make build'
   This works by appending a unique completion marker to the command and using
   tmux wait-for internally — no polling, no sleep, no coordination needed.
   Only use this for genuinely long commands; not every quick command.
 
 Examples (AI agent side):
-  clawmux run -t ${session}:0.0 --timeout 120 'make build'
-  clawmux capture-pane -t ${session}:0.0   # see the results
+  panepal run -t ${session}:0.0 --timeout 120 'make build'
+  panepal capture-pane -t ${session}:0.0   # see the results
+
+If you need the raw await/ready protocol instead of \`run\`:
+  panepal send-keys -t ${session}:0.0 'make build; panepal ready' Enter
+  panepal await${topic:+ -t $topic} --timeout 120
 
 I will:
-- run: \`clawmux${topic:+ $topic}\`
+- run: \`panepal${topic:+ -t $topic}\`
 - then tell you “ok go” or words to that effect when the pane is ready.
 EOF
 }
@@ -169,7 +173,9 @@ main() {
       exit 0
       ;;
     prompt)
-      topic="${2:-}"
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
       print_prompt "$topic"
       exit 0
       ;;
@@ -195,8 +201,8 @@ main() {
     ready)
       # Called from inside a tmux pane after a command finishes.
       # Two modes:
-      #   clawmux ready --nonce ID   (preferred — used by `clawmux run`)
-      #   clawmux ready              (legacy — signals session-based channel)
+      #   panepal ready --nonce ID   (preferred — used by `panepal run`)
+      #   panepal ready              (legacy — signals session-based channel)
       local nonce=""
       if [[ "${2:-}" == "--nonce" ]]; then
         nonce="${3:?--nonce requires a value}"
@@ -211,39 +217,40 @@ main() {
         else
           ready_sock="$(socket_path)"
         fi
-        local nonce_flag="/tmp/openclaw-nonce-${nonce}"
+        local nonce_flag="/tmp/panepal-nonce-${nonce}"
         touch "$nonce_flag"
         tmux -S "$ready_sock" wait-for -S "nonce-${nonce}" 2>/dev/null || true
       else
         # Legacy session-based mode.
         if [[ -z "${TMUX:-}" ]]; then
-          echo "clawmux ready: not inside a tmux session (\$TMUX not set)" >&2
+          echo "panepal ready: not inside a tmux session (\$TMUX not set)" >&2
           exit 1
         fi
         local inferred_sock inferred_session channel flag
         inferred_sock="${TMUX%%,*}"
         inferred_session="$(tmux display-message -p '#S')"
         channel="${inferred_session}-ready"
-        flag="/tmp/openclaw-ready-${inferred_session}"
+        flag="/tmp/panepal-ready-${inferred_session}"
         touch "$flag"
         tmux -S "$inferred_sock" wait-for -S "$channel"
       fi
       exit 0
       ;;
     await)
-      # await takes a literal session name (NOT a topic).
-      session="${2:-}"
-      if [[ -z "$session" ]]; then
-        echo "Usage: clawmux await SESSION [--timeout N]" >&2
-        exit 1
-      fi
+      shift
+      topic=""
       local timeout_sec=60
-      if [[ "${3:-}" == "--timeout" ]]; then
-        timeout_sec="${4:?--timeout requires a value}"
-      fi
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          -t) topic="${2:-}"; shift 2 ;;
+          --timeout) timeout_sec="${2:?--timeout requires a value}"; shift 2 ;;
+          *) echo "panepal await: unexpected argument '$1'" >&2; exit 1 ;;
+        esac
+      done
       sock="$(socket_path)"
+      session="$(session_name "$topic")"
       local channel="${session}-ready"
-      local flag="/tmp/openclaw-ready-${session}"
+      local flag="/tmp/panepal-ready-${session}"
       # If ready already fired before we got here, the flag file will exist.
       if [[ -f "$flag" ]]; then
         rm -f "$flag"
@@ -251,7 +258,7 @@ main() {
       fi
       if command -v timeout >/dev/null 2>&1; then
         timeout "$timeout_sec" tmux -S "$sock" wait-for "$channel" || {
-          echo "clawmux await: timed out after ${timeout_sec}s waiting for $channel" >&2
+          echo "panepal await: timed out after ${timeout_sec}s waiting for $channel" >&2
           exit 1
         }
       else
@@ -262,7 +269,7 @@ main() {
       ;;
     run)
       # Atomic send-and-wait. Generates a unique nonce, appends
-      # `; clawmux ready --nonce NONCE` to the command, sends it,
+      # `; panepal ready --nonce NONCE` to the command, sends it,
       # then waits for that nonce to be signaled.
       shift
       local target="" timeout_sec=60 run_cmd=""
@@ -270,18 +277,24 @@ main() {
         case "$1" in
           -t) target="$2"; shift 2 ;;
           --timeout) timeout_sec="$2"; shift 2 ;;
-          *) run_cmd="$1"; shift; break ;;
+          *)
+            if [[ -z "$run_cmd" ]]; then
+              run_cmd="$1"; shift
+            else
+              echo "panepal run: unexpected argument '$1'" >&2; exit 1
+            fi
+            ;;
         esac
       done
       if [[ -z "$run_cmd" ]]; then
-        echo "Usage: clawmux run [-t target] [--timeout N] 'command'" >&2
+        echo "Usage: panepal run [-t target] [--timeout N] 'command'" >&2
         exit 1
       fi
       sock="$(socket_path)"
       local nonce
       nonce="$(head -c 12 /dev/urandom | base64 | tr -cd 'a-zA-Z0-9' | head -c 16)"
-      local nonce_flag="/tmp/openclaw-nonce-${nonce}"
-      local full_cmd="${run_cmd}; clawmux ready --nonce ${nonce}"
+      local nonce_flag="/tmp/panepal-nonce-${nonce}"
+      local full_cmd="${run_cmd}; panepal ready --nonce ${nonce}"
 
       # Send the command to the pane.
       if [[ -n "$target" ]]; then
@@ -297,7 +310,7 @@ main() {
       fi
       if command -v timeout >/dev/null 2>&1; then
         timeout "$timeout_sec" tmux -S "$sock" wait-for "nonce-${nonce}" || {
-          echo "clawmux run: timed out after ${timeout_sec}s" >&2
+          echo "panepal run: timed out after ${timeout_sec}s" >&2
           rm -f "$nonce_flag"
           exit 1
         }
@@ -313,24 +326,34 @@ main() {
       exit 0
       ;;
     kill)
-      topic="${2:-}"
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
       sock="$(socket_path)"
       session="$(session_name "$topic")"
       tmux -S "$sock" kill-session -t "${session}" 2>/dev/null || true
       exit 0
       ;;
     -q)
-      topic="${2:-}"
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
       sock="$(socket_path)"
       session="$(session_name "$topic")"
       ensure_session "$sock" "$session"
       exec tmux -S "$sock" attach -t "$session"
       ;;
+    -t)
+      topic="${2:-}"
+      ;;
     "")
-      topic=""
+      usage
+      exit 0
       ;;
     *)
-      topic="$cmd"
+      echo "panepal: unknown subcommand '$cmd'" >&2
+      echo "Run 'panepal --help' for usage." >&2
+      exit 1
       ;;
   esac
 
