@@ -1,0 +1,380 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "${HOME}/bin/ansi_color.sh"
+
+# panepal - opinionated tmux attach/create helper for panepal operator workflow
+#
+# Goals:
+# - One short command to attach to the “right” tmux session.
+# - Uses an isolated socket so it doesn’t collide with your normal tmux.
+# - Creates the session if missing, but DOES NOT send any commands into the pane.
+# - Can print a standard “how to work with me over tmux” prompt you can paste into any AI chat.
+
+usage() {
+  cat <<'EOF'
+panepal - attach to (or create) a panepal tmux session
+
+Behavior:
+  - Uses socket: $PANEPAL_TMUX_SOCKET (or derived from $PANEPAL_TMUX_SOCKET_DIR)
+  - Session name:
+      topic omitted -> panepal
+      topic given   -> panepal-<topic>
+  - Creates session if missing.
+  - Default action: prints prompt, ensures session exists, waits for Enter, then attaches.
+  - Never seeds commands into the session.
+
+Subcommands:
+  panepal [-t topic]           Print prompt, create session, wait for Enter, attach.
+  panepal -q [-t topic]        Attach quietly (no prompt).
+  panepal prompt [-t topic]    Print instructions only (no attach).
+  panepal send-command [-t T] CMD   Send CMD + Enter to pane.
+  panepal send-keys [-t T] KEYS    Send raw keys to pane.
+  panepal capture-pane [-t T]      Capture pane output.
+  panepal run [-t T] [--timeout N] CMD
+      Send CMD to pane and block until it finishes. Uses a unique nonce
+      internally — no coordination required. This is the preferred way to
+      run long commands.
+  panepal ready [--nonce ID]   Signal completion (called inside pane).
+  panepal await [-t topic] [--timeout N]
+      Wait for a ready signal.
+  panepal ls                   List sessions on the socket.
+  panepal kill [-t topic]      Kill a session.
+
+Env:
+  PANEPAL_TMUX_SOCKET_DIR   (default: /tmp/panepal-tmux-sockets)
+  PANEPAL_TMUX_SOCKET       (default: <dir>/panepal.sock)
+  PANEPAL_TMUX_PREFIX       (default: panepal)
+EOF
+}
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1" >&2; exit 127; }
+}
+
+sanitize_topic() {
+  # lowercase, keep alnum + dash, convert spaces/underscores to dash
+  local t
+  t="$1"
+  t="${t,,}"
+  t="${t// /-}"
+  t="${t//_/-}"
+  # strip invalid chars
+  t="$(printf '%s' "$t" | tr -cd 'a-z0-9-')"
+  # collapse multiple dashes
+  t="$(printf '%s' "$t" | sed -E 's/-+/-/g; s/^-//; s/-$//')"
+  printf '%s' "$t"
+}
+
+socket_path() {
+  local dir socket
+  dir="${PANEPAL_TMUX_SOCKET_DIR:-/tmp/panepal-tmux-sockets}"
+  mkdir -p "$dir"
+  socket="${PANEPAL_TMUX_SOCKET:-$dir/panepal.sock}"
+  printf '%s' "$socket"
+}
+
+session_name() {
+  local prefix topic
+  prefix="${PANEPAL_TMUX_PREFIX:-panepal}"
+  topic="${1:-}"
+  if [[ -z "$topic" ]]; then
+    printf '%s' "$prefix"
+  else
+    printf '%s-%s' "$prefix" "$(sanitize_topic "$topic")"
+  fi
+}
+
+# Resolve an optional topic to a tmux pane target (session:0.0).
+# With no topic, returns the default session pane.
+pane_target() {
+  local topic="${1:-}"
+  printf '%s:0.0' "$(session_name "$topic")"
+}
+
+ensure_session() {
+  local sock session
+  sock="$1"
+  session="$2"
+  if ! tmux -S "$sock" has-session -t "${session}" 2>/dev/null; then
+    tmux -S "$sock" new-session -d -s "${session}" -n shell
+  fi
+}
+
+prompt_text() {
+  local topic session sock
+  topic="${1:-}"
+  sock="$(socket_path)"
+  session="$(session_name "$topic")"
+
+  cat <<EOF
+I want to collaborate via tmux.
+
+While we are both in the session please do not ask me to copy/paste commands to execute;
+rather, inject them into the tmux session yourself.
+** Ask before issuing destructive/irreversible actions**
+
+Always keep me informed about what you are doing/intend to do in the tmux session;
+you can do this by sending output to the chat, or comments to the tmux session, e.g.
+> # Now let's install those four libraries that were missing
+
+My tmux details:
+- socket: $sock
+- session: ${session}
+The utility program \`panepal\` will facilitate this interaction.
+
+Shortcuts (no need to pass socket; -t is a topic, not a tmux address):
+- Send command:   panepal send-command${topic:+ -t $topic} 'bundle install'
+- Send keys:      panepal send-keys${topic:+ -t $topic} C-x C-c
+- Capture output: panepal capture-pane${topic:+ -t $topic}
+
+Waiting for long commands (> 8sec):
+  Do not use "sleep"; use \`panepal run\` which sends the command and blocks
+  until it finishes:
+    panepal run${topic:+ -t $topic} [--timeout 120] 'make build'
+  This works by appending a unique completion marker to the command and using
+  tmux wait-for internally — no polling, no sleep, no coordination needed.
+  Only use this for genuinely long commands; not every quick command.
+
+Examples (AI agent side):
+  panepal run${topic:+ -t $topic} --timeout 120 'make build'
+  panepal capture-pane${topic:+ -t $topic}   # see the results
+
+If you need the raw await/ready protocol instead of \`run\`:
+  panepal send-keys${topic:+ -t $topic} 'make build; panepal ready' Enter
+  panepal await${topic:+ -t $topic} --timeout 120
+
+I will:
+- run: \`panepal${topic:+ -t $topic}\`
+- then tell you “ok go” or words to that effect when the pane is ready.
+EOF
+}
+
+copy_prompt_to_clipboard() {
+  local prompt
+  prompt="$1"
+
+  (echo "$prompt" | xsel -i -b 2>/dev/null && echo "${Green}(Sent to clipboard)${Color_Off}") || ( echo "${Red}(No clipboard)${Color_Off}" )
+}
+
+print_prompt() {
+  local prompt
+  prompt="$(prompt_text "$1")"
+  printf '%s' "$Yellow"
+  printf '%s\n' "$prompt"
+  printf '%s\n' "$Color_Off"
+  copy_prompt_to_clipboard "$prompt"
+}
+
+main() {
+  need tmux
+
+  local cmd topic sock session
+  cmd="${1:-}"
+
+  case "$cmd" in
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    prompt)
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
+      print_prompt "$topic"
+      exit 0
+      ;;
+
+    send-command)
+      shift
+      sock="$(socket_path)"
+      local sc_topic=""
+      [[ "${1:-}" == "-t" ]] && { sc_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" send-keys -t "$(pane_target "$sc_topic")" "$@" Enter
+      exit 0
+      ;;
+    send-keys|type)
+      shift
+      sock="$(socket_path)"
+      local sk_topic=""
+      [[ "${1:-}" == "-t" ]] && { sk_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" send-keys -t "$(pane_target "$sk_topic")" "$@"
+      exit 0
+      ;;
+    capture-pane|look)
+      shift
+      sock="$(socket_path)"
+      local cp_topic=""
+      [[ "${1:-}" == "-t" ]] && { cp_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" capture-pane -p -t "$(pane_target "$cp_topic")"
+      exit 0
+      ;;
+    ready)
+      # Called from inside a tmux pane after a command finishes.
+      # Two modes:
+      #   panepal ready --nonce ID   (preferred — used by `panepal run`)
+      #   panepal ready              (legacy — signals session-based channel)
+      local nonce=""
+      if [[ "${2:-}" == "--nonce" ]]; then
+        nonce="${3:?--nonce requires a value}"
+      fi
+
+      if [[ -n "$nonce" ]]; then
+        # Nonce mode: signal the nonce-specific channel.
+        # We need the socket path. If inside tmux, infer it; otherwise use default.
+        local ready_sock
+        if [[ -n "${TMUX:-}" ]]; then
+          ready_sock="${TMUX%%,*}"
+        else
+          ready_sock="$(socket_path)"
+        fi
+        local nonce_flag="/tmp/panepal-nonce-${nonce}"
+        touch "$nonce_flag"
+        tmux -S "$ready_sock" wait-for -S "nonce-${nonce}" 2>/dev/null || true
+      else
+        # Legacy session-based mode.
+        if [[ -z "${TMUX:-}" ]]; then
+          echo "panepal ready: not inside a tmux session (\$TMUX not set)" >&2
+          exit 1
+        fi
+        local inferred_sock inferred_session channel flag
+        inferred_sock="${TMUX%%,*}"
+        inferred_session="$(tmux display-message -p '#S')"
+        channel="${inferred_session}-ready"
+        flag="/tmp/panepal-ready-${inferred_session}"
+        touch "$flag"
+        tmux -S "$inferred_sock" wait-for -S "$channel"
+      fi
+      exit 0
+      ;;
+    await)
+      shift
+      topic=""
+      local timeout_sec=60
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          -t) topic="${2:-}"; shift 2 ;;
+          --timeout) timeout_sec="${2:?--timeout requires a value}"; shift 2 ;;
+          *) echo "panepal await: unexpected argument '$1'" >&2; exit 1 ;;
+        esac
+      done
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      local channel="${session}-ready"
+      local flag="/tmp/panepal-ready-${session}"
+      # If ready already fired before we got here, the flag file will exist.
+      if [[ -f "$flag" ]]; then
+        rm -f "$flag"
+        exit 0
+      fi
+      if command -v timeout >/dev/null 2>&1; then
+        timeout "$timeout_sec" tmux -S "$sock" wait-for "$channel" || {
+          echo "panepal await: timed out after ${timeout_sec}s waiting for $channel" >&2
+          exit 1
+        }
+      else
+        tmux -S "$sock" wait-for "$channel"
+      fi
+      rm -f "$flag"
+      exit 0
+      ;;
+    run)
+      # Atomic send-and-wait. Generates a unique nonce, appends
+      # `; panepal ready --nonce NONCE` to the command, sends it,
+      # then waits for that nonce to be signaled.
+      shift
+      local target="" timeout_sec=60 run_cmd=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          -t) target="$2"; shift 2 ;;
+          --timeout) timeout_sec="$2"; shift 2 ;;
+          *)
+            if [[ -z "$run_cmd" ]]; then
+              run_cmd="$1"; shift
+            else
+              echo "panepal run: unexpected argument '$1'" >&2; exit 1
+            fi
+            ;;
+        esac
+      done
+      if [[ -z "$run_cmd" ]]; then
+        echo "Usage: panepal run [-t topic] [--timeout N] 'command'" >&2
+        exit 1
+      fi
+      sock="$(socket_path)"
+      local nonce
+      nonce="$(head -c 12 /dev/urandom | base64 | tr -cd 'a-zA-Z0-9' | head -c 16)"
+      local nonce_flag="/tmp/panepal-nonce-${nonce}"
+      local full_cmd="${run_cmd}; panepal ready --nonce ${nonce}"
+
+      # Send the command to the pane.
+      tmux -S "$sock" send-keys -t "$(pane_target "$target")" "$full_cmd" Enter
+
+      # Wait for the nonce signal. Check flag first (ready may have fired already).
+      if [[ -f "$nonce_flag" ]]; then
+        rm -f "$nonce_flag"
+        exit 0
+      fi
+      if command -v timeout >/dev/null 2>&1; then
+        timeout "$timeout_sec" tmux -S "$sock" wait-for "nonce-${nonce}" || {
+          echo "panepal run: timed out after ${timeout_sec}s" >&2
+          rm -f "$nonce_flag"
+          exit 1
+        }
+      else
+        tmux -S "$sock" wait-for "nonce-${nonce}"
+      fi
+      rm -f "$nonce_flag"
+      exit 0
+      ;;
+    ls)
+      sock="$(socket_path)"
+      tmux -S "$sock" list-sessions 2>/dev/null || echo "(no sessions on $sock)"
+      exit 0
+      ;;
+    kill)
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      tmux -S "$sock" kill-session -t "${session}" 2>/dev/null || true
+      exit 0
+      ;;
+    -q)
+      shift
+      topic=""
+      [[ "${1:-}" == "-t" ]] && { topic="${2:-}"; shift 2; }
+      sock="$(socket_path)"
+      session="$(session_name "$topic")"
+      ensure_session "$sock" "$session"
+      exec tmux -S "$sock" attach -t "$session"
+      ;;
+    -t)
+      topic="${2:-}"
+      ;;
+    "")
+      topic="ai-collab"
+      ;;
+    *)
+      echo "panepal: unknown subcommand '$cmd'" >&2
+      echo "Run 'panepal --help' for usage." >&2
+      exit 1
+      ;;
+  esac
+
+  sock="$(socket_path)"
+  session="$(session_name "$topic")"
+  ensure_session "$sock" "$session"
+  print_prompt "$topic"
+  if [[ -t 0 || -t 1 ]] && [[ -r /dev/tty ]]; then
+    echo ""
+    read -r -p "Press Enter to attach to ${session} (Ctrl+C to cancel): " _ </dev/tty || true
+  else
+    echo "" >&2
+    echo "(No TTY available to wait for Enter; attaching now.)" >&2
+  fi
+  exec tmux -S "$sock" attach -t "$session"
+}
+
+main "$@"
