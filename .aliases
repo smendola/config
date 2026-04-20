@@ -532,3 +532,8 @@ tit() {
     git "$@"
   fi
 }
+
+clawmux() {
+  echo "It's called panepal now"
+  echo panepal "$@"
+}
