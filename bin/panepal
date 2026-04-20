@@ -85,6 +85,13 @@ session_name() {
   fi
 }
 
+# Resolve an optional topic to a tmux pane target (session:0.0).
+# With no topic, returns the default session pane.
+pane_target() {
+  local topic="${1:-}"
+  printf '%s:0.0' "$(session_name "$topic")"
+}
+
 ensure_session() {
   local sock session
   sock="$1"
@@ -114,29 +121,27 @@ you can do this by sending output to the chat, or comments to the tmux session, 
 My tmux details:
 - socket: $sock
 - session: ${session}
-- primary pane target: ${session}:0.0
+The utility program \`panepal\` will facilitate this interaction.
 
-The utility program \`panepal\` will facilitate this this interaction.
-
-Shortcuts for interacting with this session (no need to pass -S sockpath):
-- Send command:   panepal send-command [-t ${session}:0.0] 'bundle install'
-- Send keys:      panepal send-keys [-t ${session}:0.0] C-x C-c
-- Capture output: panepal capture-pane [-t ${session}:0.0]
+Shortcuts (no need to pass socket; -t is a topic, not a tmux address):
+- Send command:   panepal send-command${topic:+ -t $topic} 'bundle install'
+- Send keys:      panepal send-keys${topic:+ -t $topic} C-x C-c
+- Capture output: panepal capture-pane${topic:+ -t $topic}
 
 Waiting for long commands (> 8sec):
   Do not use "sleep"; use \`panepal run\` which sends the command and blocks
   until it finishes:
-    panepal run [-t ${session}:0.0] [--timeout 120] 'make build'
+    panepal run${topic:+ -t $topic} [--timeout 120] 'make build'
   This works by appending a unique completion marker to the command and using
   tmux wait-for internally — no polling, no sleep, no coordination needed.
   Only use this for genuinely long commands; not every quick command.
 
 Examples (AI agent side):
-  panepal run -t ${session}:0.0 --timeout 120 'make build'
-  panepal capture-pane -t ${session}:0.0   # see the results
+  panepal run${topic:+ -t $topic} --timeout 120 'make build'
+  panepal capture-pane${topic:+ -t $topic}   # see the results
 
 If you need the raw await/ready protocol instead of \`run\`:
-  panepal send-keys -t ${session}:0.0 'make build; panepal ready' Enter
+  panepal send-keys${topic:+ -t $topic} 'make build; panepal ready' Enter
   panepal await${topic:+ -t $topic} --timeout 120
 
 I will:
@@ -183,19 +188,25 @@ main() {
     send-command)
       shift
       sock="$(socket_path)"
-      tmux -S "$sock" send-keys "$@" Enter
+      local sc_topic=""
+      [[ "${1:-}" == "-t" ]] && { sc_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" send-keys -t "$(pane_target "$sc_topic")" "$@" Enter
       exit 0
       ;;
     send-keys|type)
       shift
       sock="$(socket_path)"
-      tmux -S "$sock" send-keys "$@"
+      local sk_topic=""
+      [[ "${1:-}" == "-t" ]] && { sk_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" send-keys -t "$(pane_target "$sk_topic")" "$@"
       exit 0
       ;;
     capture-pane|look)
       shift
       sock="$(socket_path)"
-      tmux -S "$sock" capture-pane -p "$@"
+      local cp_topic=""
+      [[ "${1:-}" == "-t" ]] && { cp_topic="${2:-}"; shift 2; }
+      tmux -S "$sock" capture-pane -p -t "$(pane_target "$cp_topic")"
       exit 0
       ;;
     ready)
@@ -287,7 +298,7 @@ main() {
         esac
       done
       if [[ -z "$run_cmd" ]]; then
-        echo "Usage: panepal run [-t target] [--timeout N] 'command'" >&2
+        echo "Usage: panepal run [-t topic] [--timeout N] 'command'" >&2
         exit 1
       fi
       sock="$(socket_path)"
@@ -297,11 +308,7 @@ main() {
       local full_cmd="${run_cmd}; panepal ready --nonce ${nonce}"
 
       # Send the command to the pane.
-      if [[ -n "$target" ]]; then
-        tmux -S "$sock" send-keys -t "$target" "$full_cmd" Enter
-      else
-        tmux -S "$sock" send-keys "$full_cmd" Enter
-      fi
+      tmux -S "$sock" send-keys -t "$(pane_target "$target")" "$full_cmd" Enter
 
       # Wait for the nonce signal. Check flag first (ready may have fired already).
       if [[ -f "$nonce_flag" ]]; then
@@ -347,8 +354,7 @@ main() {
       topic="${2:-}"
       ;;
     "")
-      usage
-      exit 0
+      topic="ai-collab"
       ;;
     *)
       echo "panepal: unknown subcommand '$cmd'" >&2
