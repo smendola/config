@@ -241,6 +241,18 @@ export SDKMAN_DIR="/home/dev/.sdkman"
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
 
+# kiro-cli: translate English to shell command (Ctrl+K)
+_kiro_translate() {
+  local cmd
+  cmd=$(echo "$BUFFER" | kiro-cli translate 2>/dev/null)
+  if [[ -n "$cmd" ]]; then
+    BUFFER="$cmd"
+    CURSOR=${#BUFFER}
+  fi
+}
+zle -N _kiro_translate
+bindkey '^K' _kiro_translate
+
 # bun completions
 [ -s "/home/dev/.bun/_bun" ] && source "/home/dev/.bun/_bun"
 
