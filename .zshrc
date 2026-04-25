@@ -251,7 +251,7 @@ _kiro_translate() {
   fi
 }
 zle -N _kiro_translate
-bindkey '^K' _kiro_translate
+bindkey '^G' _kiro_translate
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
