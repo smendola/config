@@ -118,9 +118,6 @@ Always keep me informed about what you are doing/intend to do in the tmux sessio
 you can do this by sending output to the chat, or comments to the tmux session, e.g.
 > # Now let's install those four libraries that were missing
 
-My tmux details:
-- socket: $sock
-- session: ${session}
 The utility program \`panepal\` will facilitate this interaction.
 
 Shortcuts (no need to pass socket; -t is a topic, not a tmux address):
@@ -128,25 +125,27 @@ Shortcuts (no need to pass socket; -t is a topic, not a tmux address):
 - Send keys:      panepal send-keys${topic:+ -t $topic} C-x C-c
 - Capture output: panepal capture-pane${topic:+ -t $topic}
 
-Waiting for long commands (> 8sec):
+Waiting for long-running commands
   Do not use "sleep"; use \`panepal run\` which sends the command and blocks
   until it finishes:
     panepal run${topic:+ -t $topic} [--timeout 120] 'make build'
-  This works by appending a unique completion marker to the command and using
-  tmux wait-for internally — no polling, no sleep, no coordination needed.
-  Only use this for genuinely long commands; not every quick command.
 
 Examples (AI agent side):
   panepal run${topic:+ -t $topic} --timeout 120 'make build'
   panepal capture-pane${topic:+ -t $topic}   # see the results
 
-If you need the raw await/ready protocol instead of \`run\`:
-  panepal send-keys${topic:+ -t $topic} 'make build; panepal ready' Enter
-  panepal await${topic:+ -t $topic} --timeout 120
+If for whatever reason you need/want to fall back to plain tmux cli, you can do that
+with these parameters:
 
-I will:
-- run: \`panepal${topic:+ -t $topic}\`
+- socket: $sock
+- session: ${session}
+
+
+I will now:
+- run \`panepal${topic:+ -t $topic}\`
+  to initiate the session
 - then tell you “ok go” or words to that effect when the pane is ready.
+
 EOF
 }
 
@@ -201,7 +200,7 @@ main() {
       tmux -S "$sock" send-keys -t "$(pane_target "$sk_topic")" "$@"
       exit 0
       ;;
-    capture-pane|look)
+    capture|capture-pane|look)
       shift
       sock="$(socket_path)"
       local cp_topic=""
