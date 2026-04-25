@@ -364,6 +364,7 @@ alias ipaddr="ifconfig eth0 | awk '/inet[^6]/ { print \$2 }'"
 alias host-ip="cat /etc/resolv.conf | tail -n1 | cut -d ' ' -f 2"
 
 alias newest='ls -t | head -1'
+alias whence=~/bin/whence
 
 alias yum='sudo yum'
 alias aptitude='sudo aptitude'
