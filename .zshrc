@@ -165,6 +165,8 @@ bindkey '^L' cls ;# C-Shift-L
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
 # oh-my-zsh sets LESS, so our own setting has to be way down here
 export LESS='-i -R -x4'
+export LESSCHARSET=utf-8
+
 
 # Strip out all references to "." in PATH, including :: and trailing : which
 # apparently are interpreted as .
