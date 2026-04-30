@@ -675,3 +675,22 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+mmclaude() {
+  ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic \
+  ANTHROPIC_API_KEY=${MINIMAX_API_KEY} \
+  claude --model MiniMax-M2.7 "$@"
+}
+
+dsclaude() {
+  ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
+  ANTHROPIC_API_KEY=${DEEPSEEK_API_KEY} \
+  claude --model deepseek-v4-pro "$@"
+}
+
+
+cudaclaude() {
+  ANTHROPIC_BASE_URL=http://cuda-linux:8080 \
+  ANTHROPIC_API_KEY=sk-unused-by-llama \                                                                                  claude --model qwen3.6-coding
+}
+
