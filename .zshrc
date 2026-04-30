@@ -167,6 +167,8 @@ bindkey '^L' cls ;# C-Shift-L
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
 # oh-my-zsh sets LESS, so our own setting has to be way down here
 export LESS='-i -R -x4'
+export LESSCHARSET=utf-8
+
 
 # Strip out all references to "." in PATH, including :: and trailing : which
 # apparently are interpreted as .
@@ -251,7 +253,7 @@ _kiro_translate() {
   fi
 }
 zle -N _kiro_translate
-bindkey '^Q' _kiro_translate
+bindkey '^G' _kiro_translate
 
 # bun completions
 [ -s "/home/dev/.bun/_bun" ] && source "/home/dev/.bun/_bun"

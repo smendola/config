@@ -25,8 +25,6 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # heroku autocomplete setup
 HEROKU_AC_ZSH_SETUP_PATH=/home/dev/.cache/heroku/autocomplete/zsh_setup && test -f $HEROKU_AC_ZSH_SETUP_PATH && source $HEROKU_AC_ZSH_SETUP_PATH;
 
-FAST_LOAD=1
-
 test -d ~/.rvm/scripts/rvm && source ~/.rvm/scripts/rvm
 
 path+=(/opt/RubyMine/bin)
@@ -691,6 +689,11 @@ dsclaude() {
 
 cudaclaude() {
   ANTHROPIC_BASE_URL=http://cuda-linux:8080 \
+<<<<<<< HEAD
   ANTHROPIC_API_KEY=sk-unused-by-llama \                                                                                  claude --model qwen3.6-coding
+=======
+  ANTHROPIC_API_KEY=sk-unused-by-llama \
+  claude --model qwen3.6-coding
+>>>>>>> f60a3587b3b1fa2aa7e9bfa4e483c4440b25aab8
 }
 
