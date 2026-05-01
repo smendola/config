@@ -689,12 +689,8 @@ dsclaude() {
 
 cudaclaude() {
   ANTHROPIC_BASE_URL=http://cuda-linux:8080 \
-<<<<<<< HEAD
-  ANTHROPIC_API_KEY=sk-unused-by-llama \                                                                                  claude --model qwen3.6-coding
-=======
   ANTHROPIC_API_KEY=sk-unused-by-llama \
   claude --model qwen3.6-coding
->>>>>>> f60a3587b3b1fa2aa7e9bfa4e483c4440b25aab8
 }
 
 
