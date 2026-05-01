@@ -697,3 +697,7 @@ cudaclaude() {
 >>>>>>> f60a3587b3b1fa2aa7e9bfa4e483c4440b25aab8
 }
 
+
+rp() {
+  realpath -e "$1"
+}
