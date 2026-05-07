@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Sync llama-server model presets into opencode.json."""
+
+import json
+import sys
+from pathlib import Path
+
+PRESET_PATH = Path.home() / ".config/llama.cpp/models-preset.ini"
+OPENCODE_PATH = Path.home() / ".config/opencode/opencode.json"
+DEFAULT_OUTPUT = 8192
+
+
+def parse_ini(path):
+    """Parse a simple INI file without interpolation, returning {section: {key: value}}."""
+    sections = {}
+    current = None
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith(("#", ";")):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            current = line[1:-1]
+            sections[current] = {}
+        elif "=" in line and current is not None:
+            k, _, v = line.partition("=")
+            sections[current][k.strip()] = v.strip()
+    return sections
+
+
+def ctx_label(ctx):
+    return f"{ctx // 1000}k"
+
+
+def auto_name(key, ctx):
+    return f"{key.replace('-', ' ').title()} [{ctx_label(ctx)}]"
+
+
+def main():
+    if not PRESET_PATH.exists():
+        sys.exit(f"Preset file not found: {PRESET_PATH}")
+    if not OPENCODE_PATH.exists():
+        sys.exit(f"opencode.json not found: {OPENCODE_PATH}")
+
+    presets = parse_ini(PRESET_PATH)
+    config = json.loads(OPENCODE_PATH.read_text())
+
+    models = {}
+    for section, values in presets.items():
+        ctx = int(values.get("ctx-size", 4096))
+        models[section] = {
+            "name": auto_name(section, ctx),
+            "limit": {"context": ctx, "output": DEFAULT_OUTPUT},
+        }
+        print(f"  {section}")
+
+    config["provider"]["llama-server"]["models"] = models
+    OPENCODE_PATH.write_text(json.dumps(config, indent=2) + "\n")
+    print("opencode.json written.")
+
+
+if __name__ == "__main__":
+    main()
