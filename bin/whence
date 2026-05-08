@@ -36,6 +36,20 @@ if [[ "$cmd_path" == *flatpak* ]]; then
     fi
 fi
 
+# Check brew
+if [[ "$cmd_path" == */homebrew/* || "$cmd_path" == */linuxbrew/* ]]; then
+    pkg=$(brew list --formula 2>/dev/null | grep -x "$cmd")
+    [ -z "$pkg" ] && pkg="$cmd"
+    echo "brew install $pkg"
+    exit 0
+fi
+
+# Check npm global
+if npm list -g --depth=0 --parseable 2>/dev/null | grep -q "/$cmd$"; then
+    echo "npm install -g $cmd"
+    exit 0
+fi
+
 # Check apt (resolve symlinks)
 real_path=$(readlink -f "$cmd_path")
 pkg=$(dpkg -S "$real_path" 2>/dev/null | cut -d':' -f1)
