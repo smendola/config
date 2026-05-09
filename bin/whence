@@ -7,6 +7,10 @@ fi
 
 cmd="$1"
 
+if ! command -v "$cmd" &>/dev/null; then
+    echo "Warning: '$cmd' not found on PATH" >&2
+fi
+
 # Check snap first (by name)
 if snap list "$cmd" &>/dev/null; then
     echo "snap install $cmd"
