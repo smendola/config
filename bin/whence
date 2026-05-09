@@ -13,6 +13,14 @@ if snap list "$cmd" &>/dev/null; then
     exit 0
 fi
 
+# Check cargo (before PATH lookup, since ~/.cargo/bin may not be in PATH)
+if [ -f "$HOME/.cargo/bin/$cmd" ]; then
+    pkg=$(cargo install --list 2>/dev/null | grep -B1 "$HOME/.cargo/bin/$cmd" | head -1 | awk '{print $1}')
+    [ -z "$pkg" ] && pkg="$cmd"
+    echo "cargo install $pkg"
+    exit 0
+fi
+
 cmd_path=$(command -v "$cmd" 2>/dev/null)
 
 if [ -z "$cmd_path" ]; then
