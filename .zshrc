@@ -23,38 +23,21 @@ if [[ ! -z $WSLENV ]]; then
      DISPLAY=":0"
      xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
    fi
-
-elif [[ -z $DISPLAY ]]; then
-    # If X11 display can be reached directly, do it that way
-    # in preference to display tunneled over SSH; more efficient.
-    _REMOTE_IP=${SSH_CLIENT%% *}
-    _REMOTE_IP=${_REMOTE_IP:=127.0.0.1}
-
-    # the nc -w1 avoids long delay if X11 is not running
-    _CAND_DISPLAY="${_REMOTE_IP}:0"
-    _CAND_PORT=6000
-    [[ "$_CAND_DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && _CAND_PORT=$((6000 + match[1]))
-
-    if [[ ! -z $SSH_CLIENT ]] &&
-       nc -w1 $_REMOTE_IP $_CAND_PORT < /dev/null &&
-       xset q -display $_REMOTE_IP:0 > /dev/null 2>&1
-    then
-      export DISPLAY=$_REMOTE_IP:0
-#    else
-#      # for WSL2
-#      export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
-#      # export DISPLAY=${DISPLAY:-127.0.0.1:0}
-    fi
 fi
 
 # X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
 unset X11_DPY_PORT
-[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]*:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
+[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]+:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
 
-if [[ $DISPLAY = ?*:* ]]; then
-  nc -w1 ${DISPLAY/:*/} ${X11_DPY_PORT:-6000} && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+if [[ $DISPLAY = ':0' ]]; then
+  # :0 does not necessarily mean port 6000, could be other kind of socket
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+elif [[ $X11_DPY_PORT ]]; then
+  nc -w1 ${DISPLAY/:*/} $X11_DPY_PORT && 
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 else
-  echo "RISK OF HANG HERE" &&   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+  echo "RISK OF HANG HERE" && 
+  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 fi
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
@@ -182,6 +165,8 @@ bindkey '^L' cls ;# C-Shift-L
 # Note: do not move this up near the other variables, e.g. near LESSOPEN;
 # oh-my-zsh sets LESS, so our own setting has to be way down here
 export LESS='-i -R -x4'
+export LESSCHARSET=utf-8
+
 
 # Strip out all references to "." in PATH, including :: and trailing : which
 # apparently are interpreted as .
@@ -191,6 +176,8 @@ PATH=${PATH/::/:}
 PATH=${PATH/:.:/:}
 PATH=${PATH/:.\/*:/:}
 PATH=${PATH%:}
+
+export LD_LIBRARY_PATH="$HOME/.local/lib:$LD_LIBRARY_PATH"
 
 # deprecated variable, causes warnings to stdout
 unset GREP_OPTIONS
@@ -250,15 +237,30 @@ then
 fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/dev/.sdkman"
-[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
 
+# kiro-cli: translate English to shell command (Ctrl+K)
+_kiro_translate() {
+  local cmd
+  cmd=$(echo "$BUFFER" | kiro-cli translate 2>/dev/null)
+  if [[ -n "$cmd" ]]; then
+    BUFFER="$cmd"
+    CURSOR=${#BUFFER}
+  fi
+}
+zle -N _kiro_translate
+bindkey '^G' _kiro_translate
+
 # bun completions
-[ -s "/home/sal/.bun/_bun" ] && source "/home/sal/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# opencode
+export PATH=/home/sal/.opencode/bin:$PATH

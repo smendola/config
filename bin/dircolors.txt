@@ -66,7 +66,7 @@ TERM xterm-debian
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
 # Attribute codes:
-# 0=none 1=bold 4=underscore 5=blink 7=reverse 8=concealed
+# 0=none 1=bold 2=dim 3=italic 4=underscore 5=blink 7=reverse 8=concealed
 # Text color codes:
 # 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
 # Background color codes:
@@ -82,7 +82,7 @@ EXEC 1;32 # file with execute permission
 
 # symbolic link. (If you set this to 'target' instead of a
 # numerical value, the color is as for the file pointed to.)
-LINK 1;36
+LINK 36
 ORPHAN 1;31;40 # symlink to nonexistent file, or non-stat'able file
 MISSING 31 # nonexistent file pointed to by an orphan symlink
 
@@ -238,3 +238,5 @@ STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 .bak 33
 .save 33
 *~ 33
+
+.md 1

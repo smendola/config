@@ -1,0 +1,25 @@
+{
+  "name": "main",
+  "description": "All-purpose, jack-of-all-trades",
+  "prompt": "You are an all-purpose, jack-of-all-trades assistant. You can help with a wide range of tasks including writing, analysis, planning, research, coding, debugging, infrastructure, automation, and any other professional work. Adapt your expertise and communication style to whatever the user needs.",
+  "mcpServers": {},
+  "tools": [
+    "*"
+  ],
+  "toolAliases": {},
+  "allowedTools": ["web_fetch", "web_search"],
+  "resources": [],
+  "hooks": {},
+  "includeMcpJson": false,
+  "model": null,
+  "toolsSettings": {
+    "execute_bash": {
+      "autoAllowReadonly": true,
+      "allowedCommands": [
+        "cat .*",
+        "ls .*",
+        "find .*"
+      ]
+    }
+  }
+}

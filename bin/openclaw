@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# OpenClaw wrapper to force a supported Node in non-interactive contexts.
+NODE_BIN="/home/linuxbrew/.linuxbrew/opt/node/bin/node"
+ENTRY_JS="/home/linuxbrew/.linuxbrew/lib/node_modules/openclaw/dist/entry.js"
+
+exec "$NODE_BIN" "$ENTRY_JS" "$@"

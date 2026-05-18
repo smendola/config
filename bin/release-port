@@ -35,7 +35,7 @@ case "$PORT" in
   ''|*[!0-9]*) echo "Error: PORT must be a number"; exit 1 ;;
 esac
 
-PIDS=$(lsof -ti:$PORT)
+PIDS=$(lsof -ti:$PORT -sTCP:LISTEN)
 
 if [ -z "$PIDS" ]; then
   echo "No process found on port $PORT"

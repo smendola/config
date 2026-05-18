@@ -7,9 +7,21 @@ fi
 
 cmd="$1"
 
+if ! command -v "$cmd" &>/dev/null; then
+    echo "Warning: '$cmd' not found on PATH" >&2
+fi
+
 # Check snap first (by name)
 if snap list "$cmd" &>/dev/null; then
     echo "snap install $cmd"
+    exit 0
+fi
+
+# Check cargo (before PATH lookup, since ~/.cargo/bin may not be in PATH)
+if [ -f "$HOME/.cargo/bin/$cmd" ]; then
+    pkg=$(cargo install --list 2>/dev/null | grep -B1 "$HOME/.cargo/bin/$cmd" | head -1 | awk '{print $1}')
+    [ -z "$pkg" ] && pkg="$cmd"
+    echo "cargo install $pkg"
     exit 0
 fi
 
@@ -34,6 +46,20 @@ if [[ "$cmd_path" == *flatpak* ]]; then
         echo "flatpak install $pkg"
         exit 0
     fi
+fi
+
+# Check brew
+if [[ "$cmd_path" == */homebrew/* || "$cmd_path" == */linuxbrew/* ]]; then
+    pkg=$(brew list --formula 2>/dev/null | grep -x "$cmd")
+    [ -z "$pkg" ] && pkg="$cmd"
+    echo "brew install $pkg"
+    exit 0
+fi
+
+# Check npm global
+if npm list -g --depth=0 --parseable 2>/dev/null | grep -q "/$cmd$"; then
+    echo "npm install -g $cmd"
+    exit 0
 fi
 
 # Check apt (resolve symlinks)

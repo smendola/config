@@ -363,6 +363,7 @@ alias ipaddr="ifconfig eth0 | awk '/inet[^6]/ { print \$2 }'"
 alias host-ip="cat /etc/resolv.conf | tail -n1 | cut -d ' ' -f 2"
 
 alias newest='ls -t | head -1'
+alias whence=~/bin/whence
 
 alias yum='sudo yum'
 alias aptitude='sudo aptitude'
@@ -515,6 +516,6 @@ wt-() {
 }
 
 q() {
-  kiro-cli chat --tui --trust-tools=fs_read,code "$@"
+  kiro-cli chat --trust-tools=fs_read,code "$@"
 }
 
