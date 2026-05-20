@@ -1,0 +1,2 @@
+#!/bin/bash
+(/opt/OpenCode/@opencode-aidesktop &) > /tmp/opencode-gui.$$.log 2>&1
