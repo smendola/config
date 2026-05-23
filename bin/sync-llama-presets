@@ -47,11 +47,12 @@ def main():
     models = {}
     for section, values in presets.items():
         ctx = int(values.get("ctx-size", 4096))
+        name = auto_name(section, ctx)
         models[section] = {
-            "name": auto_name(section, ctx),
+            "name": name,
             "limit": {"context": ctx, "output": DEFAULT_OUTPUT},
         }
-        print(f"  {section}")
+        print(f"  {name}")
 
     config["provider"]["llama-server"]["models"] = models
     OPENCODE_PATH.write_text(json.dumps(config, indent=2) + "\n")
