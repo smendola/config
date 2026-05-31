@@ -363,7 +363,7 @@ alias ipaddr="ifconfig eth0 | awk '/inet[^6]/ { print \$2 }'"
 # In WSL, this is the IP address of the Windows host; this is where e.g. VcXsrv would be
 alias host-ip="cat /etc/resolv.conf | tail -n1 | cut -d ' ' -f 2"
 
-alias newest='ls -t | head -1'
+alias newest='echo *(om[1])'
 alias whence=~/bin/whence
 
 alias yum='sudo yum'
