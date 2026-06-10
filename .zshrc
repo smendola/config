@@ -153,6 +153,12 @@ else
     echo "*** Oh-my-zsh is not present"
 fi
 
+precmd_functions+=(set_newest)
+
+set_newest() {
+  newest=$(echo *(om[1]))
+}
+
 ###############################################################
 ### LOAD ALL STANDARD ALIASES AND FUNCTIONS
 ###############################################################
