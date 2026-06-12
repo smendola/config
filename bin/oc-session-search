@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+# oc-session-search WORD...
+
+import sys, sqlite3, os, re
+
+DB = os.path.expanduser("~/.local/share/opencode/opencode.db")
+RADIUS = 100
+
+def excerpt(text, words):
+    text = re.sub(r'\s+', ' ', text.replace('\\n', ' '))
+    pattern = '|'.join(re.escape(w) for w in words)
+    m = re.search(pattern, text, re.IGNORECASE)
+    if not m:
+        return ''
+    s = max(0, m.start() - RADIUS)
+    e = min(len(text), m.end() + RADIUS)
+    return f"...{text[s:e].strip()}..."
+
+if len(sys.argv) < 2:
+    sys.exit("Usage: oc-session-search WORD...")
+
+words = sys.argv[1:]
+like = " AND ".join("lower(m.data) LIKE lower(?)" for _ in words)
+binds = [f"%{w}%" for w in words]
+
+db = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+rows = db.execute(f"""
+    SELECT DISTINCT s.id, s.title, s.directory,
+        datetime(s.time_created/1000, 'unixepoch', 'localtime'),
+        datetime(s.time_updated/1000, 'unixepoch', 'localtime'),
+        m.data
+    FROM session s JOIN message m ON m.session_id = s.id
+    WHERE {like}
+    ORDER BY s.time_updated DESC
+""", binds).fetchall()
+db.close()
+
+if not rows:
+    sys.exit("No sessions found.")
+
+# deduplicate by session, keep first (best-updated) match
+seen = {}
+for sid, title, directory, started, updated, data in rows:
+    if sid not in seen:
+        ws = os.path.basename(directory or '')
+        seen[sid] = (started, updated, sid, ws, title, excerpt(data, words))
+
+hdr = f"{'Started':<19}  {'Updated':<19}  {'ID':<32}  {'WS':<22}  {'Title':<40}  Excerpt"
+print(hdr)
+print('-' * 170)
+for started, updated, sid, ws, title, ex in seen.values():
+    print(f"{started:<19}  {updated:<19}  {sid:<32}  {ws[:22]:<22}  {title[:40]:<40}  {ex[:120]}")
