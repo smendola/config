@@ -67,6 +67,7 @@
 	default = current
 	autoSetupRemote = true
 	autoSetupRemote = true
+	recurseSubmodules = on-demand
 [credential]
 	helper = store
 [pull]
@@ -99,3 +100,5 @@
 [include]
     path = /home/dev/.gitconfig.themes
 
+[submodule]
+	recurse = true

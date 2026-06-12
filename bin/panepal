@@ -122,8 +122,15 @@ The utility program \`panepal\` will facilitate this interaction.
 
 Shortcuts (no need to pass socket; -t is a topic, not a tmux address):
 - Send command:   panepal send-command${topic:+ -t $topic} 'bundle install'
+                  this only works for SHELL commands; it appends extra sync
+                  stuff to your command
 - Send keys:      panepal send-keys${topic:+ -t $topic} C-x C-c
 - Capture output: panepal capture-pane${topic:+ -t $topic}
+
+**ALWAYS** capture output prior to sending a command; confirm that the TTY
+is "ready" to receive a command. I may have changed its state since you last
+touched it; or the last command you sent may not have left the TTY in the state
+that you think it did.
 
 Waiting for long-running commands
   Do not use "sleep"; use \`panepal run\` which sends the command and blocks
