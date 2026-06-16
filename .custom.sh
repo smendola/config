@@ -719,3 +719,22 @@ cudaclaude() {
 }
 
 
+frails() {
+  FAST_LOAD=1 DISABLE_SPRING=1 rails "$@"
+}
+
+kiro-commit-with-comments() {
+  (
+    cd "$(git rev-parse --show-toplevel)" 
+    kiro-cli chat --no-interactive \
+                  --trust-all-tools \
+                  "First, ensure that staged changes do not depend on unstaged changes or on untracked files. If that passes: Craft a git commit comment for staged changes; commit, and push."
+  )
+}
+
+codex-commit-with-comments () {
+    codex exec \
+      --cd "$(git rev-parse --show-toplevel)" \
+      --dangerously-bypass-approvals-and-sandbox \
+      "First, ensure that staged changes do not depend on unstaged changes or on untracked files. If that passes: Craft a git commit comment for staged changes; commit, and push."
+  }
