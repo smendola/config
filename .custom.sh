@@ -101,7 +101,7 @@ reset() {
 }
 
 up() {
-  truncate -s0 ~/aurora/log/development.log
+  truncate -s0 ~/$(project_root)/log/development.log
   rails db:migrate "$@" 2>&1 | /usr/bin/grep -v /gems/
 }
 
@@ -111,7 +111,7 @@ down() {
     argv[1]=STEP=$1
   fi
 
-  truncate -s0 ~/aurora/log/development.log
+  truncate -s0 ~/$(project_root)/log/development.log
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
@@ -143,7 +143,7 @@ debug-puma() {
 }
 
 debug-rails() {
-  rdebug-ide --host 0.0.0.0 --port 1234 --dispatcher-port 26162 -- /home/dev/aurora/bin/rails console
+  rdebug-ide --host 0.0.0.0 --port 1234 --dispatcher-port 26162 -- $(project_root)/bin/rails console
 }
 
 
@@ -219,7 +219,7 @@ promote() {
 apilog() {
   if [[ -z $1 ]]
   then
-    tail -f ~/aurora/log/development.log |
+    tail -f $(project_root)/log/development.log |
         sed -urn 's!.*method=([^ ]+).* path=(/?/api/v1/[^ ]+).* status=([^ ]+).* duration=([^ ]+) .*!\1 \2 \t\t\3  \4ms!igp'
   else
     heroku logs -a $(expand-env ${1:-production}) --tail |
@@ -720,7 +720,7 @@ cudaclaude() {
 
 
 frails() {
-  FAST_LOAD=1 DISABLE_SPRING=1 rails "$@"
+ FAST_LOAD=1 DISABLE_SPRING=1 rails "$@"
 }
 
 kiro-commit-with-comments() {
