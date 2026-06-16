@@ -31,6 +31,10 @@
     ]
   },
   "model": "sonnet",
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/dev/.claude/statusline-command.sh"
+  },
   "enabledPlugins": {
     "telegram@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
