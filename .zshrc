@@ -3,7 +3,7 @@
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
 
 # Kiro CLI pre block. Keep at the top of this file.
-kiro-cli update >/dev/null 2>&1
+[[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
 ### if just are getting started with zsh. You will have to
@@ -246,8 +246,8 @@ then
 fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/dev/.sdkman"
-[[ -s "/home/dev/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dev/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 
 # kiro-cli: translate English to shell command (Ctrl+K)
@@ -263,7 +263,7 @@ zle -N _kiro_translate
 bindkey '^G' _kiro_translate
 
 # bun completions
-[ -s "/home/dev/.bun/_bun" ] && source "/home/dev/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
