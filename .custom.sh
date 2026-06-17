@@ -31,7 +31,7 @@ path+=(/opt/RubyMine/bin)
 path+=(/usr/pgadmin4/bin)
 alias mine=rubymine.sh
 ide() {
-  pkill -ABRT -f RubyMine
+  pkill -ABRT -f rubymine
   # &! "disowns" the process
   rubymine > /tmp/rubymine.out 2>&1 &!
 }
