@@ -350,6 +350,7 @@ function gups() {
 }
 
 alias gpr='git pull --rebase'
+alias gpp='git pull --rebase && git push'
 alias mods='git status'
 alias start=xdg-open
 
