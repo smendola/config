@@ -544,7 +544,12 @@ git() {
 	echo -n 'Use pull/rebase first? y/n [y]: '
 	local yn
 	read yn
-	[[ $yn != n* ]] && command git "${prefix[@]}" pull --rebase || return
+	if [[ $yn != n* ]]; then
+	  command git "${prefix[@]}" pull --rebase "$@" || {
+	    command git "${prefix[@]}" rebase --abort 2>/dev/null
+	    command git "${prefix[@]}" pull "$@" || return
+	  }
+	fi
 	command git "${prefix[@]}" push "$@"
   else
 	command git "${prefix[@]}" $cmd "$@"
