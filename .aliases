@@ -205,15 +205,6 @@ function dots () {
   )
 }
 
-git() {
-  if [[ $(pwd) = $HOME && $1 != clone ]]
-  then
-    command git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
-  else
-    command git "$@"
-  fi
-}
-
 function syncdots()
 {
     (dots status -s | grep -q '.' && echo ci && dots commit -a -m "${1:-bla}" || echo NO CO && true) &&
@@ -540,20 +531,23 @@ clawmux() {
   echo panepal "$@"
 }
 
+
 git() {
-  if [[ $1 == push ]]
-  then
-    echo -n 'Use pull/rebase first? y/n [y]: '
-    local yn
-    read yn
-	if [[ $yn != n* ]]
-	then
-      shift
-	  command git pull --rebase && command git push "$@"
-	else
-	  command git "$@"
-	fi
+  local cmd=$1; shift
+  local prefix=()
+
+  if [[ $(pwd) == "$HOME" && $cmd != clone ]]; then
+	prefix=(--git-dir="$HOME/.config.git" --work-tree="$HOME")
+  fi
+
+  if [[ $cmd == push ]]; then
+	echo -n 'Use pull/rebase first? y/n [y]: '
+	local yn
+	read yn
+	[[ $yn != n* ]] && command git "${prefix[@]}" pull --rebase || return
+	command git "${prefix[@]}" push "$@"
   else
-    command git "$@"
+	command git "${prefix[@]}" $cmd "$@"
   fi
 }
+
