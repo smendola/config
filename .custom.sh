@@ -101,7 +101,7 @@ reset() {
 }
 
 up() {
-  truncate -s0 ~/$(project_root)/log/development.log
+  truncate -s0 $(project_root)/log/development.log
   rails db:migrate "$@" 2>&1 | /usr/bin/grep -v /gems/
 }
 
@@ -111,7 +111,7 @@ down() {
     argv[1]=STEP=$1
   fi
 
-  truncate -s0 ~/$(project_root)/log/development.log
+  truncate -s0 $(project_root)/log/development.log
   rails db:rollback "$@" 2>&1 | (grep -v /gems/ || true)
 }
 
