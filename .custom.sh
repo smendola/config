@@ -738,3 +738,5 @@ codex-commit-with-comments () {
       --dangerously-bypass-approvals-and-sandbox \
       "First, ensure that staged changes do not depend on unstaged changes or on untracked files. If that passes: Craft a git commit comment for staged changes; commit, and push."
   }
+
+kiro-cli update > /dev/null 2>&1 &!
