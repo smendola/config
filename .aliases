@@ -539,3 +539,21 @@ clawmux() {
   echo "It's called panepal now"
   echo panepal "$@"
 }
+
+git() {
+  if [[ $1 == push ]]
+  then
+    echo -n 'Use pull/rebase first? y/n [y]: '
+    local yn
+    read yn
+	if [[ $yn != n* ]]
+	then
+      shift
+	  command git pull --rebase && command git push "$@"
+	else
+	  command git "$@"
+	fi
+  else
+    command git "$@"
+  fi
+}
