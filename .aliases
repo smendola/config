@@ -484,6 +484,9 @@ wta() {
   else
     git worktree add -b $branch $dir
   fi
+  if -f $dir/.envrc; then
+    direnv allow $dir
+  fi
 }
 
 wtr() {
