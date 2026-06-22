@@ -534,28 +534,32 @@ clawmux() {
   echo panepal "$@"
 }
 
-
-git() {
-  local cmd=$1; shift
+git () {
+  local cmd=$1
+  shift
   local prefix=()
-
-  if [[ $(pwd) == "$HOME" && $cmd != clone ]]; then
-	prefix=(--git-dir="$HOME/.config.git" --work-tree="$HOME")
+  if [[ $(pwd) == "$HOME" && $cmd != clone ]]
+  then
+		  prefix=(--git-dir="$HOME/.config.git" --work-tree="$HOME")
   fi
-
-  if [[ $cmd == push ]]; then
-	echo -n 'Use pull/rebase first? y/n [y]: '
-	local yn
-	read yn
-	if [[ $yn != n* ]]; then
-	  command git "${prefix[@]}" pull --rebase "$@" || {
-	    command git "${prefix[@]}" rebase --abort 2>/dev/null
-	    command git "${prefix[@]}" pull "$@" || return
-	  }
-	fi
-	command git "${prefix[@]}" push "$@"
+  if [[ $cmd == push ]]
+  then
+		  command git "${prefix[@]}" fetch "$@" 2>/dev/null
+		  if [[ -n $(command git "${prefix[@]}" log HEAD..@{u} --oneline 2>/dev/null) ]]
+		  then
+				  echo -n 'Use pull/rebase first? y/n [y]: '
+				  local yn
+				  read yn
+		  fi
+		  if [[ $yn != n* ]]
+		  then
+				  command git "${prefix[@]}" pull --rebase "$@" || {
+						  command git "${prefix[@]}" rebase --abort 2> /dev/null
+						  command git "${prefix[@]}" pull "$@" || return
+				  }
+		  fi
+		  command git "${prefix[@]}" push "$@"
   else
-	command git "${prefix[@]}" $cmd "$@"
+		  command git "${prefix[@]}" $cmd "$@"
   fi
 }
-
