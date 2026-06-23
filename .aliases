@@ -459,6 +459,10 @@ xscale() {
 }
 
 
+reponame() {
+  basename -s .git $(git remote get-url origin)
+}
+
 alias wt=wtg
 wtg() {
    local branch=${1}
@@ -478,16 +482,17 @@ compdef _wtg wtg
 
 wta() {
   local branch=${1}
-  local dir=~/wt/${branch/\//-}
+  local dir=~/wt/$(reponame)/${branch/\//-}
   if git show-ref --verify --quiet refs/heads/$branch; then
     git worktree add $dir $branch
   else
     git worktree add -b $branch $dir
   fi
-  if -f $dir/.envrc; then
+  if [ -f $dir/.envrc ]; then
     direnv allow $dir
   fi
 }
+
 
 wtr() {
   if [[ $1 == -f ]]; then
