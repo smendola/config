@@ -166,16 +166,16 @@ function check_x()
     elif [[ $WSLENV && $DISPLAY = :0 ]]; then
       xset q > /dev/null   
     else
-	  display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
-	  display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
-	  host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
-	  host=${host:-localhost}      # if host is empty, use localhost
-	  port=$((6000 + display_number))
+      display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
+      display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
+      host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
+      host=${host:-localhost}      # if host is empty, use localhost
+      port=$((6000 + display_number))
 
-	  if nc -w1 $host $port && xset q > /dev/null; then
-		return 0
-	  fi
- 
+      if nc -w1 $host $port && xset q > /dev/null; then
+        return 0
+      fi
+
       echo "Problem with display? ($DISPLAY)" 2>&1
     fi
 
@@ -274,7 +274,7 @@ alias tcf='tree -ACF --dirsfirst'
 
 ar()
 {
-	accurev "$@"
+  accurev "$@"
 }
 
 # note; use ansifilter instead.
@@ -293,7 +293,7 @@ detach()
 
 tt()
 {
-	check_x && detach tilix "$@"
+  check_x && detach tilix "$@"
 }
 
 backup-settings()
@@ -311,14 +311,9 @@ backup-settings()
     , ls -lt settings.zip
 )}
 
-function acgui()
-{
-    detach /opt/AccuRev/bin/acgui
-}
-
 function gc()
 {
-	detach google-chrome "$@"
+  detach google-chrome "$@"
 }
 
 function tit()
@@ -359,15 +354,14 @@ alias newest='echo *(om[1])'
 alias whence=~/bin/whence
 
 alias yum='sudo yum'
-alias aptitude='sudo aptitude'
+alias pacman='sudo pacman'
+alias paru='sudo paru'
 alias apt-get='sudo apt-get'
 alias apt='sudo apt'
 alias snap='sudo snap'
-alias synaptic='sudo synaptic'
 alias service='sudo service'
 alias systemctl='sudo systemctl'
 alias sys='sudo systemctl'
-alias initctl='sudo initctl'
 alias journalctl='journalctl'
 alias bum='sudo bum'
 alias reboot='sudo reboot'
@@ -379,18 +373,17 @@ alias ifdown='sudo ifdown'
 alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
-alias netscript='sudo netscript'
 
 fix-net() {
-	sudo netscript restart
+  sudo netscript restart
 }
 
 usage() {
-	du -ha -d 3 "$@" | sort -hr | head -20
+  du -ha -d 3 "$@" | sort -hr | head -20
 }
 
 k%() {
-	kill % && sleep 2 && kill -9 %
+  kill % && sleep 2 && kill -9 %
 }
 
 public-ip() {
