@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-interactive=0 quiet=0
+interactive=0 quiet=0 all=0
 while [[ "$1" == -* ]]; do
     case $1 in
         -i)  interactive=1 ;;
         -q)  quiet=1 ;;
         -qq) quiet=2 ;;
-        *)   echo "Usage: install [-i] [-q|-qq] PKG [PKG...]" >&2; exit 1 ;;
+        -A)  all=1 ;;
+        *)   echo "Usage: install [-i] [-q|-qq] [-A] PKG [PKG...]" >&2; exit 1 ;;
     esac
     shift
 done
-(( $# )) || { echo "Usage: install [-i] [-q|-qq] PKG [PKG...]" >&2; exit 1; }
+(( $# )) || { echo "Usage: install [-i] [-q|-qq] [-A] PKG [PKG...]" >&2; exit 1; }
 
 y()   { (( interactive )) || echo "$1"; }
 log() { (( quiet < 1 )) && echo "$@" || true; }
@@ -34,8 +35,10 @@ elif command -v pacman &>/dev/null; then
     redir sudo pacman -S $(y --noconfirm) "$@" && ok "pacman -S $*" && exit
 fi
 
-read -rp "No standard package manager found. Try alternatives (paru, npm, brew, cargo)? [y/N] " ans
-[[ "$ans" =~ ^[Yy] ]] || exit 1
+if (( !all )); then
+    read -rp "No standard package manager found for: $*. Try alternatives (paru, npm, brew, cargo)? [y/N] " ans
+    [[ "$ans" =~ ^[Yy] ]] || exit 1
+fi
 
 for mgr in paru npm brew cargo; do
     command -v "$mgr" &>/dev/null || continue
