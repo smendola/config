@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -e
+
+interactive=0 quiet=0
+while [[ "$1" == -* ]]; do
+    case $1 in
+        -i)  interactive=1 ;;
+        -q)  quiet=1 ;;
+        -qq) quiet=2 ;;
+        *)   echo "Usage: install [-i] [-q|-qq] PKG [PKG...]" >&2; exit 1 ;;
+    esac
+    shift
+done
+(( $# )) || { echo "Usage: install [-i] [-q|-qq] PKG [PKG...]" >&2; exit 1; }
+
+y()   { (( interactive )) || echo "$1"; }
+log() { (( quiet < 1 )) && echo "$@" || true; }
+ok()  { (( quiet < 2 )) && echo "Installed with: $*" || true; }
+_tmp=$(mktemp)
+trap 'rm -f "$_tmp"' EXIT
+redir() {
+    if (( quiet )); then
+        "$@" >"$_tmp" || { cat "$_tmp" >&2; return 1; }
+    else
+        "$@"
+    fi
+}
+
+if command -v apt-get &>/dev/null; then
+    redir sudo apt-get install $(y -y) "$@" && ok "apt-get install $*" && exit
+elif command -v yum &>/dev/null; then
+    redir sudo yum install $(y -y) "$@" && ok "yum install $*" && exit
+elif command -v pacman &>/dev/null; then
+    redir sudo pacman -S $(y --noconfirm) "$@" && ok "pacman -S $*" && exit
+fi
+
+read -rp "No standard package manager found. Try alternatives (paru, npm, brew, cargo)? [y/N] " ans
+[[ "$ans" =~ ^[Yy] ]] || exit 1
+
+for mgr in paru npm brew cargo; do
+    command -v "$mgr" &>/dev/null || continue
+    log "Trying $mgr..."
+    case $mgr in
+        paru)   redir paru -S $(y --noconfirm) "$@" && ok "paru -S $*" && exit ;;
+        npm)    redir npm install -g "$@" && ok "npm install -g $*" && exit ;;
+        brew)   redir brew install "$@" && ok "brew install $*" && exit ;;
+        cargo)  redir cargo install "$@" && ok "cargo install $*" && exit ;;
+    esac
+done
+
+echo "No package manager succeeded." >&2
+exit 1
