@@ -231,7 +231,8 @@ fi
 export QUOTING_STYLE=escape
 eval $(dircolors $HOME/bin/dircolors.txt)
 
-eval "$(direnv hook zsh)"
+command direnv > /dev/null 2>&1 && eval "$(direnv hook zsh)" || echo 'Please install direnv'
+
 # Move direnv's chpwd hook to the end so it runs after rvm/nvm hooks
 chpwd_functions=( ${chpwd_functions[@]:#_direnv_hook} _direnv_hook )
 
@@ -279,3 +280,5 @@ export NVM_DIR="$HOME/.nvm"
 
 # Kiro CLI post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
+
+true
