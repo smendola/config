@@ -41,16 +41,7 @@ git clone -b $BRANCH https://smendola@github.com/smendola/config.git
 mv .git .config.git
 dots submodule update --init
 
-if command -v pacman &>/dev/null; then
-    sudo pacman -S --noconfirm zsh
-elif command -v apt-get &>/dev/null; then
-    sudo apt-get install -y zsh
-elif command -v yum &>/dev/null; then
-    sudo yum install -y zsh
-else
-    echo "Error: No supported package manager found (pacman, apt, yum)" >&2
-    exit 1
-fi
+./bin/install zsh
 
 KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
