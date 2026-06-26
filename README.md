@@ -1,3 +1,3 @@
 ```
-curl -fsSL  https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash
+curl -fsSL  https://raw.githubusercontent.com/smendola/config/master/setup-env.sh | bash
 ```
