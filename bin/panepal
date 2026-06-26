@@ -22,7 +22,6 @@ Behavior:
       topic given   -> panepal-<topic>
   - Creates session if missing.
   - Default action: prints prompt, ensures session exists, waits for Enter, then attaches.
-  - Never seeds commands into the session.
 
 Subcommands:
   panepal [-t topic]           Print prompt, create session, wait for Enter, attach.
@@ -136,6 +135,9 @@ Waiting for long-running commands
   Do not use "sleep"; use \`panepal run\` which sends the command and blocks
   until it finishes:
     panepal run${topic:+ -t $topic} [--timeout 120] 'make build'
+  DO immediately capture the pane after submitting a run command to confirm that it
+  was in fact correctly parsed; otherwise you may be waiting forever while the shell
+  waits forever for you to send it a missing close-quote or HEREDOC close tag.
 
 Examples (AI agent side):
   panepal run${topic:+ -t $topic} --timeout 120 'make build'
