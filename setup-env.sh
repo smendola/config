@@ -33,23 +33,32 @@ while true; do
     fi
 done
 
-
 rm -rf config .config.git .oh-my-zsh
 
 git config --global --add core.autocrlf false
 git clone -b $BRANCH https://smendola@github.com/smendola/config.git
 (cd config && tar cf - .) | tar xf -
 mv .git .config.git
+dots submodule update --init
 
-sudo apt-get install -y zsh
+if command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm zsh
+elif command -v apt-get &>/dev/null; then
+    sudo apt-get install -y zsh
+elif command -v yum &>/dev/null; then
+    sudo yum install -y zsh
+else
+    echo "Error: No supported package manager found (pacman, apt, yum)" >&2
+    exit 1
+fi
 
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-chsh $USER -s /usr/bin/zsh
+KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # install Meslo fonts
 mkdir -p ~/.local/share/fonts
 cp ~/Meslo_LG_1.2.1/*ttf ~/.local/share/fonts/
 fc-cache -f
+
+chsh $USER -s /usr/bin/zsh || echo 'You will need to use chsh to set zsh as your login shell'
 
 exec zsh --login
