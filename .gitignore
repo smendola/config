@@ -28,3 +28,5 @@ experimental
 !/bin
 !/bin.personal
 !.gnupg/gpg.conf
+config.bat
+node_modules
