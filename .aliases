@@ -548,15 +548,16 @@ git () {
   fi
 
   if [[ $sub_cmd == push ]]; then
-	if [[ -n $(command git "${prefix[@]}" log HEAD..@{u} --oneline 2>/dev/null) ]]; then
-		echo -n 'Use pull/rebase first? y/n [y]: '
-		read yn
-		[[ $yn == n* ]] && return 1
-		command git "${prefix[@]}" pull --rebase "$@" || {
-			command git "${prefix[@]}" rebase --abort 2>/dev/null
-			command git "${prefix[@]}" pull "$@" || return
-		}
-	fi
+    command git "${prefix[@]}" fetch 2>/dev/null
+    if [[ -n $(command git "${prefix[@]}" log HEAD..@{u} --oneline 2>/dev/null) ]]; then
+      echo -n 'Use pull/rebase first? y/n [y]: '
+      read yn
+      [[ $yn == n* ]] && return 1
+      command git "${prefix[@]}" pull --rebase "$@" || {
+        command git "${prefix[@]}" rebase --abort 2>/dev/null
+        command git "${prefix[@]}" pull "$@" || return
+      }
+    fi
   fi
 
   command git "${prefix[@]}" $sub_cmd "$@"
