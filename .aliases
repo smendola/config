@@ -166,16 +166,16 @@ function check_x()
     elif [[ $WSLENV && $DISPLAY = :0 ]]; then
       xset q > /dev/null   
     else
-    display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
-    display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
-    host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
-    host=${host:-localhost}      # if host is empty, use localhost
-    port=$((6000 + display_number))
+      display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
+      display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
+      host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
+      host=${host:-localhost}      # if host is empty, use localhost
+      port=$((6000 + display_number))
 
-    if nc -w1 $host $port && xset q > /dev/null; then
-    return 0
-    fi
- 
+      if nc -w1 $host $port && xset q > /dev/null; then
+        return 0
+      fi
+
       echo "Problem with display? ($DISPLAY)" 2>&1
     fi
 
