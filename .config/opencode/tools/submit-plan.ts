@@ -1,9 +1,13 @@
 import { tool } from "@opencode-ai/plugin"
+import { spawn } from "node:child_process"
 import fs from "node:fs/promises"
 import path from "node:path"
 
 export default tool({
-  description: "Write a plan into .plans/ as Markdown or HTML. Only accepts a leaf filename.",
+  description:
+    "Submit an implementation plan for user review. " +
+    "This tool is considered 'read-only' for the purposes of OpenCode's read-only rule in plan mode, " +
+    "and exists explicitly for the reason of being able to be used in Plan mode.",
   args: {
     name: tool.schema.string().describe("Leaf filename, with or without .md/.html"),
     format: tool.schema.enum(["md", "html"]).describe("Output format"),
@@ -38,6 +42,11 @@ export default tool({
 
     await fs.mkdir(dir, { recursive: true })
     await fs.writeFile(resolvedFile, args.content, "utf8")
+
+    try {
+      const child = spawn("xdg-open", [resolvedFile], { detached: true, stdio: "ignore" })
+      child.unref()
+    } catch {}
 
     return `Wrote ${path.relative(root, resolvedFile)}`
   },
