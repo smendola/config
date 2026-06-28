@@ -272,8 +272,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # opencode
 export PATH=/home/dev/.opencode/bin:$PATH
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# NVM already loaded above (see "if [[ -d $HOME/.nvm ]]" block)
 
 
 # Kiro CLI post block. Keep at the bottom of this file.
