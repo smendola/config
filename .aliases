@@ -503,6 +503,15 @@ _wtr() {
 }
 compdef _wtr wtr
 
+_wta() {
+  local -a branches checked out
+  checked=(${(f)"$(git worktree list --porcelain 2>/dev/null | awk '/^branch /{sub(".*refs/heads/",""); print}')"})
+  branches=(${(f)"$(git branch --format='%(refname:short)' 2>/dev/null)"})
+  branches=(${branches:|checked})
+  _describe 'branch' branches
+}
+compdef _wta wta
+
 wt+() {
   wta "$@"
 }
