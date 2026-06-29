@@ -7,7 +7,7 @@ while [[ "$1" == -* ]]; do
         -i)  interactive=1 ;;
         -q)  quiet=1 ;;
         -qq) quiet=2 ;;
-        -A)  all=1 ;;
+        -y|-A)  all=1 ;;
         *)   echo "Usage: install [-i] [-q|-qq] [-A] PKG [PKG...]" >&2; exit 1 ;;
     esac
     shift
@@ -36,8 +36,8 @@ elif command -v pacman &>/dev/null; then
 fi
 
 if (( !all )); then
-    read -rp "No standard package manager found for: $*. Try alternatives (paru, npm, brew, cargo)? [y/N] " ans
-    [[ "$ans" =~ ^[Yy] ]] || exit 1
+    read -rp "No standard package manager found for: $*. Try alternatives (paru, npm, brew, cargo)? [Y/n] " ans
+    [[ "$ans" =~ [nN] ]] || exit 1
 fi
 
 for mgr in paru npm brew cargo; do
