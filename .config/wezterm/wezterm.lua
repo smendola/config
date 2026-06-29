@@ -86,6 +86,16 @@ config.selection_word_boundary = " \t\n{}[]()\"'`,;:"
 local wezterm = require 'wezterm'
 local act = wezterm.action
 
+-- Split H or V based on pane aspect ratio (wider → side by side, taller → top/bottom)
+local function smart_split(window, pane)
+  local dim = pane:get_dimensions()
+  if dim.pixel_width > dim.pixel_height then
+    window:perform_action(act.SplitHorizontal { domain = 'CurrentPaneDomain' }, pane)
+  else
+    window:perform_action(act.SplitVertical { domain = 'CurrentPaneDomain' }, pane)
+  end
+end
+
 config.disable_default_key_bindings = false
 
 config.leader = {
@@ -99,6 +109,20 @@ config.keys = {
     key = "p",
     mods = "CTRL|SHIFT",
     action = wezterm.action.ActivateCommandPalette
+  },
+
+  -- Smart split: H or V based on pane aspect ratio
+  {
+    key = "=",
+    mods = "ALT",
+    action = wezterm.action_callback(smart_split),
+  },
+
+  -- Maximize current pane (zoom), hiding others; press again to restore
+  {
+    key = "Enter",
+    mods = "CTRL|SHIFT",
+    action = act.TogglePaneZoomState,
   },
   -- Split horizontally (left/right panes)
   {
