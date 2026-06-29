@@ -2,6 +2,8 @@ local wezterm = require 'wezterm'
 
 local config = wezterm.config_builder()
 
+-- config.dpi = 96
+
 ------------------------------------------------------------------------
 -- Appearance
 ------------------------------------------------------------------------
