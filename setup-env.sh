@@ -41,7 +41,7 @@ git clone -b $BRANCH https://smendola@github.com/smendola/config.git
 mv .git .config.git
 dots submodule update --init
 
-./bin/install zsh
+./bin/install-pkg zsh
 
 KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 

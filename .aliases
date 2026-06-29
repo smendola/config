@@ -356,7 +356,6 @@ alias whence=~/bin/whence
 
 alias yum='sudo yum'
 alias pacman='sudo pacman'
-alias paru='sudo paru'
 alias apt-get='sudo apt-get'
 alias apt='sudo apt'
 alias snap='sudo snap'
