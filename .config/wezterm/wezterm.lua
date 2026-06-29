@@ -143,6 +143,15 @@ config.keys = {
     mods = "CTRL|SHIFT",
     action = wezterm.action.PasteFrom "Clipboard",
   },
+
+  {
+    key = "l",
+    mods = "CTRL|SHIFT",
+    action = act.Multiple {
+      act.ClearScrollback "ScrollbackAndViewport",
+      act.SendKey { key = "l", mods = "CTRL" },
+    },
+  },
 }
 
 ------------------------------------------------------------------------
