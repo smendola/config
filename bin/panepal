@@ -34,6 +34,7 @@ Subcommands:
       Send CMD to pane and block until it finishes. Uses a unique nonce
       internally — no coordination required. This is the preferred way to
       run long commands.
+      THIS DOES NOT WORK IN SSH'ED SESSIONS
   panepal ready [--nonce ID]   Signal completion (called inside pane).
   panepal await [-t topic] [--timeout N]
       Wait for a ready signal.
