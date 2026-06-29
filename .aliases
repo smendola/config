@@ -482,9 +482,10 @@ wta() {
   else
     git worktree add -b $branch $dir
   fi
-  if [ -f $dir/.envrc ]; then
-    direnv allow $dir
-  fi
+  find $dir -name .envrc | while read f; do
+    direnv allow ${f:h}
+  done
+  cd $dir
 }
 
 
