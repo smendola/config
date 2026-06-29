@@ -104,6 +104,7 @@ alias e=subl
 alias s=subl
 
 alias deref=realpath
+alias fp=realpath
 
 # superseded
 # run commands, displaying the command at as the terminal's title,
