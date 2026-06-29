@@ -89,7 +89,7 @@ local act = wezterm.action
 config.disable_default_key_bindings = false
 
 config.leader = {
-  key = "q",
+  key = "\\",
   mods = "CTRL",
   timeout_milliseconds = 1000,
 }
