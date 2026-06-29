@@ -12,6 +12,7 @@ experimental
 !/.bash_profile
 !/.ssh
 /.ssh/authorized_keys
+/.ssh/known_hosts.old
 /.ssh/*.key*
 !/.vim
 !/.vimrc
