@@ -460,9 +460,9 @@ reponame() {
 alias wt=wtg
 wtg() {
    local branch=${1}
-   local path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{wt=$2} $2==b{print wt}')
-   if [[ -n $path ]]; then
-     cd $path
+   local wt_path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{wt=$2} $2==b{print wt}')
+   if [[ -n $wt_path ]]; then
+     cd $wt_path
    else
      echo "no worktree for branch $branch"
    fi
