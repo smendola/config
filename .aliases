@@ -201,7 +201,6 @@ type stty > /dev/null 2>&1 || stty() {
 # you get the gist.
 function dots () {
   (
-    cd $HOME
     git --git-dir=$HOME/.config.git/ --work-tree=$HOME "$@"
   )
 }
