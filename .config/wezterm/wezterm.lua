@@ -16,7 +16,7 @@ config.color_scheme = "Tokyo Night"
 
 config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
 
-config.font_size = 11.0
+config.font_size = 10.0
 config.line_height = 1.0
 config.cell_width = 1.0
 
@@ -87,10 +87,20 @@ config.selection_word_boundary = " \t\n{}[]()\"'`,;:"
 local wezterm = require 'wezterm'
 local act = wezterm.action
 
+-- Split H or V based on pane aspect ratio (wider → side by side, taller → top/bottom)
+local function smart_split(window, pane)
+  local dim = pane:get_dimensions()
+  if dim.pixel_width > dim.pixel_height then
+    window:perform_action(act.SplitHorizontal { domain = 'CurrentPaneDomain' }, pane)
+  else
+    window:perform_action(act.SplitVertical { domain = 'CurrentPaneDomain' }, pane)
+  end
+end
+
 config.disable_default_key_bindings = false
 
 config.leader = {
-  key = "q",
+  key = "\\",
   mods = "CTRL",
   timeout_milliseconds = 1000,
 }
@@ -100,6 +110,20 @@ config.keys = {
     key = "p",
     mods = "CTRL|SHIFT",
     action = wezterm.action.ActivateCommandPalette
+  },
+
+  -- Smart split: H or V based on pane aspect ratio
+  {
+    key = "=",
+    mods = "ALT",
+    action = wezterm.action_callback(smart_split),
+  },
+
+  -- Maximize current pane (zoom), hiding others; press again to restore
+  {
+    key = "Enter",
+    mods = "CTRL|SHIFT",
+    action = act.TogglePaneZoomState,
   },
   -- Split horizontally (left/right panes)
   {
@@ -144,6 +168,48 @@ config.keys = {
     mods = "CTRL|SHIFT",
     action = wezterm.action.PasteFrom "Clipboard",
   },
+
+  {
+    key = "l",
+    mods = "CTRL|SHIFT",
+    action = act.Multiple {
+      act.ClearScrollback "ScrollbackAndViewport",
+      act.SendKey { key = "l", mods = "CTRL" },
+    },
+  },
+
+  -- Font size: increase/decrease by 1
+  {
+    key = "=",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    key = "-",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
+  },
+
+  -- Font size: reset to config default
+  {
+    key = "0",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      cfg.font_size = config.font_size
+      window:set_config_overrides(cfg)
+    end),
+  },
 }
 
 ------------------------------------------------------------------------
@@ -155,6 +221,28 @@ config.mouse_bindings = {
     event = { Up = { streak = 1, button = "Left" } },
     mods = "NONE",
     action = act.CompleteSelectionOrOpenLinkAtMouseCursor "ClipboardAndPrimarySelection",
+  },
+
+  -- Font size: Ctrl+scroll wheel
+  {
+    event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
   },
 }
 
