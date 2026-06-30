@@ -160,7 +160,7 @@ fi
 precmd_functions+=(set_newest)
 
 set_newest() {
-  newest=$(echo *(om[1]))
+  newest=$(echo *(Nom[1]))
 }
 
 ###############################################################
