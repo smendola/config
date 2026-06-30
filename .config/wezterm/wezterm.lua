@@ -16,7 +16,7 @@ config.color_scheme = "Tokyo Night"
 
 config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
 
-config.font_size = 11.0
+config.font_size = 10.0
 config.line_height = 1.0
 config.cell_width = 1.0
 
@@ -177,6 +177,39 @@ config.keys = {
       act.SendKey { key = "l", mods = "CTRL" },
     },
   },
+
+  -- Font size: increase/decrease by 1
+  {
+    key = "=",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    key = "-",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
+  },
+
+  -- Font size: reset to config default
+  {
+    key = "0",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      cfg.font_size = config.font_size
+      window:set_config_overrides(cfg)
+    end),
+  },
 }
 
 ------------------------------------------------------------------------
@@ -188,6 +221,28 @@ config.mouse_bindings = {
     event = { Up = { streak = 1, button = "Left" } },
     mods = "NONE",
     action = act.CompleteSelectionOrOpenLinkAtMouseCursor "ClipboardAndPrimarySelection",
+  },
+
+  -- Font size: Ctrl+scroll wheel
+  {
+    event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
   },
 }
 
