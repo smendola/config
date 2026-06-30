@@ -16,7 +16,7 @@ config.color_scheme = "Tokyo Night"
 
 config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
 
-config.font_size = 11.0
+config.font_size = 10.0
 config.line_height = 1.0
 config.cell_width = 1.0
 
@@ -148,7 +148,10 @@ config.keys = {
   {
     key = "w",
     mods = "CTRL|SHIFT",
-    action = wezterm.action.CloseCurrentTab { confirm = true },
+    action = wezterm.action_callback(function(window, pane)
+      local tabs = window:mux_window():tabs()
+      window:perform_action(act.CloseCurrentTab { confirm = #tabs > 1 }, pane)
+    end),
   },
 
   {
@@ -177,6 +180,39 @@ config.keys = {
       act.SendKey { key = "l", mods = "CTRL" },
     },
   },
+
+  -- Font size: increase/decrease by 1
+  {
+    key = "=",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    key = "-",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
+  },
+
+  -- Font size: reset to config default
+  {
+    key = "0",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      cfg.font_size = config.font_size
+      window:set_config_overrides(cfg)
+    end),
+  },
 }
 
 ------------------------------------------------------------------------
@@ -188,6 +224,28 @@ config.mouse_bindings = {
     event = { Up = { streak = 1, button = "Left" } },
     mods = "NONE",
     action = act.CompleteSelectionOrOpenLinkAtMouseCursor "ClipboardAndPrimarySelection",
+  },
+
+  -- Font size: Ctrl+scroll wheel
+  {
+    event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = size + 1
+      window:set_config_overrides(cfg)
+    end),
+  },
+  {
+    event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, _)
+      local cfg = window:get_config_overrides() or {}
+      local size = cfg.font_size or config.font_size
+      cfg.font_size = math.max(1, size - 1)
+      window:set_config_overrides(cfg)
+    end),
   },
 }
 
@@ -288,6 +346,16 @@ config.warn_about_missing_glyphs = true
 -- wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
 --   return tab.active_pane.title
 -- end)
+
+-- Only confirm window close if more than one tab is open
+wezterm.on("window-close-requested", function(window, pane)
+  local tabs = window:mux_window():tabs()
+  if #tabs > 1 then
+    window:perform_action(act.CloseCurrentTab { confirm = true }, pane)
+  else
+    window:perform_action(act.CloseCurrentTab { confirm = false }, pane)
+  end
+end)
 
 ------------------------------------------------------------------------
 
