@@ -148,7 +148,10 @@ config.keys = {
   {
     key = "w",
     mods = "CTRL|SHIFT",
-    action = wezterm.action.CloseCurrentTab { confirm = true },
+    action = wezterm.action_callback(function(window, pane)
+      local tabs = window:mux_window():tabs()
+      window:perform_action(act.CloseCurrentTab { confirm = #tabs > 1 }, pane)
+    end),
   },
 
   {
@@ -343,6 +346,16 @@ config.warn_about_missing_glyphs = true
 -- wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
 --   return tab.active_pane.title
 -- end)
+
+-- Only confirm window close if more than one tab is open
+wezterm.on("window-close-requested", function(window, pane)
+  local tabs = window:mux_window():tabs()
+  if #tabs > 1 then
+    window:perform_action(act.CloseCurrentTab { confirm = true }, pane)
+  else
+    window:perform_action(act.CloseCurrentTab { confirm = false }, pane)
+  end
+end)
 
 ------------------------------------------------------------------------
 
