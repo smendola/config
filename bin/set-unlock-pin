@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pin_file=/etc/unlock_pin
+pam_line="auth        sufficient  pam_pwdfile.so pwdfile=$pin_file"
+
+die() {
+  if command -v kdialog >/dev/null 2>&1; then
+    kdialog --error "$1"
+  fi
+  echo "error: $1" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "$1 is required"
+}
+
+ensure_pam_service() {
+  local service=$1
+  local include_pattern=$2
+  local source_file=/usr/lib/pam.d/$service
+  local target_file=/etc/pam.d/$service
+  local tmp_file
+
+  [[ -f "$source_file" || -f "$target_file" ]] || die "PAM service $service was not found"
+
+  if [[ ! -f "$target_file" ]]; then
+    sudo cp "$source_file" "$target_file"
+    sudo chown root:root "$target_file"
+    sudo chmod 644 "$target_file"
+  fi
+
+  tmp_file=$(mktemp)
+
+  awk -v pam_line="$pam_line" -v include_pattern="$include_pattern" '
+    $0 ~ /pam_pwdfile\.so[[:space:]]+pwdfile=\/etc\/unlock_pin/ { next }
+    !inserted && $0 ~ include_pattern {
+      print pam_line
+      inserted = 1
+    }
+    { print }
+    END {
+      if (!inserted) {
+        print pam_line
+      }
+    }
+  ' "$target_file" > "$tmp_file"
+
+  sudo install -o root -g root -m 644 "$tmp_file" "$target_file"
+  rm -f "$tmp_file"
+}
+
+verify_service() {
+  local service=$1
+  local output
+
+  output=$(printf '%s\n' "$pin" | pamtester "$service" "$USER" authenticate 2>&1) || {
+    die "PIN was written, but $service verification failed:\n\n$output"
+  }
+}
+
+require_command kdialog
+require_command openssl
+require_command sudo
+
+[[ -r /usr/lib/security/pam_pwdfile.so ]] || die "pam_pwdfile is not installed"
+
+pin=$(kdialog --title "Set unlock PIN" --password "Enter new unlock PIN") || exit 1
+
+if [[ -z "$pin" ]]; then
+  die "PIN cannot be empty"
+fi
+
+confirm=$(kdialog --title "Set unlock PIN" --password "Re-enter new unlock PIN") || exit 1
+
+if [[ "$pin" != "$confirm" ]]; then
+  unset pin confirm
+  die "PINs do not match. Nothing changed."
+fi
+
+hash=$(printf '%s\n' "$pin" | openssl passwd -6 -stdin)
+unset confirm
+
+printf '%s:%s\n' "$USER" "$hash" | sudo tee "$pin_file" >/dev/null
+unset hash
+
+sudo chown "$USER":root "$pin_file"
+sudo chmod 600 "$pin_file"
+
+ensure_pam_service kde '^[[:space:]]*auth[[:space:]]+include[[:space:]]+system-local-login'
+ensure_pam_service plasmalogin '^[[:space:]]*auth[[:space:]]+include[[:space:]]+system-login'
+
+if command -v pamtester >/dev/null 2>&1; then
+  verify_service kde
+  verify_service plasmalogin
+  unset pin
+  kdialog --msgbox "Unlock PIN set up and verified for both lockscreen and graphical login."
+else
+  unset pin
+  kdialog --msgbox "Unlock PIN set up for both lockscreen and graphical login. Install pamtester if you want automatic verification."
+fi
