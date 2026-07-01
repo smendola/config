@@ -20,7 +20,7 @@ config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
 -- -> as →, etc. Keeps source characters visually distinct from math symbols.
 config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 
-config.font_size = 10.0
+config.font_size = 10.5
 config.line_height = 1.0
 config.cell_width = 1.0
 
