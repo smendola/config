@@ -84,7 +84,6 @@ config.selection_word_boundary = " \t\n{}[]()\"'`,;:"
 ------------------------------------------------------------------------
 -- Key bindings
 ------------------------------------------------------------------------
-local wezterm = require 'wezterm'
 local act = wezterm.action
 
 -- Split H or V based on pane aspect ratio (wider → side by side, taller → top/bottom)
@@ -291,9 +290,9 @@ config.ssh_domains = {
 ------------------------------------------------------------------------
 
 config.unix_domains = {
-  -- {
-  --   name = "local",
-  -- },
+  {
+    name = "mux",
+  },
 }
 
 ------------------------------------------------------------------------
