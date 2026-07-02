@@ -139,6 +139,7 @@ Waiting for long-running commands
   DO immediately capture the pane after submitting a run command to confirm that it
   was in fact correctly parsed; otherwise you may be waiting forever while the shell
   waits forever for you to send it a missing close-quote or HEREDOC close tag.
+  IMPORTANT: `panepal run` does not work in SSH sessions. It will HANG.
 
 Examples (AI agent side):
   panepal run${topic:+ -t $topic} --timeout 120 'make build'
