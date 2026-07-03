@@ -33,7 +33,11 @@ fi
 unset X11_DPY_PORT
 [[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]+:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
 
-if [[ $DISPLAY = ':0' ]]; then
+if [[ -n "$WAYLAND_DISPLAY" ]]; then # WAYLAND_DISPLAY can be a path or just a name like "wayland-0"
+  local sock="${WAYLAND_DISPLAY}"
+  [[ "${sock}" != /* ]] && sock="${XDG_RUNTIME_DIR}/${sock}"
+  [[ -S "$sock" ]] && _x_status=green || _x_status=red
+elif [[ $DISPLAY = ':0' ]]; then
   # :0 does not necessarily mean port 6000, could be other kind of socket
   xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 elif [[ $X11_DPY_PORT ]]; then
