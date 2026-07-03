@@ -30,7 +30,7 @@ config.initial_cols = 120
 config.initial_rows = 35
 
 -- config.window_decorations = "RESIZE"
--- config.window_close_confirmation = "AlwaysPrompt"
+config.window_close_confirmation = "NeverPrompt"
 
 config.window_background_opacity = 1.0
 config.text_background_opacity = 1.0
@@ -346,4 +346,3 @@ config.warn_about_missing_glyphs = true
 ------------------------------------------------------------------------
 
 return config
-
