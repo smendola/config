@@ -53,8 +53,8 @@ fi
 # TERM=%B$TERM%b
 # tty=%B%y%b
 # DISPLAY=%F{$_x_status}$DISPLAY%f"
+#SSH_CONNECTION=%B$SSH_CONNECTION%b
 [[ -z $PS1 ]] || print -P "Sourcing file %B%N%b
-SSH_CONNECTION=%B$SSH_CONNECTION%b
 Logged in as %B$USER@$HOST%b
 %B$TERM%b on %B%y%b
 DISPLAY=%F{$_x_status}${DISPLAY//\%/%%}%f"
