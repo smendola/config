@@ -14,7 +14,7 @@ config.color_scheme = "Tokyo Night"
 --   background = "#000000",
 -- }
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
+config.font = wezterm.font('JetBrains Mono', { weight = 'Light' })
 
 config.font_size = 10.0
 config.line_height = 1.0
