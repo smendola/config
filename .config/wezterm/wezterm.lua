@@ -46,7 +46,7 @@ config.color_scheme = "Tokyo Night"
 --   background = "#000000",
 -- }
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'ExtraLight' })
+config.font = wezterm.font('JetBrains Mono', { weight = 'Light' })
 
 -- Disable contextual ligatures: prevents != from rendering as ≠,
 -- -> as →, etc. Keeps source characters visually distinct from math symbols.
