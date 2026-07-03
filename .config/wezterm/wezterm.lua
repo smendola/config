@@ -66,7 +66,7 @@ config.initial_cols = 120
 config.initial_rows = 35
 
 -- config.window_decorations = "RESIZE"
--- config.window_close_confirmation = "AlwaysPrompt"
+config.window_close_confirmation = "NeverPrompt"
 
 config.window_background_opacity = 1.0
 config.text_background_opacity = 1.0
@@ -382,17 +382,6 @@ config.warn_about_missing_glyphs = true
 --   return tab.active_pane.title
 -- end)
 
--- Only confirm window close if more than one tab is open
-wezterm.on("window-close-requested", function(window, pane)
-  local tabs = window:mux_window():tabs()
-  if #tabs > 1 then
-    window:perform_action(act.CloseCurrentTab { confirm = true }, pane)
-  else
-    window:perform_action(act.CloseCurrentTab { confirm = false }, pane)
-  end
-end)
-
 ------------------------------------------------------------------------
 
 return config
-
