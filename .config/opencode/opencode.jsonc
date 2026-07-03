@@ -105,5 +105,8 @@
   },
   "plugin": [
     "/home/sal/repos/ponytail/.opencode/plugins/ponytail.mjs"
-  ]
+  ],
+  "keybinds": {
+    "diff_open": "<leader>d"
+  }
 }
