@@ -48,12 +48,31 @@ with ThreadPoolExecutor(max_workers=len(HOSTS)) as pool:
 for i, (host, is_online) in enumerate(zip(HOSTS, statuses), 1):
     print(f"{i}) {host}{'' if is_online else ' [OFFLINE]'}")
 
-choice = input("Host: ").strip()
+print('')
 
-if choice.isdigit() and 1 <= int(choice) <= len(HOSTS):
-    choice = HOSTS[int(choice) - 1]
+while True:
+    choice = input("Host: ").strip()
 
-if not choice:
-    raise SystemExit(1)
+    if not choice:
+        continue
 
-os.execvp("wezterm", ["wezterm", "ssh", choice])
+    if choice == "q" or choice == "0":
+        raise SystemExit(0)
+
+    if not choice.isdigit():
+        break
+
+    number = int(choice)
+    if 1 <= number <= len(HOSTS):
+        choice = HOSTS[number - 1]
+        break
+
+    print(f"No host numbered {choice}")
+
+subprocess.Popen(
+    ["wezterm", "ssh", choice],
+    stdin=subprocess.DEVNULL,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    start_new_session=True,
+)
