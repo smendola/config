@@ -29,3 +29,4 @@ experimental
 !/bin
 !/bin.personal
 !.gnupg/gpg.conf
+__pycache__/
