@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+
+import socket
+import subprocess
+import os
+from concurrent.futures import ThreadPoolExecutor
+
+HOSTS_FILE = os.path.expanduser("~/.wts_hosts")
+
+with open(HOSTS_FILE) as f:
+    HOSTS = [line.strip() for line in f if line.strip()]
+
+
+def ssh_target(alias):
+    host = alias
+    port = 22
+
+    proc = subprocess.run(
+        ["ssh", "-G", alias],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+
+    for line in proc.stdout.splitlines():
+        key, _, value = line.partition(" ")
+        if key == "hostname":
+            host = value
+        elif key == "port":
+            port = int(value)
+
+    return host, port
+
+
+def online(alias):
+    try:
+        host, port = ssh_target(alias)
+        with socket.create_connection((host, port), timeout=0.5):
+            return True
+    except OSError:
+        return False
+
+
+with ThreadPoolExecutor(max_workers=len(HOSTS)) as pool:
+    statuses = list(pool.map(online, HOSTS))
+
+for i, (host, is_online) in enumerate(zip(HOSTS, statuses), 1):
+    print(f"{i}) {host}{'' if is_online else ' [OFFLINE]'}")
+
+choice = input("Host: ").strip()
+
+if choice.isdigit() and 1 <= int(choice) <= len(HOSTS):
+    choice = HOSTS[int(choice) - 1]
+
+if not choice:
+    raise SystemExit(1)
+
+os.execvp("wezterm", ["wezterm", "ssh", choice])
