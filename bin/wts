@@ -3,12 +3,13 @@
 import socket
 import subprocess
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 HOSTS_FILE = os.path.expanduser("~/.wts_hosts")
-
-with open(HOSTS_FILE) as f:
-    HOSTS = [line.strip() for line in f if line.strip()]
+DIM = "\033[2m"
+DIM_RED = "\033[2;31m"
+RESET = "\033[0m"
 
 
 def ssh_target(alias):
@@ -33,46 +34,73 @@ def ssh_target(alias):
     return host, port
 
 
-def online(alias):
+def host_status(alias):
     try:
         host, port = ssh_target(alias)
         with socket.create_connection((host, port), timeout=0.5):
-            return True
+            return "online"
+    except socket.gaierror:
+        return "unknown"
     except OSError:
-        return False
+        return "offline"
 
 
-with ThreadPoolExecutor(max_workers=len(HOSTS)) as pool:
-    statuses = list(pool.map(online, HOSTS))
+def main():
+    if not os.path.exists(HOSTS_FILE):
+        print(f"Hosts file not found: {HOSTS_FILE}")
+        input("Press Enter to exit...")
+        raise SystemExit(1)
 
-for i, (host, is_online) in enumerate(zip(HOSTS, statuses), 1):
-    print(f"{i}) {host}{'' if is_online else ' [OFFLINE]'}")
+    with open(HOSTS_FILE) as f:
+        hosts = [line.strip() for line in f if line.strip()]
 
-print('')
+    with ThreadPoolExecutor(max_workers=len(hosts)) as pool:
+        statuses = list(pool.map(host_status, hosts))
 
-while True:
-    choice = input("Host: ").strip()
+    for i, (host, status) in enumerate(zip(hosts, statuses), 1):
+        line = f"{i}) {host}"
 
-    if not choice:
-        continue
+        if status == "online":
+            print(line)
+        elif status == "unknown":
+            print(f"{DIM_RED}{line} [UNKNOWN]{RESET}")
+        else:
+            print(f"{DIM}{line} [OFFLINE]{RESET}")
 
-    if choice == "q" or choice == "0":
-        raise SystemExit(0)
+    print('')
 
-    if not choice.isdigit():
-        break
+    while True:
+        choice = input("Host: ").strip()
 
-    number = int(choice)
-    if 1 <= number <= len(HOSTS):
-        choice = HOSTS[number - 1]
-        break
+        if not choice:
+            continue
 
-    print(f"No host numbered {choice}")
+        if choice == "q" or choice == "0":
+            raise SystemExit(0)
 
-subprocess.Popen(
-    ["wezterm", "ssh", choice],
-    stdin=subprocess.DEVNULL,
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL,
-    start_new_session=True,
-)
+        if not choice.isdigit():
+            break
+
+        number = int(choice)
+        if 1 <= number <= len(hosts):
+            choice = hosts[number - 1]
+            break
+
+        print(f"No host numbered {choice}")
+
+    subprocess.Popen(
+        ["wezterm", "ssh", choice],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+
+    time.sleep(2)
+
+
+try:
+    main()
+except KeyboardInterrupt:
+    print()
+    raise SystemExit(0)
