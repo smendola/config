@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 HOSTS_FILE = os.path.expanduser("~/.wts_hosts")
 DIM = "\033[2m"
 DIM_RED = "\033[2;31m"
+ITALIC = "\033[3m"
 RESET = "\033[0m"
 
 
@@ -52,20 +53,31 @@ def main():
         raise SystemExit(1)
 
     with open(HOSTS_FILE) as f:
-        hosts = [line.strip() for line in f if line.strip()]
+        entries = []
+        for line in f:
+            line = line.strip()
+            if line:
+                parts = line.split(None, 1)
+                host = parts[0]
+                desc = parts[1] if len(parts) > 1 else ""
+                entries.append((host, desc))
+
+    hosts = [host for host, _ in entries]
 
     with ThreadPoolExecutor(max_workers=len(hosts)) as pool:
         statuses = list(pool.map(host_status, hosts))
 
-    for i, (host, status) in enumerate(zip(hosts, statuses), 1):
-        line = f"{i}) {host}"
+    for i, ((host, desc), status) in enumerate(zip(entries, statuses), 1):
+        label = f"{i}) {host}"
+        if desc:
+            label += f" {ITALIC}{desc}{RESET}"
 
         if status == "online":
-            print(line)
+            print(label)
         elif status == "unknown":
-            print(f"{DIM_RED}{line} [UNKNOWN]{RESET}")
+            print(f"{DIM_RED}{label} [UNKNOWN]{RESET}")
         else:
-            print(f"{DIM}{line} [OFFLINE]{RESET}")
+            print(f"{DIM}{label} [OFFLINE]{RESET}")
 
     print('')
 
