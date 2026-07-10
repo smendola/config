@@ -61,7 +61,10 @@ NEW = """\
 
 def find_target():
     candidates = glob.glob("/usr/lib/python3*/site-packages/variety/VarietyWindow.py")
-    candidates += glob.glob("/usr/local/lib/python3*/site-packages/variety/VarietyWindow.py")
+    candidates += glob.glob("/usr/lib/python3/dist-packages/variety/VarietyWindow.py")
+    candidates += glob.glob(
+        "/usr/local/lib/python3*/site-packages/variety/VarietyWindow.py"
+    )
     candidates += glob.glob("/usr/share/variety/variety/VarietyWindow.py")
     if not candidates:
         sys.exit("ERROR: Could not find VarietyWindow.py. Is variety installed?")
