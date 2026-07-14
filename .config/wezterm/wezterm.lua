@@ -255,10 +255,25 @@ config.keys = {
 ------------------------------------------------------------------------
 
 config.mouse_bindings = {
+  -- Plain click: complete selection only (do not open links)
   {
     event = { Up = { streak = 1, button = "Left" } },
     mods = "NONE",
-    action = act.CompleteSelectionOrOpenLinkAtMouseCursor "ClipboardAndPrimarySelection",
+    action = act.CompleteSelection "ClipboardAndPrimarySelection",
+  },
+
+  -- Ctrl+Click: open link
+  {
+    event = { Up = { streak = 1, button = "Left" } },
+    mods = "CTRL",
+    action = act.OpenLinkAtMouseCursor,
+  },
+
+  -- Middle click: paste from clipboard
+  {
+    event = { Down = { streak = 1, button = "Middle" } },
+    mods = "NONE",
+    action = act.PasteFrom "Clipboard",
   },
 
   -- Font size: Ctrl+scroll wheel
