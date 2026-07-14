@@ -102,3 +102,6 @@
 
 [submodule]
 	recurse = true
+[merge "take-theirs"]
+	name = Always take theirs
+	driver = cp %B %A

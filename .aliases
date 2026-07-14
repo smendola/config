@@ -341,7 +341,7 @@ function gups() {
 
 alias gpr='git pull --rebase'
 alias gpp='git pull --rebase && git push'
-alias mods='git status'
+alias mods='git status --short'
 alias start=xdg-open
 
 alias vpn='sudo openconnect -q --authgroup=1_BOSVPN -b --no-cert-check bosvpn.phtcorp.com'
