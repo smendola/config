@@ -73,7 +73,7 @@ config.text_background_opacity = 1.0
 
 -- config.macos_window_background_blur = 20
 
-config.enable_scroll_bar = false
+config.enable_scroll_bar = true
 config.enable_tab_bar = true
 config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = true
@@ -90,8 +90,8 @@ config.cursor_blink_rate = 800
 -- Scrolling
 ------------------------------------------------------------------------
 
-config.scrollback_lines = 10000
-config.enable_scroll_bar = false
+config.scrollback_lines = 90000
+config.enable_scroll_bar = true
 
 ------------------------------------------------------------------------
 -- Performance
@@ -346,7 +346,7 @@ config.default_workspace = "default"
 
 config.window_padding = {
   left = 4,
-  right = 4,
+  right = 12,
   top = 2,
   bottom = 2,
 }
