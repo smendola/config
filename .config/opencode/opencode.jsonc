@@ -90,6 +90,16 @@
     }
   },
   "mcp": {
+    "asana": {
+      "type": "remote",
+      "url": "https://mcp.asana.com/v2/mcp",
+      "enabled": true,
+      "oauth": {
+        "clientId": "{env:ASANA_CLIENT_ID}",
+        "clientSecret": "{env:ASANA_CLIENT_SECRET}",
+        "redirectUri": "http://localhost:19876/mcp/oauth/callback"
+      }
+    },
     "sentry": {
       "type": "remote",
       "url": "https://mcp.sentry.dev/mcp"
