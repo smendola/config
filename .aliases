@@ -549,22 +549,51 @@ git () {
   local sub_cmd=$1
   shift
   local prefix=()
+  local auto_stashed=0
+  local git_status=0
+
+  # In $HOME, treat git commands as dotfile-repo commands, except clone.
   if [[ $(pwd) == "$HOME" && $sub_cmd != clone ]]; then
     prefix=(--git-dir="$HOME/.config.git" --work-tree="$HOME")
   fi
 
   if [[ $sub_cmd == push ]]; then
     command git "${prefix[@]}" fetch 2>/dev/null
+
+    # If upstream has commits we do not have, offer to pull before pushing.
     if [[ -n $(command git "${prefix[@]}" log HEAD..@{u} --oneline 2>/dev/null) ]]; then
       echo -n 'Use pull/rebase first? y/n [y]: '
+      local yn
       read yn
       [[ $yn == n* ]] && return 1
-      command git "${prefix[@]}" pull --rebase "$@" || {
+
+      # Rebase needs a clean worktree, so temporarily stash local work.
+      # Include staged changes and untracked files; restore with --index below.
+      if ! command git "${prefix[@]}" diff --quiet || \
+         ! command git "${prefix[@]}" diff --cached --quiet || \
+         [[ -n $(command git "${prefix[@]}" ls-files --others --exclude-standard) ]]; then
+        command git "${prefix[@]}" stash push --include-untracked -m "git push autostash" || return
+        auto_stashed=1
+      fi
+
+      # Prefer rebase. If that fails, abort any in-progress rebase and try merge.
+      if ! command git "${prefix[@]}" pull --rebase "$@"; then
         command git "${prefix[@]}" rebase --abort 2>/dev/null
-        command git "${prefix[@]}" pull "$@" || return
-      }
+        command git "${prefix[@]}" pull "$@"
+        git_status=$?
+      fi
     fi
   fi
 
-  command git "${prefix[@]}" $sub_cmd "$@"
+  if (( git_status == 0 )); then
+    command git "${prefix[@]}" $sub_cmd "$@"
+    git_status=$?
+  fi
+
+  # Restore local work even if pull or push failed; keep the original failure code.
+  if (( auto_stashed )); then
+    command git "${prefix[@]}" stash pop --index
+    (( git_status == 0 )) && git_status=$?
+  fi
+  return $git_status
 }
