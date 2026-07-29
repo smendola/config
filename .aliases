@@ -481,6 +481,7 @@ wta() {
   local dir=~/wt/$(reponame)/${branch/\//-}
   if git show-ref --verify --quiet refs/heads/$branch; then
     git worktree add $dir $branch
+    (cd $dir && git submodule update --init --recursive)
   else
     git worktree add -b $branch $dir
   fi
