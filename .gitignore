@@ -36,4 +36,5 @@ experimental
 !/.local/share/icons/
 /.local/share/icons/*
 !/.local/share/icons/apps
+!.config/opencode/opencode.jsonc
 __pycache__/
