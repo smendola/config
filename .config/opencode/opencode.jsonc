@@ -16,10 +16,15 @@
     "reserved": 15000
   },
   "provider": {
+    "zai": {
+      "options": {
+        "apiKey": "{env:ZAI_GLM_KEY}"
+      }
+    },
     "deepseek": {
       "options": {
         "baseURL": "https://api.deepseek.com",
-        "apiKey": "sk-2b3a3b9375834364afc86965e9d9f1af"
+        "apiKey": "{env:DEEPSEEK_API_KEY}"
       }
     },
     "llama-server": {
@@ -102,7 +107,6 @@
     "asana": {
       "type": "remote",
       "url": "https://mcp.asana.com/v2/mcp",
-      "enabled": true,
       "oauth": {
         "clientId": "{env:ASANA_CLIENT_ID}",
         "clientSecret": "{env:ASANA_CLIENT_SECRET}",
@@ -116,9 +120,17 @@
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
-      "enabled": true,
       "headers": {
         "Authorization": "Bearer {env:CONTEXT7_API_KEY}"
+      }
+    },
+    "freecad": {
+      "type": "local",
+      "command": ["/home/sal/miniconda3/bin/freecad-mcp"],
+      "environment": {
+        "FREECAD_MODE": "xmlrpc",
+        "FREECAD_SOCKET_HOST": "localhost",
+        "FREECAD_XMLRPC_PORT": "9875"
       }
     }
   },
