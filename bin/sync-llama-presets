@@ -44,14 +44,18 @@ def main():
     presets = parse_ini(PRESET_PATH)
     config = json.loads(OPENCODE_PATH.read_text())
 
+    existing_models = config["provider"]["llama-server"].get("models", {})
+
     models = {}
     for section, values in presets.items():
         ctx = int(values.get("ctx-size", 4096))
         name = auto_name(section, ctx)
-        models[section] = {
-            "name": name,
-            "limit": {"context": ctx, "output": DEFAULT_OUTPUT},
-        }
+        # Preserve any extra settings (e.g. "interleaved") already present
+        # for this model; only overwrite the fields we manage.
+        merged = dict(existing_models.get(section, {}))
+        merged["name"] = name
+        merged["limit"] = {"context": ctx, "output": DEFAULT_OUTPUT}
+        models[section] = merged
         print(f"  {name}")
 
     config["provider"]["llama-server"]["models"] = models
