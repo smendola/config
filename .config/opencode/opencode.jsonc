@@ -26,9 +26,12 @@
       "name": "llama-server cuda-linux:8080",
       "models": {
         "bonsai-27b-q2-think": {
-          "name": "Bonsai 27B Q2 Think [100k]",
+          "name": "Bonsai 27B Q2 Think [120k]",
+          "interleaved": {
+            "field": "reasoning_content"
+          },
           "limit": {
-            "context": 100000,
+            "context": 120000,
             "output": 8192
           }
         },
