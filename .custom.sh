@@ -109,7 +109,13 @@ up() {
 }
 
 down() {
-  if [[ $1 =~ ^[0-9]+ ]]
+  if [[ $1 =~ ^[0-9]{14}.* ]]
+  then
+    argv[1]=VERSION=$1
+    truncate -s0 $(project_root)/log/development.log
+    rails db:migrate:down "$@" 2>&1 | (grep -v /gems/ || true)
+    return
+  elif [[ $1 =~ ^[0-9]{1,2}$ ]]
   then
     argv[1]=STEP=$1
   fi
