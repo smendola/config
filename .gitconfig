@@ -80,7 +80,7 @@
     pager = delta
 
 [interactive]
-    eiffFilter = delta --color-only
+    diffFilter = delta --color-only
 
 [delta]
     features = zenburn
@@ -105,3 +105,9 @@
 [merge "take-theirs"]
 	name = Always take theirs
 	driver = cp %B %A
+[credential "https://github.com"]
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://git.heroku.com"]
+	helper = !heroku git:credentials
