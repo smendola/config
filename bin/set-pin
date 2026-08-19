@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+import getpass
+import os
+import subprocess
+import sys
+
+PIN_FILE = "/etc/unlock_pin"
+USERNAME = "sal"
+
+pin = getpass.getpass("Enter new PIN: ")
+confirm = getpass.getpass("Confirm new PIN: ")
+
+if pin != confirm:
+    print("PINs do not match. Aborting.")
+    sys.exit(1)
+
+result = subprocess.run(
+    ["openssl", "passwd", "-6", "-stdin"],
+    input=pin,
+    capture_output=True,
+    text=True
+)
+
+if result.returncode != 0:
+    print("Failed to hash PIN:", result.stderr)
+    sys.exit(1)
+
+hashed = result.stdout.strip()
+line = f"{USERNAME}:{hashed}\n"
+
+with open(PIN_FILE, "w") as f:
+    f.write(line)
+
+os.chmod(PIN_FILE, 0o600)
+print("PIN updated successfully.")

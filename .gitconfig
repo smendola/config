@@ -80,7 +80,7 @@
     pager = delta
 
 [interactive]
-    eiffFilter = delta --color-only
+    diffFilter = delta --color-only
 
 [delta]
     features = zenburn
@@ -109,3 +109,5 @@
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = !/usr/bin/gh auth git-credential
+[credential "https://git.heroku.com"]
+	helper = !heroku git:credentials
