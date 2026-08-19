@@ -505,6 +505,60 @@ notify () {
   echo "$text" | yad --text-info --title "$title" --button='Got it' --wrap --fontname 'Sans normal 14' --geometry 500x300-300-200
 }
 
+# Core helper: call the Heroku API with auth. Usage: _heroku_api METHOD /path [curl-args...]
+_heroku_api () {
+  local method=$1; shift
+  local endpoint=$1; shift
+  local token=$(heroku auth:token 2>/dev/null)
+  local url="https://api.heroku.com${endpoint}"
+
+  if [ -z "$token" ]; then
+    echo "Could not get Heroku auth token" >&2
+    return 1
+  fi
+
+  if command -v curl >/dev/null 2>&1; then
+    curl -s -X "$method" \
+      -H "Authorization: Bearer $token" \
+      -H "Accept: application/vnd.heroku+json; version=3" \
+      -H "Content-Type: application/json" \
+      "$url" "$@"
+    return
+  fi
+
+  if command -v wget >/dev/null 2>&1; then
+    local args=(
+      --quiet
+      --output-document=-
+      --method="$method"
+      --header="Authorization: Bearer $token"
+      --header="Accept: application/vnd.heroku+json; version=3"
+      --header="Content-Type: application/json"
+    )
+
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --data|-d|--data-raw)
+          shift
+          args+=(--body-data="$1")
+          ;;
+        --no-buffer)
+          ;;
+        *)
+          args+=("$1")
+          ;;
+      esac
+      shift
+    done
+
+    wget "${args[@]}" "$url"
+    return
+  fi
+
+  echo "Need curl or wget to call the Heroku API" >&2
+  return 1
+}
+
 hbo () {
   local app=$(expand-env ${1:-develop})
   title "hbo $env"
@@ -564,7 +618,13 @@ aurora () {
 # cancel all pending builds in a heroku env
 hbc () {
   local app=$(expand-env ${1:-develop})
-  heroku builds -a $app | grep pending | cut -c1-36 | xargs --verbose -i@ heroku builds:cancel @ -a $app
+  local builds=$(_heroku_api GET /apps/$app/builds) || return
+  printf '%s' "$builds" \
+    | python3 -c "import sys,json; [print(b['id']) for b in json.load(sys.stdin) if b['status']=='pending']" \
+    | while read -r id; do
+        echo "Cancelling build $id on $app"
+        _heroku_api DELETE /apps/$app/builds/$id
+      done
 }
 
 hb () {
