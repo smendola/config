@@ -80,6 +80,14 @@ fi
 # Check apt (resolve symlinks)
 pkg=$(dpkg -S "$real_path" 2>/dev/null | cut -d':' -f1)
 if [ -n "$pkg" ]; then
+    # Try to find the source repo
+    origin=$(apt-cache policy "$pkg" 2>/dev/null \
+        | awk '/\*\*\*/{found=1} found && /http/{print $2; exit}')
+    if [ -n "$origin" ]; then
+        echo "# source: $origin"
+    else
+        echo "# source: manually installed (no apt repo)"
+    fi
     echo "apt install $pkg"
     exit 0
 fi
