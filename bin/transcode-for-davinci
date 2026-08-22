@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+"""
+transcode-for-davinci
+Convert video files to DNxHR HQ + PCM for DaVinci Resolve Free on Linux.
+
+Usage: transcode-for-davinci [-v|-q] [--no-cuda] [-d DIR] <file|dir> [file|dir ...]
+  -v        verbose: show full ffmpeg output
+  -q        quiet: no output at all
+  --no-cuda disable CUDA hardware decoding, use CPU instead
+  -d DIR    output directory; relative input paths are prepended with DIR/,
+            absolute input paths have their leading / stripped then prepended
+
+Failed files are appended to ./failed_transcode.txt as they occur.
+"""
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".mts", ".m4v"}
+FAILED_LOG = Path("failed_transcode.txt")
+
+
+def build_cmd(path: Path, output: Path, ffmpeg_flags: list, cuda: bool) -> list:
+    # hwaccel_output_format is intentionally omitted so ffmpeg handles pixel
+    # format conversion automatically — identical to the CPU path.
+    hw_flags = ["-hwaccel", "cuda"] if cuda else []
+
+    return [
+        "ffmpeg",
+        *ffmpeg_flags,
+        *hw_flags,
+        "-i", str(path),
+        "-c:v", "dnxhd",
+        "-profile:v", "dnxhr_hq",
+        "-pix_fmt", "yuv422p",
+        "-c:a", "pcm_s16le",
+        str(output),
+    ]
+
+
+def resolve_output(path: Path, destdir: Path | None) -> Path:
+    stem = path.stem + "_dnxhr.mov"
+    if destdir is None:
+        return path.with_name(stem)
+    if path.is_absolute():
+        rel = Path(*path.parts[1:])  # strip leading /
+    else:
+        rel = path
+    return destdir / rel.with_name(stem)
+
+
+def log_failed(path: Path, quiet: bool):
+    with FAILED_LOG.open("a") as f:
+        f.write(str(path) + "\n")
+    if not quiet:
+        print(f"  Failed: logged to {FAILED_LOG}", file=sys.stderr)
+
+
+def transcode(path: Path, destdir: Path | None, verbose: bool, quiet: bool, cuda: bool) -> bool:
+    if path.stem.endswith("_dnxhr"):
+        if not quiet:
+            print(f"  Skipping (already a dnxhr output): {path}")
+        return True
+
+    output = resolve_output(path, destdir)
+
+    if output.exists():
+        if not quiet:
+            print(f"  Skipping (output exists): {output}")
+        return True
+
+    if not quiet:
+        print(f"→ {path}")
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    if verbose:
+        ffmpeg_flags = []
+    elif quiet:
+        ffmpeg_flags = ["-v", "quiet"]
+    else:
+        ffmpeg_flags = ["-v", "quiet", "-stats"]
+
+    cmd = build_cmd(path, output, ffmpeg_flags, cuda)
+    result = subprocess.run(cmd)
+
+    if result.returncode != 0 and cuda:
+        if not quiet:
+            print(f"  CUDA decode failed, retrying with CPU...")
+        if output.exists():
+            output.unlink()
+        cmd = build_cmd(path, output, ffmpeg_flags, cuda=False)
+        result = subprocess.run(cmd)
+
+    if result.returncode != 0:
+        print(f"  Error: ffmpeg failed for {path}", file=sys.stderr)
+        if output.exists():
+            output.unlink()
+        log_failed(path, quiet)
+        return False
+
+    if not quiet:
+        print(f"  Done: {output}\n")
+
+    return True
+
+
+def process(target: Path, destdir: Path | None, verbose: bool, quiet: bool, cuda: bool):
+    if target.is_file():
+        if target.suffix.lower() in EXTENSIONS:
+            transcode(target, destdir, verbose, quiet, cuda)
+        else:
+            if not quiet:
+                print(f"  Skipping (unsupported extension): {target}")
+    elif target.is_dir():
+        files = sorted(
+            f for f in target.rglob("*")
+            if f.is_file() and f.suffix.lower() in EXTENSIONS
+        )
+        for f in files:
+            transcode(f, destdir, verbose, quiet, cuda)
+    else:
+        if not quiet:
+            print(f"Skipping: '{target}' (not a file or directory)")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="transcode-for-davinci",
+        description="Convert video files to DNxHR HQ + PCM for DaVinci Resolve Free on Linux.",
+    )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-v", "--verbose", action="store_true", help="Show full ffmpeg output")
+    group.add_argument("-q", "--quiet", action="store_true", help="No output at all")
+    parser.add_argument("--no-cuda", action="store_true", help="Disable CUDA hardware decoding, use CPU instead")
+    parser.add_argument("-d", "--destdir", metavar="DIR", type=Path, help="Output directory")
+    parser.add_argument("targets", nargs="+", metavar="file|dir")
+
+    args = parser.parse_args()
+
+    destdir = args.destdir if args.destdir else None
+
+    for target in args.targets:
+        process(Path(target), destdir, args.verbose, args.quiet, not args.no_cuda)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""
+transcode-from-davinci
+Convert DNxHR MOV files from DaVinci Resolve to high-bitrate H.265 MP4.
+
+Usage: transcode-from-davinci [-v|-q] [--no-cuda] [-d DIR] <file|dir> [file|dir ...]
+  -v        verbose: show full ffmpeg output
+  -q        quiet: no output at all
+  --no-cuda disable CUDA entirely (decode and encode), use CPU instead
+  -d DIR    output directory; relative input paths are prepended with DIR/,
+            absolute input paths have their leading / stripped then prepended
+
+Failed files are appended to ./failed_transcode.txt as they occur.
+"""
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+EXTENSIONS = {".mov"}
+FAILED_LOG = Path("failed_transcode.txt")
+
+
+def build_cmd(path: Path, output: Path, ffmpeg_flags: list, cuda_decode: bool) -> list:
+    if cuda_decode:
+        hw_flags = ["-hwaccel", "cuda"]
+        video_flags = [
+            "-c:v", "hevc_nvenc",
+            "-preset", "p5",
+            "-tune", "hq",
+            "-rc", "vbr",
+            "-cq", "18",
+            "-b:v", "80M",
+            "-maxrate", "120M",
+            "-bufsize", "240M",
+        ]
+    else:
+        hw_flags = []
+        video_flags = [
+            "-c:v", "libx265",
+            "-preset", "slow",
+            "-crf", "18",
+            "-b:v", "80M",
+            "-maxrate", "120M",
+            "-bufsize", "240M",
+        ]
+
+    return [
+        "ffmpeg",
+        *ffmpeg_flags,
+        *hw_flags,
+        "-i", str(path),
+        "-map", "0:v:0",
+        "-map", "0:a?",
+        *video_flags,
+        "-pix_fmt", "yuv420p",
+        "-c:a", "aac",
+        "-b:a", "320k",
+        "-movflags", "+faststart",
+        str(output),
+    ]
+
+
+def resolve_output(path: Path, destdir: Path | None) -> Path:
+    base = path.stem.removesuffix("_dnxhr")
+    stem = base + "_h265.mp4"
+    if destdir is None:
+        return path.with_name(stem)
+    if path.is_absolute():
+        rel = Path(*path.parts[1:])  # strip leading /
+    else:
+        rel = path
+    return destdir / rel.with_name(stem)
+
+
+def log_failed(path: Path, quiet: bool):
+    with FAILED_LOG.open("a") as f:
+        f.write(str(path) + "\n")
+    if not quiet:
+        print(f"  Failed: logged to {FAILED_LOG}", file=sys.stderr)
+
+
+def transcode(path: Path, destdir: Path | None, verbose: bool, quiet: bool, cuda: bool) -> bool:
+    if path.stem.endswith("_h265"):
+        if not quiet:
+            print(f"  Skipping (already an h265 output): {path}")
+        return True
+
+    output = resolve_output(path, destdir)
+
+    if output.exists():
+        if not quiet:
+            print(f"  Skipping (output exists): {output}")
+        return True
+
+    if not quiet:
+        print(f"-> {path}")
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    if verbose:
+        ffmpeg_flags = []
+    elif quiet:
+        ffmpeg_flags = ["-v", "quiet"]
+    else:
+        ffmpeg_flags = ["-v", "quiet", "-stats"]
+
+    cmd = build_cmd(path, output, ffmpeg_flags, cuda_decode=cuda)
+    result = subprocess.run(cmd)
+
+    if result.returncode != 0 and cuda:
+        if not quiet:
+            print("  CUDA failed, retrying with CPU...")
+        if output.exists():
+            output.unlink()
+        cmd = build_cmd(path, output, ffmpeg_flags, cuda_decode=False)
+        result = subprocess.run(cmd)
+
+    if result.returncode != 0:
+        print(f"  Error: ffmpeg failed for {path}", file=sys.stderr)
+        if output.exists():
+            output.unlink()
+        log_failed(path, quiet)
+        return False
+
+    if not quiet:
+        print(f"  Done: {output}\n")
+
+    return True
+
+
+def process(target: Path, destdir: Path | None, verbose: bool, quiet: bool, cuda: bool):
+    if target.is_file():
+        if target.suffix.lower() in EXTENSIONS:
+            transcode(target, destdir, verbose, quiet, cuda)
+        else:
+            if not quiet:
+                print(f"  Skipping (unsupported extension): {target}")
+    elif target.is_dir():
+        files = sorted(
+            f for f in target.rglob("*")
+            if f.is_file() and f.suffix.lower() in EXTENSIONS
+        )
+        for f in files:
+            transcode(f, destdir, verbose, quiet, cuda)
+    else:
+        if not quiet:
+            print(f"Skipping: '{target}' (not a file or directory)")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="transcode-from-davinci",
+        description="Convert DNxHR MOV files from DaVinci Resolve to high-bitrate H.265 MP4.",
+    )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-v", "--verbose", action="store_true", help="Show full ffmpeg output")
+    group.add_argument("-q", "--quiet", action="store_true", help="No output at all")
+    parser.add_argument("--no-cuda", action="store_true", help="Disable CUDA entirely (decode and encode), use CPU instead")
+    parser.add_argument("-d", "--destdir", metavar="DIR", type=Path, help="Output directory")
+    parser.add_argument("targets", nargs="+", metavar="file|dir")
+
+    args = parser.parse_args()
+
+    destdir = args.destdir if args.destdir else None
+
+    for target in args.targets:
+        process(Path(target), destdir, args.verbose, args.quiet, not args.no_cuda)
+
+
+if __name__ == "__main__":
+    main()
