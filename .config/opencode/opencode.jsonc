@@ -31,17 +31,17 @@
       "name": "llama-server cuda-linux:8080",
       "models": {
         "bonsai-27b-q2-think": {
-          "name": "Bonsai 27B Q2 Think [120k]",
+          "name": "Bonsai 27B Q2 Think [160k]",
           "interleaved": {
             "field": "reasoning_content"
           },
           "limit": {
-            "context": 120000,
+            "context": 160000,
             "output": 8192
           }
         },
-        "ornith-35b/a3b-think": {
-          "name": "Ornith 35B/A3B Think [200k]",
+        "ornith-1.5-35b/a3b-think": {
+          "name": "Ornith 1.5 35B/A3B Think [200k]",
           "limit": {
             "context": 200000,
             "output": 8192
@@ -75,13 +75,6 @@
             "output": 8192
           }
         },
-        "kimi-vl-a3b": {
-          "name": "Kimi Vl A3B [131k]",
-          "limit": {
-            "context": 131072,
-            "output": 8192
-          }
-        },
         "glm4.7-30b-a3b-q5-think": {
           "name": "Glm4.7 30B A3B Q5 Think [128k]",
           "limit": {
@@ -95,6 +88,20 @@
             "context": 128000,
             "output": 8192
           }
+        },
+        "qwen3.8-q4-think": {
+          "name": "Qwen3.8 Q4 Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-q3-think": {
+          "name": "Qwen3.8 Q3 Think [60k]",
+          "limit": {
+            "context": 60000,
+            "output": 8192
+          }
         }
       },
       "options": {
@@ -105,6 +112,7 @@
   },
   "mcp": {
     "asana": {
+      "enabled": false,
       "type": "remote",
       "url": "https://mcp.asana.com/v2/mcp",
       "oauth": {
@@ -126,7 +134,9 @@
     },
     "freecad": {
       "type": "local",
-      "command": ["/home/sal/miniconda3/bin/freecad-mcp"],
+      "command": [
+        "/home/sal/miniconda3/bin/freecad-mcp"
+      ],
       "environment": {
         "FREECAD_MODE": "xmlrpc",
         "FREECAD_SOCKET_HOST": "localhost",

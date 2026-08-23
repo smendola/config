@@ -56,11 +56,11 @@ def main():
         merged["name"] = name
         merged["limit"] = {"context": ctx, "output": DEFAULT_OUTPUT}
         models[section] = merged
-        print(f"  {name}")
+        print(f"* {name}")
 
     config["provider"]["llama-server"]["models"] = models
     OPENCODE_PATH.write_text(json.dumps(config, indent=2) + "\n")
-    print("opencode.json written.")
+    print("Updated opencode.json.")
 
 
 if __name__ == "__main__":
