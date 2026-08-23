@@ -2,6 +2,8 @@ local wezterm = require 'wezterm'
 
 local config = wezterm.config_builder()
 
+config.dim_tint_factor = 0.33
+
 -- config.dpi = 96
 
 ------------------------------------------------------------------------

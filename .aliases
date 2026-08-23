@@ -377,6 +377,9 @@ alias ifup='sudo ifup'
 alias iptables='sudo iptables'
 alias ufw='sudo ufw'
 
+# Note: do NOT automatically sudo with paru
+alias paru='paru --noconfirm'
+
 fix-net() {
   sudo netscript restart
 }
