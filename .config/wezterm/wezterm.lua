@@ -218,6 +218,12 @@ config.keys = {
     },
   },
 
+  {
+    key = "Delete",
+    mods = "CTRL|SHIFT",
+    action = act.CloseCurrentPane { confirm = false },
+  },
+
   -- Font size: increase/decrease by 1
   {
     key = "=",

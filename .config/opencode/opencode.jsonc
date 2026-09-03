@@ -4,7 +4,6 @@
   "lsp": true,
   "enabled_providers": [
     "zai",
-    "opencode",
     "deepseek",
     "mimimax",
     "openai",
@@ -112,7 +111,6 @@
   },
   "mcp": {
     "asana": {
-      "enabled": false,
       "type": "remote",
       "url": "https://mcp.asana.com/v2/mcp",
       "oauth": {
