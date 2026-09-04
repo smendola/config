@@ -29,16 +29,6 @@
     "llama-server": {
       "name": "llama-server cuda-linux:8080",
       "models": {
-        "bonsai-27b-q2-think": {
-          "name": "Bonsai 27B Q2 Think [160k]",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "limit": {
-            "context": 160000,
-            "output": 8192
-          }
-        },
         "ornith-1.5-35b/a3b-think": {
           "name": "Ornith 1.5 35B/A3B Think [200k]",
           "limit": {
@@ -74,6 +64,13 @@
             "output": 8192
           }
         },
+        "glm4.7-30b-a3b-q3-think": {
+          "name": "Glm4.7 30B A3B Q3 Think [128k]",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
         "glm4.7-30b-a3b-q5-think": {
           "name": "Glm4.7 30B A3B Q5 Think [128k]",
           "limit": {
@@ -81,8 +78,8 @@
             "output": 8192
           }
         },
-        "glm4.7-30b-a3b-think": {
-          "name": "Glm4.7 30B A3B Think [128k]",
+        "glm4.7-30b-a3b-iq4-think": {
+          "name": "Glm4.7 30B A3B Iq4 Think [128k]",
           "limit": {
             "context": 128000,
             "output": 8192
@@ -95,10 +92,31 @@
             "output": 8192
           }
         },
-        "qwen3.8-q3-think": {
-          "name": "Qwen3.8 Q3 Think [60k]",
+        "qwen3.8-iq2": {
+          "name": "Qwen3.8 Iq2 [160k]",
           "limit": {
-            "context": 60000,
+            "context": 160000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq2-think": {
+          "name": "Qwen3.8 Iq2 Think [160k]",
+          "limit": {
+            "context": 160000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-think": {
+          "name": "Qwen3.8 Iq3 Think [64k]",
+          "limit": {
+            "context": 64000,
+            "output": 8192
+          }
+        },
+        "dirk-qwen3.8-iq4-think": {
+          "name": "Dirk Qwen3.8 Iq4 Think [64k]",
+          "limit": {
+            "context": 64000,
             "output": 8192
           }
         }
