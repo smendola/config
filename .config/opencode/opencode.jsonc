@@ -29,16 +29,6 @@
     "llama-server": {
       "name": "llama-server cuda-linux:8080",
       "models": {
-        "bonsai-27b-q2-think": {
-          "name": "Bonsai 27B Q2 Think [160k]",
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "limit": {
-            "context": 160000,
-            "output": 8192
-          }
-        },
         "ornith-1.5-35b/a3b-think": {
           "name": "Ornith 1.5 35B/A3B Think [200k]",
           "limit": {
@@ -74,6 +64,13 @@
             "output": 8192
           }
         },
+        "glm4.7-30b-a3b-q3-think": {
+          "name": "Glm4.7 30B A3B Q3 Think [128k]",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
         "glm4.7-30b-a3b-q5-think": {
           "name": "Glm4.7 30B A3B Q5 Think [128k]",
           "limit": {
@@ -81,8 +78,8 @@
             "output": 8192
           }
         },
-        "glm4.7-30b-a3b-think": {
-          "name": "Glm4.7 30B A3B Think [128k]",
+        "glm4.7-30b-a3b-iq4-think": {
+          "name": "Glm4.7 30B A3B Iq4 Think [128k]",
           "limit": {
             "context": 128000,
             "output": 8192
@@ -95,10 +92,52 @@
             "output": 8192
           }
         },
-        "qwen3.8-q3-think": {
-          "name": "Qwen3.8 Q3 Think [60k]",
+        "qwen3.8-iq2": {
+          "name": "Qwen3.8 Iq2 [160k]",
           "limit": {
-            "context": 60000,
+            "context": 160000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq2-think": {
+          "name": "Qwen3.8 Iq2 Think [160k]",
+          "limit": {
+            "context": 160000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-140-think": {
+          "name": "Qwen3.8 Iq3 140 Think [140k]",
+          "limit": {
+            "context": 140000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq4-think": {
+          "name": "Qwen3.8 Iq4 Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "dirk-qwen3.8-iq4-think": {
+          "name": "Dirk Qwen3.8 Iq4 Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-gsq-rco-think": {
+          "name": "Qwen3.8 Iq3 Gsq Rco Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-gsq-rco-200-think": {
+          "name": "Qwen3.8 Iq3 Gsq Rco 200 Think [195k]",
+          "limit": {
+            "context": 195000,
             "output": 8192
           }
         }
@@ -147,6 +186,21 @@
         "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
         "READ_ONLY": "false",
         "REQUEST_TIMEOUT": "60000"
+      }
+    },
+    "freecad": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "/usr/bin/env",
+        "-C",
+        "/tmp/opencode",
+        "/home/sal/miniconda3/bin/freecad-mcp"
+      ],
+      "environment": {
+        "FREECAD_MODE": "xmlrpc",
+        "FREECAD_SOCKET_HOST": "localhost",
+        "FREECAD_XMLRPC_PORT": "9875"
       }
     }
   },

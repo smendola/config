@@ -602,4 +602,6 @@ git () {
   return $git_status
 }
 
-alias freecad-mcp="flatpak run --no-documents-portal --no-session-bus --a11y-bus org.freecad.FreeCAD /home/sal/.var/app/org.freecad.FreeCAD/data/FreeCAD/Mod/RobustMCPBridge/freecad_mcp_bridge/startup_bridge.py"
+freecad-mcp() {
+  flatpak run --no-documents-portal --no-session-bus --a11y-bus org.freecad.FreeCAD /home/sal/.var/app/org.freecad.FreeCAD/data/FreeCAD/Mod/RobustMCPBridge/freecad_mcp_bridge/startup_bridge.py
+}
