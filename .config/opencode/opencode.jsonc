@@ -106,17 +106,38 @@
             "output": 8192
           }
         },
-        "qwen3.8-iq3-think": {
-          "name": "Qwen3.8 Iq3 Think [64k]",
+        "qwen3.8-iq3-140-think": {
+          "name": "Qwen3.8 Iq3 140 Think [140k]",
           "limit": {
-            "context": 64000,
+            "context": 140000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq4-think": {
+          "name": "Qwen3.8 Iq4 Think [100k]",
+          "limit": {
+            "context": 100000,
             "output": 8192
           }
         },
         "dirk-qwen3.8-iq4-think": {
-          "name": "Dirk Qwen3.8 Iq4 Think [64k]",
+          "name": "Dirk Qwen3.8 Iq4 Think [100k]",
           "limit": {
-            "context": 64000,
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-gsq-rco-think": {
+          "name": "Qwen3.8 Iq3 Gsq Rco Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-iq3-gsq-rco-200-think": {
+          "name": "Qwen3.8 Iq3 Gsq Rco 200 Think [195k]",
+          "limit": {
+            "context": 195000,
             "output": 8192
           }
         }
@@ -139,6 +160,7 @@
       }
     },
     "sentry": {
+      "enabled": false,
       "type": "remote",
       "url": "https://mcp.sentry.dev/mcp"
     },
@@ -150,8 +172,12 @@
       }
     },
     "freecad": {
+      "enabled": true,
       "type": "local",
       "command": [
+        "/usr/bin/env",
+        "-C",
+        "/tmp/opencode",
         "/home/sal/miniconda3/bin/freecad-mcp"
       ],
       "environment": {
