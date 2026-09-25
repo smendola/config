@@ -1,1 +1,0 @@
-/home/sal/repos/ponytail/.opencode/command/ponytail-gain.md
