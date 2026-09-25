@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+import sys, os, configparser, shlex
+
+args = sys.argv[1:]
+if not args or args[0].startswith('-'):
+    sys.exit("usage: llama-cli-wrap PRESET [OTHER_OPTIONS]")
+
+preset, extra = args[0], args[1:]
+
+cfg = configparser.ConfigParser()
+cfg.read(os.path.expanduser('~/.config/llama.cpp/models-preset.ini'))
+if preset not in cfg:
+    sys.exit(f"preset '{preset}' not found")
+
+cmd = ['llama-cli']
+for key, val in cfg[preset].items():
+    flag = '-m' if key == 'model' else f'--{key}'
+    cmd += [flag, val]
+cmd += extra
+
+print(shlex.join(cmd))
+os.execvp('llama-cli', cmd)
