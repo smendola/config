@@ -99,34 +99,6 @@
             "output": 8192
           }
         },
-        "qwen3.8-iq2-think": {
-          "name": "Qwen3.8 Iq2 Think [160k]",
-          "limit": {
-            "context": 160000,
-            "output": 8192
-          }
-        },
-        "qwen3.8-iq3-140-think": {
-          "name": "Qwen3.8 Iq3 140 Think [140k]",
-          "limit": {
-            "context": 140000,
-            "output": 8192
-          }
-        },
-        "qwen3.8-iq4-think": {
-          "name": "Qwen3.8 Iq4 Think [100k]",
-          "limit": {
-            "context": 100000,
-            "output": 8192
-          }
-        },
-        "dirk-qwen3.8-iq4-think": {
-          "name": "Dirk Qwen3.8 Iq4 Think [100k]",
-          "limit": {
-            "context": 100000,
-            "output": 8192
-          }
-        },
         "qwen3.8-iq3-gsq-rco-think": {
           "name": "Qwen3.8 Iq3 Gsq Rco Think [100k]",
           "limit": {
@@ -150,6 +122,7 @@
   },
   "mcp": {
     "asana": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.asana.com/v2/mcp",
       "oauth": {
@@ -159,15 +132,18 @@
       }
     },
     "sentry": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.sentry.dev/mcp"
     },
     "postman": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.postman.com/minimal",
       "enabled": true
     },
     "context7": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
@@ -175,13 +151,13 @@
       }
     },
     "sendgrid": {
+      "enabled": true,
       "type": "local",
       "command": [
         "npx",
         "-y",
         "sendgrid-mcp"
       ],
-      "enabled": true,
       "environment": {
         "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
         "READ_ONLY": "false",
@@ -189,7 +165,7 @@
       }
     },
     "freecad": {
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "command": [
         "/usr/bin/env",
@@ -205,7 +181,6 @@
     }
   },
   "plugin": [
-    "/home/sal/repos/ponytail/.opencode/plugins/ponytail.mjs"
   ],
   "keybinds": {
     "diff_open": "<leader>d"
