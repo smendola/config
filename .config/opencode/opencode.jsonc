@@ -139,8 +139,7 @@
     "postman": {
       "enabled": false,
       "type": "remote",
-      "url": "https://mcp.postman.com/minimal",
-      "enabled": true
+      "url": "https://mcp.postman.com/minimal"
     },
     "context7": {
       "type": "remote",
