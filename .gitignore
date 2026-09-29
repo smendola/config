@@ -38,3 +38,5 @@ experimental
 !/.local/share/icons/apps
 !.config/opencode/opencode.jsonc
 __pycache__/
+config.bat
+node_modules
