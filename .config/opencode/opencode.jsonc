@@ -140,9 +140,9 @@
       "enabled": false,
       "type": "remote",
       "url": "https://mcp.postman.com/minimal",
-      "enabled": true
     },
     "context7": {
+      "enabled": true,
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
@@ -157,7 +157,6 @@
         "-y",
         "sendgrid-mcp"
       ],
-      "enabled": true,
       "environment": {
         "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
         "READ_ONLY": "false",
@@ -165,7 +164,7 @@
       }
     },
     "freecad": {
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "command": [
         "/usr/bin/env",
