@@ -139,7 +139,7 @@
     "postman": {
       "enabled": false,
       "type": "remote",
-      "url": "https://mcp.postman.com/minimal",
+      "url": "https://mcp.postman.com/minimal"
     },
     "context7": {
       "enabled": true,
@@ -165,6 +165,21 @@
     },
     "freecad": {
       "enabled": false,
+      "type": "local",
+      "command": [
+        "/usr/bin/env",
+        "-C",
+        "/tmp/opencode",
+        "/home/sal/miniconda3/bin/freecad-mcp"
+      ],
+      "environment": {
+        "FREECAD_MODE": "xmlrpc",
+        "FREECAD_SOCKET_HOST": "localhost",
+        "FREECAD_XMLRPC_PORT": "9875"
+      }
+    },
+    "freecad": {
+      "enabled": true,
       "type": "local",
       "command": [
         "/usr/bin/env",
