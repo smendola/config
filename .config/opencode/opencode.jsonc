@@ -156,7 +156,6 @@
         "-y",
         "sendgrid-mcp"
       ],
-      "enabled": true,
       "environment": {
         "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
         "READ_ONLY": "false",
