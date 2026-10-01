@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Sync llama-server model presets into opencode.jsonc."""
+"""Sync llama-server model presets into opencode.jsonc and dsh cordis.patch.yml."""
 
 import json
+import re
 import sys
 from pathlib import Path
 
+import yaml
+
 PRESET_PATH = Path.home() / ".config/llama.cpp/models-preset.ini"
 OPENCODE_PATH = Path.home() / ".config/opencode/opencode.jsonc"
+DSH_PATH = Path.home() / ".dsh/profiles/web/cordis.patch.yml"
 DEFAULT_OUTPUT = 8192
 
 
@@ -35,11 +39,56 @@ def auto_name(key, ctx):
     return f"{key.replace('-', ' ').title()} [{ctx_label(ctx)}]"
 
 
+class DshDumper(yaml.SafeDumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super().increase_indent(flow, False)
+
+
+def is_vision(values):
+    return bool(values.get("mmproj"))
+
+
+def update_dsh(presets):
+    text = DSH_PATH.read_text()
+    entries = yaml.safe_load(text)
+
+    header = ""
+    for line in text.splitlines(keepends=True):
+        if line.startswith("#"):
+            header += line
+        elif line.strip():
+            break
+
+    entry = next(e for e in entries if e.get("id") == "llm-pi-ai")
+    provider = entry["config"]["providers"]["cuda-linux"]
+    existing = {m["id"]: m for m in provider.get("models", [])}
+
+    models = []
+    for section, values in presets.items():
+        ctx = int(values.get("ctx-size", 4096))
+        merged = dict(existing.get(section, {}))
+        merged["id"] = section
+        merged["name"] = auto_name(section, ctx)
+        merged["contextWindow"] = ctx
+        merged["input"] = ["text"] + (["image"] if is_vision(values) else [])
+        models.append(merged)
+
+    provider["models"] = models
+    DSH_PATH.write_text(
+        header + yaml.dump(
+            entries, Dumper=DshDumper, sort_keys=False, allow_unicode=True
+        )
+    )
+    print(f"Updated {DSH_PATH}.")
+
+
 def main():
     if not PRESET_PATH.exists():
         sys.exit(f"Preset file not found: {PRESET_PATH}")
     if not OPENCODE_PATH.exists():
         sys.exit(f"opencode.json not found: {OPENCODE_PATH}")
+    if not DSH_PATH.exists():
+        sys.exit(f"dsh patch file not found: {DSH_PATH}")
 
     presets = parse_ini(PRESET_PATH)
     config = json.loads(OPENCODE_PATH.read_text())
@@ -55,12 +104,20 @@ def main():
         merged = dict(existing_models.get(section, {}))
         merged["name"] = name
         merged["limit"] = {"context": ctx, "output": DEFAULT_OUTPUT}
+        if is_vision(values):
+            merged["attachment"] = True
+            merged["modalities"] = {"input": ["text", "image"], "output": ["text"]}
+        else:
+            merged.pop("attachment", None)
+            merged.pop("modalities", None)
         models[section] = merged
         print(f"* {name}")
 
     config["provider"]["llama-server"]["models"] = models
     OPENCODE_PATH.write_text(json.dumps(config, indent=2) + "\n")
     print("Updated opencode.json.")
+
+    update_dsh(presets)
 
 
 if __name__ == "__main__":
