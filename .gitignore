@@ -37,3 +37,5 @@ experimental
 /.local/share/icons/*
 !/.local/share/icons/apps
 __pycache__/
+config.bat
+node_modules
