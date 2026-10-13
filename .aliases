@@ -480,18 +480,23 @@ _wtg() {
 compdef _wtg wtg
 
 wta() {
-  local branch=${1}
-  local dir=~/wt/$(reponame)/${branch/\//-}
-  if git show-ref --verify --quiet refs/heads/$branch; then
-    git worktree add $dir $branch
-    (cd $dir && git submodule update --init --recursive)
-  else
-    git worktree add -b $branch $dir
+  if [[ $# != 1 || -z $1 ]]; then
+    print -u2 'Usage: wta <branch>'
+    return 1
   fi
-  find $dir -name .envrc | while read f; do
-    direnv allow ${f:h}
+  local branch=${1}
+  local dir=~/wt/$(reponame)/${branch//\//-}
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add "$dir" "$branch" || return
+  else
+    git worktree add -b "$branch" "$dir" || return
+  fi
+  # Initialize submodules for new branches as well as existing branches.
+  (cd "$dir" && submodules) || return
+  find "$dir" -name .envrc -print0 | while IFS= read -r -d '' f; do
+    direnv allow "${f:h}"
   done
-  cd $dir
+  cd "$dir"
 }
 
 
