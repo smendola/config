@@ -491,6 +491,10 @@ wta() {
   else
     git worktree add -b "$branch" "$dir" || return
   fi
+  # Approve before the first cd triggers the direnv shell hook.
+  if [[ -f "$dir/.envrc" ]]; then
+    direnv allow "$dir" || return
+  fi
   # Initialize submodules for new branches as well as existing branches.
   (cd "$dir" && submodules) || return
   find "$dir" -name .envrc -print0 | while IFS= read -r -d '' f; do
