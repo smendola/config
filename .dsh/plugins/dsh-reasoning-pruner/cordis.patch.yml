@@ -1,6 +1,0 @@
-- insert:
-    - id: reasoning-pruner
-      name: dsh-reasoning-pruner
-      config:
-        enabled: true
-        debug: false

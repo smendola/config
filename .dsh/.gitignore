@@ -4,6 +4,7 @@ profiles/web/node_modules/
 profiles/web/.plugin-manager/
 profiles/web/cordis.yml
 profiles/web/cordis.patch.yml.bak
+plugins/
 sessions/
 storages/
 logs/

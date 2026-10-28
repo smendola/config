@@ -12,8 +12,8 @@ importers:
         specifier: github:smendola/dsh-opencode-mcp-parity#fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
         version: https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
       dsh-reasoning-pruner:
-        specifier: link:/home/sal/.dsh/plugins/dsh-reasoning-pruner
-        version: link:../../plugins/dsh-reasoning-pruner
+        specifier: github:smendola/dsh-reasoning-pruner#5ad819e7d35f50e309c1904565d8f8a978f74672
+        version: https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672
 
 packages:
 
@@ -23,6 +23,13 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
+  dsh-reasoning-pruner@https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672:
+    resolution: {gitHosted: true, integrity: sha512-Ol9CDxjjwRfLPwsOygQqqH1JLbp0SAUU0mPoV0IMk5zXoDtQGe4f02Ps/TNPR3FJtEW5xBCU/sDn2/l2Fhgi0g==, tarball: https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672}
+    version: 0.1.0
+    engines: {node: '>=20'}
+
 snapshots:
 
   dsh-opencode-mcp-parity@https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968: {}
+
+  dsh-reasoning-pruner@https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672: {}
