@@ -7,12 +7,12 @@
         "@deepseek-ai/dsh-base",
         "@deepseek-ai/dsh-web-app",
         "dsh-reasoning-pruner",
-        "@local/opencode-mcp-parity"
+        "dsh-opencode-mcp-parity"
       ]
     }
   },
   "dependencies": {
-    "@local/opencode-mcp-parity": "link:/home/sal/.dsh/plugins/opencode-mcp-parity",
+    "dsh-opencode-mcp-parity": "github:smendola/dsh-opencode-mcp-parity#fc97ad5cd8c3efb6ef6d6a075375a24f1203f968",
     "dsh-reasoning-pruner": "link:/home/sal/.dsh/plugins/dsh-reasoning-pruner"
   }
 }

@@ -8,9 +8,21 @@ importers:
 
   .:
     dependencies:
-      '@local/opencode-mcp-parity':
-        specifier: link:/home/sal/.dsh/plugins/opencode-mcp-parity
-        version: link:../../plugins/opencode-mcp-parity
+      dsh-opencode-mcp-parity:
+        specifier: github:smendola/dsh-opencode-mcp-parity#fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
+        version: https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
       dsh-reasoning-pruner:
         specifier: link:/home/sal/.dsh/plugins/dsh-reasoning-pruner
         version: link:../../plugins/dsh-reasoning-pruner
+
+packages:
+
+  dsh-opencode-mcp-parity@https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968:
+    resolution: {gitHosted: true, integrity: sha512-sMWpTREbH1FRijxWbiHRvu2wWayJnz5riTSCGgQAJ5HPOBBzYwCq4OJu4cZlj9VVS3dx23WXl6Vo8Qbwxu5QPA==, tarball: https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968}
+    version: 1.0.0
+    engines: {node: '>=20'}
+    hasBin: true
+
+snapshots:
+
+  dsh-opencode-mcp-parity@https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968: {}

@@ -90,7 +90,7 @@
   name: '@deepseek-ai/dsh-agent-default-model'
   config:
     provider: deepseek-official
-    model: deepseek-flash
+    model: deepseek-v4-pro
     reasoningEffort: high
 - id: reasoning-pruner
   name: dsh-reasoning-pruner
