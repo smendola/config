@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/sal/miniconda3/bin/python3
 """Renders a Markdown file to HTML and opens it in the browser.
 Usage: mdopen.py <file.md>
 
