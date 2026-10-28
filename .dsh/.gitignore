@@ -1,0 +1,18 @@
+# generated / machine state
+profiles/node_modules/
+profiles/web/node_modules/
+profiles/web/.plugin-manager/
+profiles/web/cordis.yml
+profiles/web/cordis.patch.yml.bak
+sessions/
+storages/
+logs/
+cache/
+attachments/
+llm-deepseek/
+
+# never commit
+.credentials.yaml
+.anonymous-user-id
+settings.yaml.imported
+*.log

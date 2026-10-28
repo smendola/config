@@ -1,0 +1,106 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+- id: ui-settings-general
+  name: '@deepseek-ai/dsh-client-ui-settings-general'
+  config:
+    welcomeNoticeVersion: 2026-09-28.1
+- id: ui-conversation
+  name: '@deepseek-ai/dsh-client-ui-conversation'
+  config:
+    busyEnter: queue
+- id: ui-theme
+  name: '@deepseek-ai/dsh-client-ui-theme'
+  config:
+    preference: dark
+    fontSize: 16
+- id: llm-pi-ai
+  name: '@deepseek-ai/dsh-llm-pi-ai'
+  config:
+    providers:
+      cuda-linux-llama:
+        apiKeyEnv: CUDA_LINUX_API_KEY
+        api: openai-completions
+        baseURL: http://cuda-linux:8080/
+        models:
+          - id: qwen3.6-35b/a3b-think
+            name: Qwen3.6 35B/A3B Think [260k]
+            contextWindow: 260000
+            input:
+              - text
+          - id: kimi-vl-a3b-think
+            name: Kimi Vl A3B Think [131k]
+            contextWindow: 131072
+            input:
+              - text
+          - id: glm4.7-30b-a3b-q3-think
+            name: Glm4.7 30B A3B Q3 Think [128k]
+            contextWindow: 128000
+            input:
+              - text
+          - id: glm4.7-30b-a3b-q5-think
+            name: Glm4.7 30B A3B Q5 Think [128k]
+            contextWindow: 128000
+            input:
+              - text
+          - id: glm4.7-30b-a3b-iq4-think
+            name: Glm4.7 30B A3B Iq4 Think [128k]
+            contextWindow: 128000
+            input:
+              - text
+          - id: qwen3.8-q4-think
+            name: Qwen3.8 Q4 Think [100k]
+            contextWindow: 100000
+            input:
+              - text
+          - id: qwen3.8-iq3-140-think
+            name: Qwen3.8 Iq3 140 Think [140k]
+            contextWindow: 140000
+            input:
+              - text
+          - id: qwen3.8-iq4-think
+            name: Qwen3.8 Iq4 Think [100k]
+            contextWindow: 100000
+            input:
+              - text
+          - id: qwen3.8-iq3-gsq-rco-think
+            name: Qwen3.8 Iq3 Gsq Rco Think [100k]
+            contextWindow: 100000
+            input:
+              - text
+          - id: qwen3.8-iq3-gsq-rco-200-vision-think
+            name: Qwen3.8 Iq3 Gsq Rco 200 Vision Think [200k]
+            contextWindow: 200000
+            input:
+              - text
+              - image
+        displayName: llama.cpp
+      cuda-linux-strata:
+        apiKeyEnv: CUDA_LINUX_STRATA_API_KEY
+        api: openai-completions
+        baseURL: http://localhost:9090/v1
+        models:
+          - id: qwen3.8-flash-next-coder-iq1_m
+            name: qwen3.8-flash-next-coder-iq1_m
+            input:
+              - text
+              - image
+        displayName: Strata
+- id: agent-default-model
+  name: '@deepseek-ai/dsh-agent-default-model'
+  config:
+    provider: deepseek-official
+    model: deepseek-flash
+    reasoningEffort: high
+- id: reasoning-pruner
+  name: dsh-reasoning-pruner
+  config:
+    enabled: true
+    debug: true
+- id: agent-preset-registry
+  name: '@deepseek-ai/dsh-agent-preset-registry'
+  config:
+    default: standard
+    selectedDefault: standard
+- id: mcp-freecad
+  disabled: true

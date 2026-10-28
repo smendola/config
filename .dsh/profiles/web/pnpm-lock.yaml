@@ -1,0 +1,16 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: false
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@local/opencode-mcp-parity':
+        specifier: link:/home/sal/.dsh/plugins/opencode-mcp-parity
+        version: link:../../plugins/opencode-mcp-parity
+      dsh-reasoning-pruner:
+        specifier: link:/home/sal/.dsh/plugins/dsh-reasoning-pruner
+        version: link:../../plugins/dsh-reasoning-pruner

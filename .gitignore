@@ -17,6 +17,7 @@ experimental
 !/.vim
 !/.vimrc
 .vim/.netrwhist
+!/.dsh
 !/.minttyrc
 !/.ffmpeg
 !/.emacs
