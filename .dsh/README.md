@@ -182,7 +182,7 @@ opencode doesn't express, e.g. `solidcraft.cwd`), `exclude`, `comments`.
 | Server | Transport | Effective state | Notes |
 |---|---|---|---|
 | `context7` | streamable-http | **enabled** | `Authorization: Bearer $CONTEXT7_API_KEY`. `failOnStartupError: true`. |
-| `chrome-devtools` | stdio (`npx -y chrome-devtools-mcp@1.11.0 …`) | **enabled** | Was absent from the old hand-authored bundle; now mirrored faithfully. |
+| `chrome-devtools` | stdio (`npx -y chrome-devtools-mcp@1.12.0 …`) | **enabled** | Was absent from the old hand-authored bundle; now mirrored faithfully. |
 | `solidcraft` | stdio | **enabled** | `solidcraft-cli mcp --allow-any-path`, `cwd` set by `sync.config.json` `extra`. |
 | `freecad` | stdio | disabled | opencode has `enabled: false`; the generator sets `disabled: true` directly. |
 | `asana` | streamable-http | disabled | Forced off: opencode uses OAuth, which `dsh-mcp-client` does not implement. |
