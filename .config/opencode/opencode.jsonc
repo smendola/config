@@ -127,7 +127,7 @@
       "command": [
         "npx",
         "-y",
-        "chrome-devtools-mcp@1.11.0",
+        "chrome-devtools-mcp@1.12.0",
         "--autoConnect",
         "--no-usage-statistics",
         "--no-performance-crux"
