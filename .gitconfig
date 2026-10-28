@@ -106,8 +106,12 @@
 	name = Always take theirs
 	driver = cp %B %A
 [credential "https://github.com"]
+	helper = 
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://git.heroku.com"]
 	helper = !heroku git:credentials
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/

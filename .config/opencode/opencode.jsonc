@@ -127,7 +127,7 @@
       "command": [
         "npx",
         "-y",
-        "chrome-devtools-mcp@1.11.0",
+        "chrome-devtools-mcp@1.12.0",
         "--autoConnect",
         "--no-usage-statistics",
         "--no-performance-crux"
@@ -190,6 +190,15 @@
         "FREECAD_SOCKET_HOST": "localhost",
         "FREECAD_XMLRPC_PORT": "9875"
       }
+    },
+    "solidcraft": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "/home/sal/.local/bin/solidcraft-cli",
+        "mcp",
+        "--allow-any-path"
+      ]
     }
   },
   "plugin": [
