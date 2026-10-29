@@ -192,7 +192,7 @@
       }
     },
     "solidcraft": {
-      "enabled": false,
+      "enabled": true,
       "type": "local",
       "command": [
         "/home/sal/.local/bin/solidcraft-cli",
