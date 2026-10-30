@@ -11,6 +11,8 @@
 ### customize the ENVIRONMENT VARIABLES.
 ###############################################################
 
+autoload -Uz compinit && compinit -u
+
 OS_ID=$(source /etc/os-release; echo $ID)
 if [ $TERM != linux ] && toe -a | grep -qs $TERM-256color
 then
