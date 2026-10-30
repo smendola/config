@@ -1,4 +1,6 @@
 {
   "mcp.loadedBefore": true,
-  "chat.defaultAgent": "main"
+  "chat.defaultAgent": "main",
+  "chat.agentEngine": "v3",
+  "chat.enableAutoAgentUpgrade": true
 }
