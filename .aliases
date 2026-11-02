@@ -609,7 +609,7 @@ git () {
     if (( ai_message && ! explicit_message )); then
       # Git prepares the index (including -a/pathspecs) before calling the editor.
       GIT_EDITOR="\"$HOME/.local/bin/ai-commit-editor\"" \
-        command git "${prefix[@]}" commit --edit "${commit_args[@]}"
+        command git "${prefix[@]}" -c advice.waitingForEditor=false commit --edit "${commit_args[@]}"
     else
       command git "${prefix[@]}" commit "${original_args[@]}"
     fi
