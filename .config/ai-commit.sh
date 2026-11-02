@@ -1,3 +1,3 @@
 generate_ai_commit_comment() {
-  kiro-cli chat --no-interactive --trust-tools= --wrap never
+  kiro-cli chat --no-interactive --trust-tools= --wrap never 2>/dev/null
 }
