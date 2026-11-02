@@ -36,4 +36,4 @@ if [[ ! $message =~ [^[:space:]] ]]; then
   exit 1
 fi
 printf '%s\n' "$message" > "$1"
-printf '\033[3m%s\033[23m\n' "$message"
+printf '\033[36m%s\033[0m\n' "$message"
