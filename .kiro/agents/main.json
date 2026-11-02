@@ -7,9 +7,12 @@
     "*"
   ],
   "toolAliases": {},
-  "allowedTools": ["web_fetch", "web_search"],
+  "allowedTools": [
+    "web_fetch",
+    "web_search"
+  ],
   "resources": [],
-  "hooks": {},
+  "hooks": [],
   "includeMcpJson": false,
   "model": null,
   "toolsSettings": {
@@ -21,5 +24,41 @@
         "find .*"
       ]
     }
+  },
+  "permissions": {
+    "rules": [
+      {
+        "capability": "shell",
+        "match": [
+          "cat *",
+          "ls *",
+          "find *"
+        ],
+        "effect": "allow"
+      },
+      {
+        "capability": "web_fetch",
+        "effect": "allow"
+      },
+      {
+        "capability": "web_search",
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_read",
+        "match": [
+          "./**"
+        ],
+        "effect": "allow"
+      }
+    ],
+    "policies": [
+      "read-only-shell"
+    ]
+  },
+  "kiroUpgrade": {
+    "revision": 2,
+    "fingerprint": "sha256:0366feb115cd9903ae9c25b635daadbfe7fa00683512ea5c3ea8f18dd1f7bd0e",
+    "source": "sha256:91d6adb9972cbbd8a191f1e6069d6e784f8776f4ba1e41098e3a0c91d7b57afb"
   }
 }
