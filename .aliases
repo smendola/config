@@ -559,6 +559,10 @@ clawmux() {
 }
 
 git () {
+  if (( $# == 0 )); then
+    command git
+    return $?
+  fi
   local sub_cmd=$1
   shift
   local prefix=()
@@ -568,6 +572,48 @@ git () {
   # In $HOME, treat git commands as dotfile-repo commands, except clone.
   if [[ $(pwd) == "$HOME" && $sub_cmd != clone ]]; then
     prefix=(--git-dir="$HOME/.config.git" --work-tree="$HOME")
+  fi
+
+  if [[ $sub_cmd == commit ]]; then
+    local original_args=("$@")
+    local commit_args=()
+    local ai_message=0
+    local explicit_message=0
+    while (( $# )); do
+      case "$1" in
+        -m|--message|-am)
+          if [[ ${2-} == x || ${2-} == ai ]]; then
+            ai_message=1
+            [[ $1 == -am ]] && commit_args+=(-a)
+            shift 2
+            continue
+          fi
+          explicit_message=1
+          commit_args+=("$1")
+          if (( $# > 1 )); then commit_args+=("$2"); shift; fi
+          ;;
+        -mx|-mai|--message=x|--message=ai) ai_message=1 ;;
+        -amx|-amai) ai_message=1; commit_args+=(-a) ;;
+        -m*|-am*|--message=*|-F*|--file*|-C*|-c*|--reuse-message*|--reedit-message*|--fixup*|--squash*|--no-edit)
+          explicit_message=1
+          commit_args+=("$1")
+          ;;
+        --)
+          commit_args+=("$@")
+          break
+          ;;
+        *) commit_args+=("$1") ;;
+      esac
+      shift
+    done
+    if (( ai_message && ! explicit_message )); then
+      # Git prepares the index (including -a/pathspecs) before calling the editor.
+      GIT_EDITOR="\"$HOME/.local/bin/ai-commit-editor\"" \
+        command git "${prefix[@]}" commit --edit "${commit_args[@]}"
+    else
+      command git "${prefix[@]}" commit "${original_args[@]}"
+    fi
+    return $?
   fi
 
   if [[ $sub_cmd == push ]]; then
