@@ -8,14 +8,41 @@ importers:
 
   .:
     dependencies:
+      '@max-null/dsh-skill-mcp-center':
+        specifier: ^0.7.0
+        version: 0.7.0
       dsh-opencode-mcp-parity:
         specifier: github:smendola/dsh-opencode-mcp-parity#fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
         version: https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968
+      dsh-opencode-palette:
+        specifier: ^2.1.12
+        version: 2.1.12
+      dsh-plugin:
+        specifier: ^2.2.7
+        version: 2.2.7
       dsh-reasoning-pruner:
-        specifier: github:smendola/dsh-reasoning-pruner#5ad819e7d35f50e309c1904565d8f8a978f74672
-        version: https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672
+        specifier: link:/home/sal/repos/dsh-reasoning-pruner
+        version: link:../../../repos/dsh-reasoning-pruner
 
 packages:
+
+  '@max-null/dsh-skill-mcp-center@0.7.0':
+    resolution: {integrity: sha512-KG4af7G/94W0M1lABGPAHmTZCPB9ayI+Y8TAGWMzvcNU7lctdcMkHoUlQGX9WDSeUKNVaWgxzm+c2ht7hy8Gig==}
+    peerDependencies:
+      '@deepseek-ai/cordis': ^4.0.1
+      '@deepseek-ai/cordis-plugin-loader': ^1.0.2
+      '@deepseek-ai/dsh-client-connection': '>=0.1.1-rc.1 <0.3.0'
+      '@deepseek-ai/dsh-host-apiproxy': '>=0.1.1-rc.1 <0.3.0'
+      '@deepseek-ai/dsh-skill': '>=0.1.1-rc.1 <0.3.0'
+      '@deepseek-ai/dsh-tools': '>=0.1.1-rc.1 <0.3.0'
+
+  argparse@2.0.1:
+    resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
+
+  dsh-log@0.3.4:
+    resolution: {integrity: sha512-uCG6sLTze5YjmZmLln2KAeCCepsKvzGhnpZmkym/3OKNOsMKH5sA2lunwrLoOfmLxxju3/ZkKQmLp76Fklpw2w==}
+    engines: {node: '>=22'}
+    hasBin: true
 
   dsh-opencode-mcp-parity@https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968:
     resolution: {gitHosted: true, integrity: sha512-sMWpTREbH1FRijxWbiHRvu2wWayJnz5riTSCGgQAJ5HPOBBzYwCq4OJu4cZlj9VVS3dx23WXl6Vo8Qbwxu5QPA==, tarball: https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968}
@@ -23,13 +50,50 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  dsh-reasoning-pruner@https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672:
-    resolution: {gitHosted: true, integrity: sha512-Ol9CDxjjwRfLPwsOygQqqH1JLbp0SAUU0mPoV0IMk5zXoDtQGe4f02Ps/TNPR3FJtEW5xBCU/sDn2/l2Fhgi0g==, tarball: https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672}
-    version: 0.1.0
-    engines: {node: '>=20'}
+  dsh-opencode-palette@2.1.12:
+    resolution: {integrity: sha512-5Bi1DkFixXg0EtWUUMJBwSSudHRREa4yrjLHc6pPe3+5/ar+fdyu9nTzUVXa//PrSJO3RUlhshlQeaKSdL60rA==}
+    engines: {dsh: '>=0.2.0-rc.1', node: '>=22.18.0'}
+
+  dsh-plugin-update@0.18.39:
+    resolution: {integrity: sha512-06qfoOTdWxnGHasdpJCWHWy9seTyfr84GsxP9kaCHI9eEds7gYe6O3RBUYm7uvuMk1W1oL+rnn8EV6AR78Cm1g==}
+    engines: {node: '>=22'}
+
+  dsh-plugin@2.2.7:
+    resolution: {integrity: sha512-gPowehN0OmSLHMG5AAgiONlJIn+8YTKEXzUKFO06+bXZG++MF2tUh2MdgfxuSdTGu6OWqLHplYhd/Ejx4T36WQ==}
+    engines: {node: '>=22.6'}
+    peerDependencies:
+      '@deepseek-ai/cordis': 4.0.1
+    peerDependenciesMeta:
+      '@deepseek-ai/cordis':
+        optional: true
+
+  js-yaml@4.3.2:
+    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
+    hasBin: true
 
 snapshots:
 
+  '@max-null/dsh-skill-mcp-center@0.7.0':
+    dependencies:
+      js-yaml: 4.3.2
+
+  argparse@2.0.1: {}
+
+  dsh-log@0.3.4: {}
+
   dsh-opencode-mcp-parity@https://codeload.github.com/smendola/dsh-opencode-mcp-parity/tar.gz/fc97ad5cd8c3efb6ef6d6a075375a24f1203f968: {}
 
-  dsh-reasoning-pruner@https://codeload.github.com/smendola/dsh-reasoning-pruner/tar.gz/5ad819e7d35f50e309c1904565d8f8a978f74672: {}
+  dsh-opencode-palette@2.1.12:
+    dependencies:
+      dsh-log: 0.3.4
+      dsh-plugin-update: 0.18.39
+
+  dsh-plugin-update@0.18.39:
+    dependencies:
+      dsh-log: 0.3.4
+
+  dsh-plugin@2.2.7: {}
+
+  js-yaml@4.3.2:
+    dependencies:
+      argparse: 2.0.1

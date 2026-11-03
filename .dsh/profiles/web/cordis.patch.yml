@@ -85,18 +85,22 @@
             input:
               - text
               - image
-        displayName: Strata
+          - id: qwen3.6-35b-a3b-ud-q4_k_m
+            name: qwen3.6-35b-a3b-ud-q4_k_m
+            input:
+              - text
+              - image
+        displayName: (Poly)Strata
 - id: agent-default-model
   name: '@deepseek-ai/dsh-agent-default-model'
   config:
-    provider: deepseek-official
-    model: deepseek-v4-pro
-    reasoningEffort: high
+    provider: cuda-linux-strata
+    model: qwen3.6-35b-a3b-ud-q4_k_m
 - id: reasoning-pruner
   name: dsh-reasoning-pruner
   config:
     enabled: true
-    debug: true
+    show: true
 - id: agent-preset-registry
   name: '@deepseek-ai/dsh-agent-preset-registry'
   config:
@@ -104,3 +108,8 @@
     selectedDefault: standard
 - id: mcp-freecad
   disabled: true
+- id: bash-sandbox
+  name: "@deepseek-ai/dsh-bash-sandbox"
+  config:
+    timeoutMs: 60000
+    maxOutputBytes: 24000

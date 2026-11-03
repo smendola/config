@@ -1,0 +1,20 @@
+{
+  "max-null/dsh-skill-mcp-center": {
+    "version": "0.7.0",
+    "updatedAt": "2026-10-25T16:06:10Z",
+    "installedAt": "2026-11-02T13:25:51.783Z",
+    "npmPackage": "@max-null/dsh-skill-mcp-center"
+  },
+  "lilyblessing/dsh-mcp-skill-panel": {
+    "version": "",
+    "updatedAt": "",
+    "installedAt": "",
+    "npmPackage": "dsh-mcp-skill-panel"
+  },
+  "featherhunter/dsh-opencode-palette": {
+    "version": "2.1.12",
+    "updatedAt": "2026-11-02T19:45:07Z",
+    "installedAt": "2026-11-03T12:33:09.065Z",
+    "npmPackage": "dsh-opencode-palette"
+  }
+}
