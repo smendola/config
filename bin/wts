@@ -46,6 +46,25 @@ def host_status(alias):
         return "offline"
 
 
+def is_current_host(alias):
+    """Return True if the SSH alias resolves to the current machine."""
+    current = socket.gethostname().lower()
+    try:
+        host, _ = ssh_target(alias)
+        resolved = socket.gethostbyname(host)
+        # Check against all local addresses
+        local_addrs = {info[4][0] for info in socket.getaddrinfo(socket.gethostname(), None)}
+        local_addrs.update({"127.0.0.1", "::1"})
+        if resolved in local_addrs:
+            return True
+        # Also match by hostname
+        if host.lower() == current or host.lower().split(".")[0] == current.split(".")[0]:
+            return True
+    except OSError:
+        pass
+    return False
+
+
 def main():
     if not os.path.exists(HOSTS_FILE):
         print(f"Hosts file not found: {HOSTS_FILE}")
@@ -66,13 +85,18 @@ def main():
 
     with ThreadPoolExecutor(max_workers=len(hosts)) as pool:
         statuses = list(pool.map(host_status, hosts))
+        current_flags = list(pool.map(is_current_host, hosts))
 
-    for i, ((host, desc), status) in enumerate(zip(entries, statuses), 1):
+    for i, ((host, desc), status, current) in enumerate(zip(entries, statuses, current_flags), 1):
         label = f"{i}) {host}"
         if desc:
             label += f" {ITALIC}{desc}{RESET}"
+        if current:
+            label += " (this)"
 
-        if status == "online":
+        if current:
+            print(f"{DIM}{label}{RESET}")
+        elif status == "online":
             print(label)
         elif status == "unknown":
             print(f"{DIM_RED}{label} [UNKNOWN]{RESET}")
