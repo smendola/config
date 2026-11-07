@@ -60,7 +60,7 @@ def update_dsh(presets):
             break
 
     entry = next(e for e in entries if e.get("id") == "llm-pi-ai")
-    provider = entry["config"]["providers"]["cuda-linux"]
+    provider = entry["config"]["providers"]["cuda-linux-llama"]
     existing = {m["id"]: m for m in provider.get("models", [])}
 
     models = []
@@ -102,7 +102,10 @@ def main():
         # Preserve any extra settings (e.g. "interleaved") already present
         # for this model; only overwrite the fields we manage.
         merged = dict(existing_models.get(section, {}))
-        merged["name"] = name
+        if is_vision(values):
+            merged["name"] = name.replace(" [", " 👁️‍🗨️ [")
+        else:
+            merged["name"] = name
         merged["limit"] = {"context": ctx, "output": DEFAULT_OUTPUT}
         if is_vision(values):
             merged["attachment"] = True
@@ -114,7 +117,7 @@ def main():
         print(f"* {name}")
 
     config["provider"]["llama-server"]["models"] = models
-    OPENCODE_PATH.write_text(json.dumps(config, indent=2) + "\n")
+    OPENCODE_PATH.write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n")
     print("Updated opencode.json.")
 
     update_dsh(presets)

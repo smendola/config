@@ -30,31 +30,10 @@
     "llama-server": {
       "name": "llama-server cuda-linux:8080",
       "models": {
-        "ornith-1.5-35b/a3b-think": {
-          "name": "Ornith 1.5 35B/A3B Think [200k]",
-          "limit": {
-            "context": 200000,
-            "output": 8192
-          }
-        },
         "qwen3.6-35b/a3b-think": {
           "name": "Qwen3.6 35B/A3B Think [260k]",
           "limit": {
             "context": 260000,
-            "output": 8192
-          }
-        },
-        "qwen3.5-9b-mtp-think": {
-          "name": "Qwen3.5 9B Mtp Think [262k]",
-          "limit": {
-            "context": 262144,
-            "output": 8192
-          }
-        },
-        "gemma4-26b/a4b-think": {
-          "name": "Gemma4 26B/A4B Think [120k]",
-          "limit": {
-            "context": 120000,
             "output": 8192
           }
         },
@@ -86,32 +65,49 @@
             "output": 8192
           }
         },
-        "qwen3.8-q4-think": {
-          "name": "Qwen3.8 Q4 Think [100k]",
+        "qwen3.8-27b-q4-think": {
+          "name": "Qwen3.8 27B Q4 Think [100k]",
           "limit": {
             "context": 100000,
             "output": 8192
           }
         },
-        "qwen3.8-iq2": {
-          "name": "Qwen3.8 Iq2 [160k]",
+        "qwen3.8-27b-iq3-140-think": {
+          "name": "Qwen3.8 27B Iq3 140 Think [140k]",
           "limit": {
-            "context": 160000,
+            "context": 140000,
             "output": 8192
           }
         },
-        "qwen3.8-iq3-gsq-rco-think": {
-          "name": "Qwen3.8 Iq3 Gsq Rco Think [100k]",
+        "qwen3.8-27b-iq4-think": {
+          "name": "Qwen3.8 27B Iq4 Think [100k]",
           "limit": {
             "context": 100000,
             "output": 8192
           }
         },
-        "qwen3.8-iq3-gsq-rco-200-think": {
-          "name": "Qwen3.8 Iq3 Gsq Rco 200 Think [195k]",
+        "qwen3.8-27b-iq3-gsq-rco-think": {
+          "name": "Qwen3.8 27B Iq3 Gsq Rco Think [100k]",
           "limit": {
-            "context": 195000,
+            "context": 100000,
             "output": 8192
+          }
+        },
+        "qwen3.8-27b-iq3-gsq-rco-200-vision-think": {
+          "name": "Qwen3.8 27B Iq3 Gsq Rco 200 Vision Think 👁️‍🗨️ [200k]",
+          "limit": {
+            "context": 200000,
+            "output": 8192
+          },
+          "attachment": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         }
       },
@@ -134,11 +130,16 @@
       },
       "models": {
         "qwen3.6-35b-a3b-ud-q4_k_m": {
-          "name": "Qwen3.6 35B/A3B UD Q4_K_M [262k]",
+          "name": "Qwen3.6 👁️‍🗨️ 35B/A3B UD Q4_K_M [262k]",
           "capabilities": {
             "tools": true,
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "limit": {
             "context": 262144,
@@ -146,11 +147,16 @@
           }
         },
         "qwen3.8-flash-next-coder-iq1_m": {
-          "name": "Qwen3.8 Flash Next Coder IQ1_M [131k]",
+          "name": "Qwen3.8 👁️‍🗨️ Flash Next Coder [131k]",
           "capabilities": {
             "tools": true,
-            "input": ["text", "image"],
-            "output": ["text"]
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           },
           "limit": {
             "context": 131072,
@@ -191,8 +197,7 @@
     "postman": {
       "enabled": true,
       "type": "remote",
-      "url": "https://mcp.postman.com/minimal",
-      "enabled": true
+      "url": "https://mcp.postman.com/minimal"
     },
     "context7": {
       "enabled": true,
@@ -241,8 +246,7 @@
       ]
     }
   },
-  "plugin": [
-  ],
+  "plugin": [],
   "keybinds": {
     "diff_open": "<leader>d"
   }
