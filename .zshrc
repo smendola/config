@@ -1,15 +1,15 @@
 
-# Kiro CLI pre block. Keep at the top of this file.
-[[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
+# Added by Kiro CLI
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="${PATH:+$PATH:}$HOME/.local/bin" ;; esac
 
-# Kiro CLI pre block. Keep at the top of this file.
-[[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.pre.zsh"
 
 ###############################################################
 ### This is Sal's standard .zshrc; use as a starting point
 ### if just are getting started with zsh. You will have to
 ### customize the ENVIRONMENT VARIABLES.
 ###############################################################
+
+autoload -Uz compinit && compinit -u
 
 OS_ID=$(source /etc/os-release; echo $ID)
 if [ $TERM != linux ] && toe -a | grep -qs $TERM-256color
@@ -279,9 +279,5 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH=/home/dev/.opencode/bin:$PATH
 
 # NVM already loaded above (see "if [[ -d $HOME/.nvm ]]" block)
-
-
-# Kiro CLI post block. Keep at the bottom of this file.
-[[ -f "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/kiro-cli/shell/zshrc.post.zsh"
 
 true
