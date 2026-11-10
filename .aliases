@@ -537,7 +537,7 @@ wt-() {
 }
 
 q() {
-  kiro-cli chat -a
+  kiro-cli chat -a "$@"
 }
 
 # kitty is a special tty mode
