@@ -199,6 +199,12 @@
         "mcp",
         "--allow-any-path"
       ]
+    },
+    "servers": {
+      "onshape-featurescript": {
+        "type": "remote",
+        "url": "https://fs-mcp.labs.onshape.app/mcp"
+      }
     }
   },
   "plugin": [
