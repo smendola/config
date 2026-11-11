@@ -180,7 +180,7 @@
       ]
     },
     "asana": {
-      "enabled": true,
+      "enabled": false,
       "type": "remote",
       "url": "https://mcp.asana.com/v2/mcp",
       "oauth": {
@@ -195,7 +195,7 @@
       "url": "https://mcp.sentry.dev/mcp"
     },
     "postman": {
-      "enabled": true,
+      "enabled": false,
       "type": "remote",
       "url": "https://mcp.postman.com/minimal"
     },
@@ -208,7 +208,7 @@
       }
     },
     "sendgrid": {
-      "enabled": true,
+      "enabled": false,
       "type": "local",
       "command": [
         "npx",
