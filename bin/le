@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""Identify line endings; NUL bytes mean binary, no endings defaults to unix."""
+
+import argparse
+import sys
+
+
+def line_endings(stream):
+    unix = dos = mac = 0
+    pending_mac = b""
+    while chunk := stream.read(65536):
+        if b"\0" in chunk:
+            return "binary"
+        chunk = pending_mac + chunk
+        pending_mac = b"\r" if chunk.endswith(b"\r") else b""
+        if pending_mac:
+            chunk = chunk[:-1]
+        pairs = chunk.count(b"\r\n")
+        dos += pairs
+        unix += chunk.count(b"\n") - pairs
+        mac += chunk.count(b"\r") - pairs
+    mac += bool(pending_mac)
+    kinds = [name for name, count in (("unix", unix), ("DOS", dos), ("mac", mac)) if count]
+    return "mixed" if len(kinds) > 1 else kinds[0] if kinds else "unix"
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--clean-text", action="store_true", help="fail if binary")
+    endings = parser.add_mutually_exclusive_group()
+    endings.add_argument("--clean-unix", action="store_true", help="fail unless unix or binary")
+    endings.add_argument("--clean-dos", action="store_true", help="fail unless DOS or binary")
+    parser.add_argument("file", metavar="FILE")
+    args = parser.parse_args()
+    clean = args.clean_text or args.clean_unix or args.clean_dos
+    try:
+        with open(args.file, "rb") as stream:
+            result = line_endings(stream)
+    except OSError as error:
+        if not clean:
+            print(f"le: {error}", file=sys.stderr)
+        return 1
+    if not clean:
+        print(result)
+    if result == "binary":
+        return int(args.clean_text)
+    if args.clean_unix:
+        return int(result != "unix")
+    if args.clean_dos:
+        return int(result != "DOS")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
