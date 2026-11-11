@@ -2,5 +2,6 @@
   "mcp.loadedBefore": true,
   "chat.defaultAgent": "main",
   "chat.agentEngine": "v3",
-  "chat.enableAutoAgentUpgrade": true
+  "chat.enableAutoAgentUpgrade": true,
+  "chat.disableTrustAllConfirmation": true
 }
