@@ -537,7 +537,7 @@ wt-() {
 }
 
 q() {
-  kiro-cli chat --trust-tools=fs_read,code "$@"
+  kiro-cli chat -a "$@"
 }
 
 # kitty is a special tty mode
@@ -578,9 +578,11 @@ git () {
     local original_args=("$@")
     local commit_args=()
     local ai_message=0
+    local ai_amend=0
     local explicit_message=0
     while (( $# )); do
       case "$1" in
+        --amend) ai_amend=1; commit_args+=("$1") ;;
         -m|--message|-am)
           if [[ ${2-} == x || ${2-} == ai ]]; then
             ai_message=1
@@ -608,7 +610,7 @@ git () {
     done
     if (( ai_message && ! explicit_message )); then
       # Git prepares the index (including -a/pathspecs) before calling the editor.
-      GIT_EDITOR="\"$HOME/.local/bin/ai-commit-editor\"" \
+      AI_COMMIT_AMEND=$ai_amend GIT_EDITOR="\"$HOME/.local/bin/ai-commit-editor\"" \
         command git "${prefix[@]}" -c advice.waitingForEditor=false commit --edit "${commit_args[@]}"
     else
       command git "${prefix[@]}" commit "${original_args[@]}"
