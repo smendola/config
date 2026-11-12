@@ -8,7 +8,7 @@
     "minimax",
     "openai",
     "llama-server",
-    "polystrata"
+    "strata"
   ],
   "compaction": {
     "auto": true,
@@ -118,8 +118,8 @@
     }
   },
   "providers": {
-    "polystrata": {
-      "name": "PolyStrata :9090",
+    "strata": {
+      "name": "(Poly)Strata :9090",
       "package": "@opencode/ai/providers/openai-compatible",
       "settings": {
         "baseURL": "http://127.0.0.1:9090/v1"
@@ -147,7 +147,7 @@
           }
         },
         "qwen3.8-flash-next-coder-iq1_m": {
-          "name": "Qwen3.8 👁️‍🗨️ Flash Next Coder [131k]",
+          "name": "Qwen3.8 Flash Next Coder 👁️‍🗨️ [131k]",
           "capabilities": {
             "tools": true,
             "input": [
@@ -160,6 +160,23 @@
           },
           "limit": {
             "context": 131072,
+            "output": 8192
+          }
+        },
+        "swift-1.5-iq3_s": {
+          "name": "Swift1.5 IQ3_S 👁️‍🗨️ [205k]",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 204800,
             "output": 8192
           }
         }
