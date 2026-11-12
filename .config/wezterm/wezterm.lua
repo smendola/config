@@ -143,6 +143,12 @@ config.leader = {
 }
 
 config.keys = {
+  -- Alternate Herdr prefix: Ctrl+Shift+A sends F12.
+  {
+    key = "A",
+    mods = "CTRL|SHIFT",
+    action = act.SendKey { key = "F12" },
+  },
   {
     key = "p",
     mods = "CTRL|SHIFT",

@@ -7,7 +7,8 @@
     "deepseek",
     "minimax",
     "openai",
-    "llama-server"
+    "llama-server",
+    "strata"
   ],
   "compaction": {
     "auto": true,
@@ -117,6 +118,72 @@
       "options": {
         "baseURL": "http://cuda-linux:8080/v1",
         "apiKey": "not.needed"
+      }
+    }
+  },
+  "providers": {
+    "strata": {
+      "name": "(Poly)Strata :9090",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:9090/v1"
+      },
+      "compatibility": {
+        "maxTokensField": "max_tokens",
+        "reasoningField": "reasoning_content"
+      },
+      "models": {
+        "qwen3.6-35b-a3b-ud-q4_k_m": {
+          "name": "Qwen3.6 35B/A3B UD Q4_K_M 👁️‍🗨️ [262k]",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 262144,
+            "output": 8192
+          }
+        },
+        "qwen3.8-flash-next-coder-iq1_m": {
+          "name": "Qwen3.8 Flash Next Coder 👁️‍🗨️ [131k]",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 131072,
+            "output": 8192
+          }
+        },
+        "swift-1.5-iq3_s": {
+          "name": "Swift1.5 IQ3_S 👁️‍🗨️ [205k]",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 204800,
+            "output": 8192
+          }
+        }
       }
     }
   },
