@@ -184,85 +184,27 @@
     }
   },
   "mcp": {
-    "chrome-devtools": {
-      "enabled": false,
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "chrome-devtools-mcp@1.12.0",
-        "--autoConnect",
-        "--no-usage-statistics",
-        "--no-performance-crux"
-      ]
-    },
-    "asana": {
-      "enabled": false,
-      "type": "remote",
-      "url": "https://mcp.asana.com/v2/mcp",
-      "oauth": {
-        "clientId": "{env:ASANA_CLIENT_ID}",
-        "clientSecret": "{env:ASANA_CLIENT_SECRET}",
-        "redirectUri": "http://localhost:19876/mcp/oauth/callback"
-      }
-    },
-    "sentry": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://mcp.sentry.dev/mcp"
-    },
-    "postman": {
-      "enabled": false,
-      "type": "remote",
-      "url": "https://mcp.postman.com/minimal"
-    },
-    "context7": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:CONTEXT7_API_KEY}"
-      }
-    },
-    "sendgrid": {
-      "enabled": false,
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "sendgrid-mcp"
-      ],
-      "environment": {
-        "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
-        "READ_ONLY": "false",
-        "REQUEST_TIMEOUT": "60000"
-      }
-    },
-    "freecad": {
-      "enabled": false,
-      "type": "local",
-      "command": [
-        "/usr/bin/env",
-        "-C",
-        "/tmp/opencode",
-        "/home/sal/miniconda3/bin/freecad-mcp"
-      ],
-      "environment": {
-        "FREECAD_MODE": "xmlrpc",
-        "FREECAD_SOCKET_HOST": "localhost",
-        "FREECAD_XMLRPC_PORT": "9875"
-      }
-    },
-    "solidcraft": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "/home/sal/.local/bin/solidcraft-cli",
-        "mcp",
-        "--allow-any-path"
-      ]
-    },
     "servers": {
+      "context7": {
+        "disabled": false,
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp",
+        "headers": {
+          "Authorization": "Bearer {env:CONTEXT7_API_KEY}"
+        }
+      },
+      "chrome-devtools": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "chrome-devtools-mcp@1.12.0",
+          "--autoConnect",
+          "--no-usage-statistics",
+          "--no-performance-crux"
+        ]
+      },
       "firefox-devtools": {
         "type": "local",
         "command": [
@@ -272,7 +214,72 @@
         ],
         "disabled": false
       },
+
+
+      /*** External dev tools ***/
+      "asana": {
+        "disabled": true,
+        "type": "remote",
+        "url": "https://mcp.asana.com/v2/mcp",
+        "oauth": {
+          "client_id": "{env:ASANA_CLIENT_ID}",
+          "client_secret": "{env:ASANA_CLIENT_SECRET}",
+          "redirect_uri": "http://localhost:19876/mcp/oauth/callback"
+        }
+      },
+      "sentry": {
+        "disabled": false,
+        "type": "remote",
+        "url": "https://mcp.sentry.dev/mcp"
+      },
+      "postman": {
+        "disabled": true,
+        "type": "remote",
+        "url": "https://mcp.postman.com/minimal"
+      },
+      "sendgrid": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "sendgrid-mcp"
+        ],
+        "environment": {
+          "SENDGRID_API_KEY": "{env:SENDGRID_API_KEY}",
+          "READ_ONLY": "false",
+          "REQUEST_TIMEOUT": "60000"
+        }
+      },
+
+
+      /*** CAD TOOLS ***/
+      "freecad": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "/usr/bin/env",
+          "-C",
+          "/tmp/opencode",
+          "/home/sal/miniconda3/bin/freecad-mcp"
+        ],
+        "environment": {
+          "FREECAD_MODE": "xmlrpc",
+          "FREECAD_SOCKET_HOST": "localhost",
+          "FREECAD_XMLRPC_PORT": "9875"
+        }
+      },
+      "solidcraft": {
+        "disabled": false,
+        "type": "local",
+        "command": [
+          "/home/sal/.local/bin/solidcraft-cli",
+          "mcp",
+          "--allow-any-path"
+        ]
+      },
       "onshape-featurescript": {
+        "disabled": true,
         "type": "remote",
         "url": "https://fs-mcp.labs.onshape.app/mcp"
       }
