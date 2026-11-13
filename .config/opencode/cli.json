@@ -24,7 +24,8 @@
     "indicators": "status"
   },
   "prompt": {
-    "paste": "compact"
+    "paste": "compact",
+    "image_preview": true
   },
   "attention": {
     "notifications": true,
