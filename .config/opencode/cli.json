@@ -1,0 +1,33 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "mercury"
+  },
+  "keybinds": {
+    "diff.open": "<leader>d"
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": true,
+    "thinking": "show",
+    "verbosity": "high",
+    "permissions": "autoaccept"
+  },
+  "animations": true,
+  "plugins": [
+    "./herdr-opencode"
+  ],
+  "tabs": {
+    "indicators": "status"
+  },
+  "prompt": {
+    "paste": "compact"
+  },
+  "attention": {
+    "notifications": true,
+    "sound": true
+  }
+}
