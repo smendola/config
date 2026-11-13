@@ -263,6 +263,15 @@
       ]
     },
     "servers": {
+      "firefox-devtools": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@mozilla/firefox-devtools-mcp@latest"
+        ],
+        "disabled": false
+      },
       "onshape-featurescript": {
         "type": "remote",
         "url": "https://fs-mcp.labs.onshape.app/mcp"
