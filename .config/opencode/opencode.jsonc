@@ -30,31 +30,10 @@
     "llama-server": {
       "name": "llama-server cuda-linux:8080",
       "models": {
-        "ornith-1.5-35b/a3b-think": {
-          "name": "Ornith 1.5 35B/A3B Think [200k]",
-          "limit": {
-            "context": 200000,
-            "output": 8192
-          }
-        },
         "qwen3.6-35b/a3b-think": {
           "name": "Qwen3.6 35B/A3B Think [260k]",
           "limit": {
             "context": 260000,
-            "output": 8192
-          }
-        },
-        "qwen3.5-9b-mtp-think": {
-          "name": "Qwen3.5 9B Mtp Think [262k]",
-          "limit": {
-            "context": 262144,
-            "output": 8192
-          }
-        },
-        "gemma4-26b/a4b-think": {
-          "name": "Gemma4 26B/A4B Think [120k]",
-          "limit": {
-            "context": 120000,
             "output": 8192
           }
         },
@@ -84,6 +63,51 @@
           "limit": {
             "context": 128000,
             "output": 8192
+          }
+        },
+        "qwen3.8-27b-q4-think": {
+          "name": "Qwen3.8 27B Q4 Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-27b-iq3-140-think": {
+          "name": "Qwen3.8 27B Iq3 140 Think [140k]",
+          "limit": {
+            "context": 140000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-27b-iq4-think": {
+          "name": "Qwen3.8 27B Iq4 Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-27b-iq3-gsq-rco-think": {
+          "name": "Qwen3.8 27B Iq3 Gsq Rco Think [100k]",
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        },
+        "qwen3.8-27b-iq3-gsq-rco-200-vision-think": {
+          "name": "Qwen3.8 27B Iq3 Gsq Rco 200 Vision Think 👁️‍🗨️ [200k]",
+          "limit": {
+            "context": 200000,
+            "output": 8192
+          },
+          "attachment": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         },
         "qwen3.8-q4-think": {
@@ -218,8 +242,7 @@
     "postman": {
       "enabled": true,
       "type": "remote",
-      "url": "https://mcp.postman.com/minimal",
-      "enabled": true
+      "url": "https://mcp.postman.com/minimal"
     },
     "context7": {
       "enabled": true,

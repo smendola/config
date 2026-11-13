@@ -1,0 +1,71 @@
+#!/bin/bash
+# git-merge-file <frombranch> <file>
+#
+# Does a proper 3-way merge of <file> from <frombranch> into the current
+# working tree, using the common ancestor as the base.
+# Equivalent to running git merge but scoped to a single file.
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: git merge-file <frombranch> <file>" >&2
+    echo "       Merges <file> from <frombranch> into the current working tree." >&2
+    exit 1
+}
+
+[[ $# -eq 2 ]] || usage
+
+FROM_BRANCH="$1"
+FILE="$2"
+
+# Validate we're in a git repo
+git rev-parse --git-dir > /dev/null 2>&1 || { echo "Not a git repository." >&2; exit 1; }
+
+# Validate the branch exists
+git rev-parse --verify "$FROM_BRANCH" > /dev/null 2>&1 || {
+    echo "Branch not found: $FROM_BRANCH" >&2
+    exit 1
+}
+
+# Validate the file exists on disk (we need something to merge into)
+[[ -f "$FILE" ]] || {
+    echo "File not found in working tree: $FILE" >&2
+    exit 1
+}
+
+# Find the common ancestor commit
+MERGE_BASE=$(git merge-base HEAD "$FROM_BRANCH") || {
+    echo "Could not find common ancestor between HEAD and $FROM_BRANCH" >&2
+    exit 1
+}
+
+# Check the file exists in both the ancestor and the other branch
+git show "${MERGE_BASE}:${FILE}" > /dev/null 2>&1 || {
+    echo "File not found in common ancestor (${MERGE_BASE:0:8}): $FILE" >&2
+    echo "Cannot do a 3-way merge without a base. Use 'git checkout $FROM_BRANCH -- $FILE' instead." >&2
+    exit 1
+}
+
+git show "${FROM_BRANCH}:${FILE}" > /dev/null 2>&1 || {
+    echo "File not found in branch $FROM_BRANCH: $FILE" >&2
+    exit 1
+}
+
+# Stage base and theirs into temp files
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+BASE="$TMPDIR/base"
+THEIRS="$TMPDIR/theirs"
+
+git show "${MERGE_BASE}:${FILE}" > "$BASE"
+git show "${FROM_BRANCH}:${FILE}" > "$THEIRS"
+
+# Run the 3-way merge (modifies FILE in place; exits non-zero on conflicts)
+if git merge-file "$FILE" "$BASE" "$THEIRS"; then
+    echo "Merged cleanly: $FILE"
+else
+    CONFLICTS=$(grep -c "^<<<<<<< " "$FILE" || true)
+    echo "Merge complete with $CONFLICTS conflict(s) in $FILE — resolve manually."
+    exit 1
+fi
