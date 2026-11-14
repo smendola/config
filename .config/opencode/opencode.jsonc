@@ -218,7 +218,7 @@
 
       /*** External dev tools ***/
       "asana": {
-        "disabled": true,
+        "disabled": false,
         "type": "remote",
         "url": "https://mcp.asana.com/v2/mcp",
         "oauth": {
@@ -233,12 +233,12 @@
         "url": "https://mcp.sentry.dev/mcp"
       },
       "postman": {
-        "disabled": true,
+        "disabled": false,
         "type": "remote",
         "url": "https://mcp.postman.com/minimal"
       },
       "sendgrid": {
-        "disabled": true,
+        "disabled": false,
         "type": "local",
         "command": [
           "npx",
@@ -270,7 +270,7 @@
         }
       },
       "solidcraft": {
-        "disabled": false,
+        "disabled": true,
         "type": "local",
         "command": [
           "/home/sal/.local/bin/solidcraft-cli",
