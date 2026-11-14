@@ -1,0 +1,500 @@
+#!/usr/bin/env python3
+"""Add Firefox equivalents of visible Chrome Apps; preserve existing launchers."""
+import argparse
+import configparser
+import ctypes
+import ctypes.util
+import datetime
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import struct
+import subprocess
+import sys
+import tempfile
+import unicodedata
+import uuid
+from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
+
+
+def varint(data, pos=0):
+    value = shift = 0
+    while shift < 70:
+        byte = data[pos]
+        pos += 1
+        value |= (byte & 127) << shift
+        if byte < 128:
+            return value, pos
+        shift += 7
+    raise ValueError('Invalid varint')
+
+
+def fields(data):
+    pos = 0
+    while pos < len(data):
+        tag, pos = varint(data, pos)
+        wire = tag & 7
+        if wire == 0:
+            value, pos = varint(data, pos)
+        elif wire in (1, 2, 5):
+            if wire == 2:
+                size, pos = varint(data, pos)
+            else:
+                size = 8 if wire == 1 else 4
+            value = data[pos:pos + size]
+            pos += size
+            if pos > len(data):
+                raise ValueError('Truncated protobuf')
+        else:
+            raise ValueError('Unsupported protobuf wire type')
+        yield tag >> 3, value
+
+
+def table_entries(data):
+    end = len(data) - 4 - 4 * struct.unpack('<I', data[-4:])[0]
+    pos, key = 0, b''
+    while pos < end:
+        shared, pos = varint(data, pos)
+        size, pos = varint(data, pos)
+        length, pos = varint(data, pos)
+        key = key[:shared] + data[pos:pos + size]
+        pos += size
+        yield key, data[pos:pos + length]
+        pos += length
+
+
+def read_table(data, snappy):
+    def block(handle):
+        offset, pos = varint(handle)
+        size, _ = varint(handle, pos)
+        raw = data[offset:offset + size]
+        compression = data[offset + size]
+        if compression == 1:
+            if snappy is None:
+                raise ValueError('libsnappy is required to read Chrome app URLs')
+            length = ctypes.c_size_t()
+            if snappy.snappy_uncompressed_length(raw, len(raw), ctypes.byref(length)):
+                raise ValueError('Invalid Snappy block')
+            if length.value > 64 * 1024 * 1024:
+                raise ValueError('Oversized Snappy block')
+            output = ctypes.create_string_buffer(length.value)
+            if snappy.snappy_uncompress(raw, len(raw), output, ctypes.byref(length)):
+                raise ValueError('Cannot decompress Snappy block')
+            raw = output.raw[:length.value]
+        elif compression != 0:
+            raise ValueError('Unsupported LevelDB compression')
+        return raw
+
+    if data[-8:] != bytes.fromhex('57fb808b247547db'):
+        raise ValueError('Invalid LevelDB table')
+    footer = data[-48:]
+    _, pos = varint(footer)
+    _, pos = varint(footer, pos)
+    for _, handle in table_entries(block(footer[pos:])):
+        for key, value in table_entries(block(handle)):
+            tag = int.from_bytes(key[-8:], 'little')
+            yield key[:-8], tag >> 8, tag & 255, value
+
+
+def read_log(data):
+    fragments = b''
+    for start in range(0, len(data), 32768):
+        block = data[start:start + 32768]
+        pos = 0
+        while pos + 7 <= len(block):
+            _, length, kind = struct.unpack_from('<IHB', block, pos)
+            pos += 7
+            if not kind or pos + length > len(block):
+                break  # Padding or an unfinished write by a running Chrome.
+            chunk = block[pos:pos + length]
+            pos += length
+            if kind == 1:
+                record = chunk
+            elif kind == 2:
+                fragments = chunk
+                continue
+            elif kind == 3:
+                fragments += chunk
+                continue
+            elif kind == 4:
+                record = fragments + chunk
+                fragments = b''
+            else:
+                continue
+            sequence, count = struct.unpack_from('<QI', record)
+            offset = 12
+            for index in range(count):
+                operation = record[offset]
+                length, offset = varint(record, offset + 1)
+                key = record[offset:offset + length]
+                offset += length
+                value = b''
+                if operation == 1:
+                    length, offset = varint(record, offset)
+                    value = record[offset:offset + length]
+                    offset += length
+                elif operation != 0:
+                    raise ValueError('Invalid LevelDB operation')
+                yield key, sequence + index, operation, value
+
+
+def chrome_urls(root, profile):
+    """Read snapshots of Chrome's database without opening or locking it."""
+    library = ctypes.util.find_library('snappy')
+    snappy = ctypes.CDLL(library) if library else None
+    latest = {}
+    directory = root / profile / 'Sync Data/LevelDB'
+    for path in sorted(directory.glob('*')):
+        if path.suffix not in ('.ldb', '.log'):
+            continue
+        try:
+            data = path.read_bytes()
+            records = read_table(data, snappy) if path.suffix == '.ldb' else read_log(data)
+            for key, sequence, operation, value in records:
+                if key.startswith(b'web_apps-dt-'):
+                    if key not in latest or sequence > latest[key][0]:
+                        latest[key] = (sequence, operation, value)
+        except (OSError, ValueError, IndexError, struct.error) as error:
+            print(f'Warning: could not fully read {path}: {error}', file=sys.stderr)
+    result = {}
+    for key, (_, operation, value) in latest.items():
+        if not operation:
+            continue
+        try:
+            for number, specifics in fields(value):
+                if number == 1 and isinstance(specifics, bytes):
+                    for field, url in fields(specifics):
+                        if field == 1 and isinstance(url, bytes):
+                            text = url.decode()
+                            if text.startswith(('http://', 'https://')):
+                                result[key[12:].decode()] = text
+        except (ValueError, IndexError, UnicodeError):
+            continue
+    return result
+
+
+def desktop(path):
+    config = configparser.ConfigParser(interpolation=None, strict=False)
+    config.read(path)
+    return dict(config['Desktop Entry'])
+
+
+def argument(command, flag):
+    args = shlex.split(command)
+    for index, arg in enumerate(args):
+        if arg == flag and index + 1 < len(args):
+            return args[index + 1].replace('%%', '%')
+        if arg.startswith(flag + '='):
+            return arg.split('=', 1)[1]
+    return None
+
+
+def quote(value):
+    value = value.replace('%', '%%')
+    for char in ('\\', '"', '`', '$'):
+        value = value.replace(char, '\\' + char)
+    # Desktop-entry string escaping is applied before Exec argument parsing.
+    return '"' + value.replace('\\', '\\\\') + '"'
+
+
+def atomic_write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp = tempfile.mkstemp(prefix='.' + path.name, dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            stream.write(text)
+        os.chmod(temp, (path.stat().st_mode & 0o777) if path.exists() else 0o644)
+        os.replace(temp, path)
+    finally:
+        if os.path.exists(temp):
+            os.unlink(temp)
+
+
+def require_firefox_closed():
+    for process in Path('/proc').glob('[0-9]*'):
+        try:
+            executable = (process / 'exe').resolve(strict=True).name
+            if executable in ('firefox', 'firefox-bin'):
+                raise ValueError('Close Firefox before updating web-app registrations, then rerun')
+        except (FileNotFoundError, PermissionError, ProcessLookupError):
+            continue
+
+
+def app_filename(name):
+    aliases = {'Google Calendar': 'calendar', 'WhatsApp Web': 'whatsapp'}
+    label = aliases.get(name, name)
+    label = unicodedata.normalize('NFKD', label).encode('ascii', 'ignore').decode()
+    slug = re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')
+    if not slug:
+        raise ValueError(f'Cannot derive a filename from app name: {name!r}')
+    return slug + '.desktop'
+
+
+def register_shortcuts(profile, apps, filenames, pending):
+    """Keep launch IDs, registered IDs and Linux window identities consistent."""
+    registry_path = Path(profile) / 'taskbartabs/taskbartabs.json'
+    original = registry_path.read_text() if registry_path.exists() else None
+    registry = json.loads(original) if original else {'version': 1, 'taskbarTabs': []}
+    if registry.get('version') != 1 or not isinstance(registry.get('taskbarTabs'), list):
+        raise ValueError('Unsupported Firefox taskbar-tabs registry format')
+    records = registry['taskbarTabs']
+    by_id = {record['id']: record for record in records}
+    if len(by_id) != len(records):
+        raise ValueError('Duplicate IDs in Firefox taskbar-tabs registry')
+    before = json.dumps(registry, sort_keys=True)
+    planned = dict(pending)
+    for filename in dict.fromkeys(filenames):
+        path = apps / filename
+        text = planned.get(path, path.read_text() if path.exists() else '')
+        config = configparser.ConfigParser(interpolation=None, strict=False)
+        config.read_string(text)
+        entry = config['Desktop Entry']
+        command = entry['Exec']
+        identifier = argument(command, '-taskbar-tab')
+        uuid.UUID(identifier)
+        url = argument(command, '-new-window')
+        parsed = urlsplit(url)
+        if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+            raise ValueError(f'Invalid app URL in {filename}')
+        if argument(command, '-profile') != str(profile):
+            raise ValueError(f'Unexpected Firefox profile in {filename}')
+        container = int(argument(command, '-container') or '0')
+        record = by_id.get(identifier)
+        if record is None:
+            scope = {'hostname': parsed.hostname}
+            # Docs and Sheets share a host; keep their navigation scopes distinct.
+            if parsed.hostname == 'docs.google.com':
+                scope['prefix'] = '/' + parsed.path.strip('/').split('/')[0] + '/'
+            record = {'id': identifier, 'scopes': [scope],
+                      'userContextId': container, 'startUrl': url,
+                      'name': entry['Name'], 'shortcutRelativePath': filename}
+            records.append(record)
+            by_id[identifier] = record
+        elif record['userContextId'] != container:
+            raise ValueError(f'Container mismatch in {filename}')
+        # Firefox uses this registered desktop-entry name as the Linux window class.
+        canonical = filename
+        if Path(canonical).name != canonical or not canonical.endswith('.desktop'):
+            raise ValueError(f'Unexpected registered shortcut path: {canonical}')
+        record['shortcutRelativePath'] = canonical
+        window_class = canonical[:-len('.desktop')]
+        if entry.get('StartupWMClass') != window_class:
+            if re.search(r'^StartupWMClass=', text, flags=re.M):
+                text = re.sub(r'^StartupWMClass=.*$', 'StartupWMClass=' + window_class,
+                              text, flags=re.M)
+            else:
+                text = text.rstrip('\n') + '\nStartupWMClass=' + window_class + '\n'
+            planned[path] = text
+    if json.dumps(registry, sort_keys=True) != before:
+        planned[registry_path] = json.dumps(registry, separators=(',', ':')) + '\n'
+    pending[:] = list(planned.items())
+    return registry_path
+
+
+def run(args):
+    home = Path.home()
+    apps = home / '.local/share/applications'
+    merged = home / '.config/menus/applications-merged'
+    source_menu = ET.parse(merged / 'user-chrome-apps.menu')
+    excluded = set()
+    edits = home / '.config/menus/applications-kmenuedit.menu'
+    if edits.exists():
+        for menu in ET.parse(edits).findall('.//Menu'):
+            if menu.findtext('Name') == 'chrome-apps':
+                excluded.update(e.text for e in menu.findall('./Exclude/Filename'))
+    existing = []
+    for path in sorted(apps.glob('*.desktop')):
+        try:
+            entry = desktop(path)
+            command = entry.get('exec', '')
+            if not argument(command, '-taskbar-tab'):
+                continue
+            existing.append((path, entry, argument(command, '-profile'),
+                             argument(command, '-new-window')))
+        except (ValueError, KeyError, configparser.Error):
+            continue
+    profiles = {p for _, _, p, _ in existing if p}
+    if not profiles:
+        # Still discover the profile after all launchers have been deleted.
+        for base in (home / '.config/mozilla/firefox', home / '.mozilla/firefox'):
+            profiles.update(str(p.parent.parent) for p in base.glob('*/taskbartabs/taskbartabs.json'))
+    if args.profile:
+        profile = str(Path(args.profile).expanduser().resolve())
+    elif len(profiles) == 1:
+        profile = profiles.pop()
+    else:
+        raise ValueError('Specify --profile PATH; could not identify a unique Firefox shortcut profile')
+    if not Path(profile).is_dir():
+        raise ValueError(f'Firefox profile not found: {profile}')
+    binary = shutil.which('firefox')
+    if not binary:
+        raise ValueError('Firefox executable not found')
+    binary = str(Path(binary).resolve())
+    registry_path = Path(profile) / 'taskbartabs/taskbartabs.json'
+    registered = json.loads(registry_path.read_text()).get('taskbarTabs', []) if registry_path.exists() else []
+    pending, filenames, used, url_cache = [], [], set(), {}
+    for node in source_menu.findall('.//Include/Filename'):
+        source = node.text
+        if source in excluded or not source or Path(source).name != source:
+            continue
+        entry = desktop(apps / source)
+        if any(entry.get(k, '').lower() == 'true' for k in ('hidden', 'nodisplay')):
+            continue
+        command = entry['exec']
+        chrome_profile = argument(command, '--profile-directory') or 'Default'
+        appid = argument(command, '--app-id')
+        if not appid or not re.fullmatch('[a-p]{32}', appid):
+            raise ValueError(f'Cannot identify Chrome app: {source}')
+        if Path(chrome_profile).name != chrome_profile:
+            raise ValueError(f'Invalid Chrome profile: {chrome_profile}')
+        name = entry['name']
+        if name == 'Chrome Remote Desktop':
+            name += f' ({chrome_profile})'
+        path = apps / app_filename(name)
+        if path.name in used:
+            raise ValueError(f'App names collide at {path.name}; no changes made')
+        if path.exists():
+            prior = desktop(path)
+            prior_command = prior.get('exec', '')
+            if (prior.get('x-chrome-source') != source
+                    or argument(prior_command, '-profile') != profile
+                    or not argument(prior_command, '-taskbar-tab')):
+                raise ValueError(f'Refusing to overwrite unrelated file: {path}')
+            filenames.append(path.name)
+            used.add(path.name)
+            print(f'Reuse: {name}')
+            continue
+        if chrome_profile not in url_cache:
+            url_cache[chrome_profile] = chrome_urls(args.chrome_dir, chrome_profile)
+        url = url_cache[chrome_profile].get(appid)
+        if not url:
+            raise ValueError(f'No launch URL found for {name}; no changes made')
+        identifier = str(uuid.uuid5(uuid.NAMESPACE_URL, f'chrome-to-firefox:{profile}:{source}'))
+        matches = [r for r in registered if r.get('startUrl') == url
+                   and r.get('name') == name and r.get('userContextId') == 0]
+        if len(matches) == 1:
+            identifier = matches[0]['id']
+        command = [binary, '-taskbar-tab', identifier, '-new-window', url,
+                   '-profile', profile, '-container', '0']
+        text = '\n'.join(['[Desktop Entry]', 'Type=Application', 'Version=1.5',
+                          'Name=' + name, 'Icon=' + entry.get('icon', 'firefox'),
+                          'Exec=' + ' '.join(map(quote, command)),
+                          'Comment=Open in Firefox', 'X-Chrome-Source=' + source, ''])
+        pending.append((path, text))
+        filenames.append(path.name)
+        used.add(path.name)
+        print(f'Create: {name} -> {path.name}')
+
+    menupath = merged / 'user-firefox-apps.menu'
+    if menupath.exists():
+        tree = ET.parse(menupath)
+        root = tree.getroot()
+        menus = [m for m in root.findall('Menu') if m.findtext('Name') == 'firefox-apps']
+        if len(menus) != 1:
+            raise ValueError(f'Unexpected menu structure: {menupath}')
+        menu = menus[0]
+    else:
+        root = ET.Element('Menu')
+        ET.SubElement(root, 'Name').text = 'Applications'
+        menu = ET.SubElement(root, 'Menu')
+        ET.SubElement(menu, 'Name').text = 'firefox-apps'
+        ET.SubElement(menu, 'Directory').text = 'firefox-apps.directory'
+    include = menu.find('Include')
+    if include is None:
+        include = ET.SubElement(menu, 'Include')
+    # Drop only dangling entries from the old UUID-based generated menu.
+    stale = [e for e in include.findall('Filename')
+             if re.fullmatch(r'firefox\.webapp-[0-9a-f-]{36}\.desktop', e.text or '')
+             and not (apps / e.text).exists()]
+    for element in stale:
+        include.remove(element)
+    known = {e.text for e in include.findall('Filename')}
+    added = [name for name in dict.fromkeys(filenames) if name not in known]
+    for name in added:
+        ET.SubElement(include, 'Filename').text = name
+    if added or stale or not menupath.exists():
+        ET.indent(root, space='  ')
+        text = ('<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"\n'
+                ' "http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">\n'
+                + ET.tostring(root, encoding='unicode') + '\n')
+        pending.append((menupath, text))
+    directory = home / '.local/share/desktop-directories/firefox-apps.directory'
+    if not directory.exists():
+        pending.append((directory, '[Desktop Entry]\nType=Directory\nName=Firefox Apps\nIcon=firefox\n'))
+    registry_path = register_shortcuts(profile, apps, filenames, pending)
+    registry_changed = any(path == registry_path for path, _ in pending)
+    new_count = sum(p.suffix == '.desktop' and not p.exists() for p, _ in pending)
+    updated_count = sum(p.suffix == '.desktop' and p.exists() for p, _ in pending)
+    if not args.dry_run:
+        if registry_changed:
+            require_firefox_closed()
+        # Validate all planned launchers before making any changes.
+        validator = shutil.which('desktop-file-validate')
+        if validator:
+            with tempfile.TemporaryDirectory(prefix='firefox-shortcuts-') as temporary:
+                for path, text in pending:
+                    if path.suffix == '.desktop':
+                        test = Path(temporary) / path.name
+                        test.write_text(text)
+                        subprocess.run([validator, str(test)], check=True)
+        if registry_changed:
+            require_firefox_closed()
+        backup_root = home / '.local/state/firefox-shortcuts/backups' / datetime.datetime.now().strftime('%Y%m%d-%H%M%S-%f')
+        for path, _ in pending:
+            if path.exists():
+                destination = backup_root / str(path).lstrip('/')
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(path, destination)
+        if backup_root.exists():
+            print(f'Backups: {backup_root}')
+        # Persist registrations first so no new launcher has an unregistered ID.
+        pending.sort(key=lambda item: item[0] != registry_path)
+        for path, text in pending:
+            if path == menupath and path.exists():
+                backup = path.with_suffix('.menu.bak')
+                if not backup.exists():
+                    shutil.copy2(path, backup)
+            atomic_write(path, text)
+        if pending and shutil.which('kbuildsycoca6'):
+            subprocess.run(['kbuildsycoca6', '--noincremental'], check=True)
+    print(f'{"Would create" if args.dry_run else "Created"} {new_count} shortcuts; '
+          f'{updated_count} updated; reused {len(filenames) - new_count}; {len(pending)} file changes'
+          + (' planned.' if args.dry_run else '.'))
+    if registry_changed and args.dry_run:
+        print('Firefox must be closed to apply the registry changes.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, epilog=
+        'Existing shortcuts and menu entries are preserved. Removed Chrome apps are not deleted. '
+        'All new shortcuts use the selected Firefox profile and container 0. '
+        'Filenames use app names (calendar.desktop, whatsapp.desktop); UUIDs stay internal. '
+        'Close Firefox before adding or repairing app registrations; changed files are backed up.')
+    parser.add_argument('--dry-run', action='store_true', help='Preview changes without writing files')
+    parser.add_argument('--profile', help='Firefox profile directory (default: infer from shortcuts or web-app registries)')
+    parser.add_argument('--chrome-dir', type=Path,
+                        default=Path.home() / '.config/google-chrome', help='Chrome user-data directory')
+    args = parser.parse_args()
+    try:
+        if args.dry_run:
+            run(args)
+        else:
+            state = Path.home() / '.local/state/firefox-shortcuts'
+            state.mkdir(parents=True, exist_ok=True)
+            with (state / 'lock').open('a') as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                run(args)
+    except (OSError, ValueError, KeyError, configparser.Error, ET.ParseError,
+            subprocess.CalledProcessError) as error:
+        print(f'Error: {error}', file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
