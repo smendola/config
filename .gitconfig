@@ -6,75 +6,75 @@
 ;;;;;;;;; Generic settings not specific to me ;;;;;;;;
 
 [core]
-	autocrlf = false
+    autocrlf = false
 [color]
-	ui = true
-	branch = auto
-	diff = auto
-	status = auto
+    ui = true
+    branch = auto
+    diff = auto
+    status = auto
 [color "branch"]
-	current = green bold
-	; local = yellow 
-	; remote = green
+    current = green bold
+    ; local = yellow 
+    ; remote = green
 [color "diff"]
-	meta = yellow bold
-	frag = magenta bold
-	old = red bold
-	new = green bold
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
 [color "status"]
-	; added = green
-	changed = yellow
+    ; added = green
+    changed = yellow
     untracked = red italic
 
 [alias]
-	co = checkout
+    co = checkout
     c-p = cherry-pick
     wt = worktree
-	ci = commit
-	dt = difftool
-	dty = difftool -y
+    ci = commit
+    dt = difftool
+    dty = difftool -y
     comit = commit
     commmit = commit
-	
-	; see: http://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git/4991675#4991675
-	oldest-ancestor = !bash -c 'diff -u <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
-	branchdiff = !sh -c \"git diff `git oldest-ancestor`..\"
-	branchdt = !sh -c \"git dt `git oldest-ancestor`..\"
-	branchdty = !sh -c \"git dty `git oldest-ancestor`..\"
-	branchlog = !sh -c \"git log `git oldest-ancestor`..\"
-	
-	; MINGW Git requires this ugliness;
-	; cygwin git would allow:
-	; workon = workon
-	; yes, it would.
-	branches = !sh -c $HOME/bin/git-branches
-	what = !sh -c $HOME/bin/git-what
-	workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
-	permission-reset = "!git diff -p | grep -E \"^(diff|old mode|new mode)\" | sed -e \"s/^old/NEW/;s/^new/old/;s/^NEW/new/\" | git apply"
+    
+    ; see: http://stackoverflow.com/questions/1527234/finding-a-branch-point-with-git/4991675#4991675
+    oldest-ancestor = !bash -c 'diff -u <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | sed -ne \"s/^ //p\" | head -1' -
+    branchdiff = !sh -c \"git diff `git oldest-ancestor`..\"
+    branchdt = !sh -c \"git dt `git oldest-ancestor`..\"
+    branchdty = !sh -c \"git dty `git oldest-ancestor`..\"
+    branchlog = !sh -c \"git log `git oldest-ancestor`..\"
+    
+    ; MINGW Git requires this ugliness;
+    ; cygwin git would allow:
+    ; workon = workon
+    ; yes, it would.
+    branches = !sh -c $HOME/bin/git-branches
+    what = !sh -c $HOME/bin/git-what
+    workon = !bash -c '$HOME/bin/git-workon "${0}" \"${1}\"'
+    permission-reset = "!git diff -p | grep -E \"^(diff|old mode|new mode)\" | sed -e \"s/^old/NEW/;s/^new/old/;s/^NEW/new/\" | git apply"
 
 ;;;; Git has built-in support for diffmerge, meld and diffuse
 ;;;; no need to configure them as custom tools
 
 [diff]
-	tool = meld
+    tool = meld
 [merge]
-	tool = meld
+    tool = meld
 
 [gui]
 [url "https://"]
-	insteadOf = git://
+    insteadOf = git://
 [push]
-	default = current
-	autoSetupRemote = true
-	autoSetupRemote = true
-	recurseSubmodules = on-demand
+    default = current
+    autoSetupRemote = true
+    autoSetupRemote = true
+    recurseSubmodules = on-demand
 [credential]
-	helper = store
+    helper = store
 [pull]
-	rebase = false
-	default = current
+    rebase = false
+    default = current
 [init]
-	defaultBranch = main
+    defaultBranch = main
 
 [core]
     pager = delta
@@ -101,13 +101,13 @@
     path = /home/dev/.gitconfig.themes
 
 [submodule]
-	recurse = true
+    recurse = true
 [merge "take-theirs"]
-	name = Always take theirs
-	driver = cp %B %A
+    name = Always take theirs
+    driver = cp %B %A
 [credential "https://github.com"]
-	helper = !/usr/bin/gh auth git-credential
+    helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = !/usr/bin/gh auth git-credential
+    helper = !/usr/bin/gh auth git-credential
 [credential "https://git.heroku.com"]
-	helper = !heroku git:credentials
+    helper = !heroku git:credentials
