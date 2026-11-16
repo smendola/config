@@ -13,7 +13,7 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 
 ## Self-attribution
 
-When you create a new file, or make significant edits to a file, add a comment at top to identify
+When you create a new file, or make **substantial** edits to a file (not trivial changes), add a comment at top to identify
 the agent session that worked on the file.
 
 use format:
