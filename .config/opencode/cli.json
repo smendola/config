@@ -28,7 +28,7 @@
     "image_preview": true
   },
   "attention": {
-    "notifications": true,
+    "notifications": false,
     "sound": true
   }
 }
