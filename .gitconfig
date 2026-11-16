@@ -106,6 +106,9 @@
     name = Always take theirs
     driver = cp %B %A
 [credential "https://github.com"]
+    # Helpers accumulate: the empty entry clears earlier helpers for GitHub HTTPS,
+    # then the next entry adds gh. This does not delete stored credentials.
+    helper =
     helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
     helper = !/usr/bin/gh auth git-credential
