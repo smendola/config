@@ -31,8 +31,12 @@
     c-p = cherry-pick
     wt = worktree
     ci = commit
+    d = diff HEAD
+    dh = diff HEAD
     dt = difftool
+    dth = difftool HEAD
     dty = difftool -y
+    dtyh = difftool -y HEAD
     comit = commit
     commmit = commit
     
