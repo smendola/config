@@ -118,3 +118,5 @@
     insteadOf = git@github.com:
     insteadOf = ssh://git@github.com/
     helper = !heroku git:credentials
+[merge "keep-current"]
+	driver = true
