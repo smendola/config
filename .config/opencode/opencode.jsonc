@@ -255,6 +255,14 @@
 
 
       /*** CAD TOOLS ***/
+      "orcaslicer": {
+        "disabled": true,
+        "type": "local",
+        "command": [
+          "/home/sal/miniconda3/bin/uvx",
+          "orcaslicer-mcp"
+        ]
+      },
       "freecad": {
         "disabled": true,
         "type": "local",
@@ -284,6 +292,14 @@
         "type": "remote",
         "url": "https://fs-mcp.labs.onshape.app/mcp"
       }
+    },
+    "solidcraft": {
+      "command": [
+        "/tmp/.mount_solidcOdDagB/usr/bin/solidcraft-cli",
+        "mcp"
+      ],
+      "enabled": true,
+      "type": "local"
     }
   },
   "plugin": [],
