@@ -13,6 +13,18 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 
 ## Self-attribution
 
+### With associated Asana task
+When you are working on an Asana task (provided by user), add session-identifying info to the Asana task description
+
+Add an H1 named "AI Session(s)" to the description of the asana task (unless a similarly, not necessarily identical, heading is already present).
+Under that, append a line like this:
+
+`OC:${HOST}:${USER}:${OPENCODE_SESSION_ID}`
+
+### Without associated Asana task:
+
+If there is no know Asana task, annotate changed files instead, as follows.
+
 When you create a new file, or make **substantial** edits to a file (not trivial changes), add a comment at top to identify
 the agent session that worked on the file.
 
