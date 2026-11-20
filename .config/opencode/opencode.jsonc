@@ -118,6 +118,31 @@
     }
   },
   "providers": {
+    "basalt": {
+      "name": "Basalt :9090",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:9090/v1"
+      },
+      "compatibility": {
+        "maxTokensField": "max_tokens",
+        "reasoningField": "reasoning_content"
+      },
+      "models": {
+        "Qwen3.8-Flash-Next UD-IQ1_M": {
+          "name": "Qwen3.8 Flash Next UD-IQ1_M [100k]",
+          "capabilities": {
+            "tools": true,
+            "input": ["text", "image", "video"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        }
+      }
+    },
     "strata": {
       "name": "(Poly)Strata :9090",
       "package": "@opencode/ai/providers/openai-compatible",
