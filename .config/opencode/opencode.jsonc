@@ -135,7 +135,7 @@
           "name": "Qwen3.8 27B QUASAR-NVFP4 [8k]",
           "capabilities": {
             "tools": true,
-            "input": ["text"],
+            "input": ["text", "image"],
             "output": ["text"]
           },
           "limit": {
