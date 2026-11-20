@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+"""Find likely camera-original DJI drone MP4s using ffprobe metadata."""
+
+import argparse
+from datetime import datetime
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+
+TRANSCODER = re.compile(
+    r"lav[cf]|ffmpeg|handbrake|[xh][ ._-]?26[45]|"
+    r"adobe|premiere|after effects|davinci|resolve|blackmagic|"
+    r"final cut|apple prores|compressor|imovie|videotoolbox|"
+    r"nvenc|qsv|amf encoder|capcut|shotcut|kdenlive|"
+    r"avidemux|avid|vegas|filmora|powerdirector|magix|"
+    r"gstreamer|mencoder|virtualdub|voukoder|shutter encoder",
+    re.IGNORECASE,
+)
+PROVENANCE_FIELDS = {
+    "encoder", "encoded_by", "encoding_tool", "software",
+    "writing_application", "writing_library", "com.apple.quicktime.software",
+}
+CAMERA_FIELDS = PROVENANCE_FIELDS | {
+    "handler_name", "make", "model", "manufacturer",
+    "com.apple.quicktime.make", "com.apple.quicktime.model",
+}
+
+
+def tag_sets(metadata):
+    return [
+        metadata.get("format", {}).get("tags", {}),
+        *(stream.get("tags", {}) for stream in metadata.get("streams", [])),
+    ]
+
+
+def classification(metadata):
+    """Conservative metadata heuristic; copied metadata cannot prove originality."""
+    streams = metadata.get("streams", [])
+    if not any(
+        stream.get("codec_type") == "video"
+        and not stream.get("disposition", {}).get("attached_pic")
+        for stream in streams
+    ):
+        return False, "no video stream"
+    camera_values = []
+    for tags in tag_sets(metadata):
+        for key, value in tags.items():
+            key, value = key.lower(), str(value)
+            if key in PROVENANCE_FIELDS and TRANSCODER.search(value):
+                return False, f"post-processing signature: {value}"
+            if key in CAMERA_FIELDS:
+                camera_values.append(value)
+    # DJI also makes handheld cameras; those aren't drone originals.
+    if any(re.search(r"osmo|pocket|action\s*\d", value, re.I) for value in camera_values):
+        return False, "DJI handheld/action camera"
+    if any(
+        re.search(r"dji|^FC\d{3,}[A-Z]*$", value, re.I)
+        for value in camera_values
+    ):
+        return True, "DJI camera/encoder/track metadata"
+    return False, "no DJI provenance metadata"
+
+
+def capture_date(metadata, path):
+    # Preserve the recorded calendar date, without applying the host timezone.
+    # Never substitute filesystem mtime (usually a copy/download date).
+    groups = tag_sets(metadata)
+    for key in (
+        "com.apple.quicktime.creationdate", "date_time_original",
+        "datetimeoriginal", "creation_time", "date",
+    ):
+        for tags in groups:
+            for tag, value in tags.items():
+                if tag.lower() != key:
+                    continue
+                match = re.match(r"(\d{4})[-:](\d{2})[-:](\d{2})", str(value))
+                if match:
+                    try:
+                        date = datetime(*map(int, match.groups()))
+                    except ValueError:
+                        continue
+                    if date.year > 1904:  # Ignore unset QuickTime timestamps.
+                        return date.strftime("%Y-%m-%d")
+    match = re.match(r"DJI_(\d{14})(?:_|\.|$)", path.name, re.I)
+    if match:
+        try:
+            return datetime.strptime(match[1], "%Y%m%d%H%M%S").strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    return "unknown"
+
+
+def human_size(size):
+    value = float(size)
+    for unit in ("B", "KiB", "MiB", "GiB", "TiB", "PiB"):
+        if value < 1024 or unit == "PiB":
+            return f"{int(value)} B" if unit == "B" else f"{value:.1f} {unit}"
+        value /= 1024
+
+
+def probe(path):
+    result = subprocess.run(
+        [
+            "ffprobe", "-v", "error", "-show_format", "-show_streams",
+            "-of", "json", os.path.abspath(path),
+        ],
+        capture_output=True, text=True, errors="replace", timeout=120,
+    )
+    if result.returncode:
+        raise ValueError(result.stderr.strip() or "ffprobe failed")
+    data = json.loads(result.stdout)
+    if not isinstance(data, dict):
+        raise ValueError("unexpected ffprobe output")
+    return data
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=(
+            "Requires ffprobe (FFmpeg). Output is tab-separated: path, human size, "
+            "capture date (or 'unknown'). Metadata-based detection is heuristic: "
+            "transcodes preserving DJI metadata may pass; originals lacking DJI "
+            "metadata are skipped. Symlinked directories are not traversed."
+        ),
+    )
+    parser.add_argument("DIR", type=Path, nargs="+", help="directories to search recursively")
+    parser.add_argument("-v", "--verbose", action="store_true", help="explain skipped files on stderr")
+    args = parser.parse_args()
+    for root in args.DIR:
+        if not root.is_dir():
+            parser.error(f"not a directory: {root}")
+    if not shutil.which("ffprobe"):
+        parser.error("ffprobe not found; install FFmpeg and put ffprobe on PATH")
+
+    errors = False
+
+    def report_error(error):
+        nonlocal errors
+        errors = True
+        print(f"find-dji-originals: {error}", file=sys.stderr)
+
+    for root in args.DIR:
+        for directory, dirs, files in os.walk(root, onerror=report_error):
+            dirs.sort()
+            for name in sorted(files):
+                if Path(name).suffix.lower() != ".mp4":
+                    continue
+                path = Path(directory) / name
+                try:
+                    metadata = probe(path)
+                    original, reason = classification(metadata)
+                    if not original:
+                        if args.verbose:
+                            print(f"skip {str(path)!r}: {reason}", file=sys.stderr)
+                        continue
+                    date = capture_date(metadata, path)
+                    # Escape unusual control characters to keep each result on one line.
+                    display = str(path).replace("\\", "\\\\").replace("\t", "\\t")
+                    display = display.replace("\r", "\\r").replace("\n", "\\n")
+                    print(f"{display}\t{human_size(path.stat().st_size)}\t{date}")
+                except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+                    report_error(f"{str(path)!r}: {error}")
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except BrokenPipeError:
+        # Avoid a second flush error when piping a large result into head.
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        sys.exit(0)
