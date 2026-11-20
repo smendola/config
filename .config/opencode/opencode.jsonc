@@ -131,18 +131,6 @@
         "reasoningField": "reasoning_content"
       },
       "models": {
-        "Qwen3.8-27B QUASAR-NVFP4": {
-          "name": "Qwen3.8 27B QUASAR-NVFP4 [8k]",
-          "capabilities": {
-            "tools": true,
-            "input": ["text", "image"],
-            "output": ["text"]
-          },
-          "limit": {
-            "context": 8192,
-            "output": 4096
-          }
-        },
         "Qwen3.8-Flash-Next UD-IQ1_M": {
           "name": "Qwen3.8 Flash Next UD-IQ1_M [100k]",
           "capabilities": {
