@@ -1,3 +1,4 @@
+// OC:CUDA-LINUX:sal:ses_e0bd65411ffen9uAgM679tif9q Edited
 {
   "$schema": "https://opencode.ai/config.json",
   "formatter": true,
@@ -8,7 +9,8 @@
     "minimax",
     "openai",
     "llama-server",
-    "strata"
+    "strata",
+    "basalt"
   ],
   "compaction": {
     "auto": true,
@@ -118,6 +120,43 @@
     }
   },
   "providers": {
+    "basalt": {
+      "name": "Basalt :9090",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://127.0.0.1:9090/v1"
+      },
+      "compatibility": {
+        "maxTokensField": "max_tokens",
+        "reasoningField": "reasoning_content"
+      },
+      "models": {
+        "Qwen3.8-27B QUASAR-NVFP4": {
+          "name": "Qwen3.8 27B QUASAR-NVFP4 [8k]",
+          "capabilities": {
+            "tools": true,
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 8192,
+            "output": 4096
+          }
+        },
+        "Qwen3.8-Flash-Next UD-IQ1_M": {
+          "name": "Qwen3.8 Flash Next UD-IQ1_M [100k]",
+          "capabilities": {
+            "tools": true,
+            "input": ["text", "image", "video"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 100000,
+            "output": 8192
+          }
+        }
+      }
+    },
     "strata": {
       "name": "(Poly)Strata :9090",
       "package": "@opencode/ai/providers/openai-compatible",
