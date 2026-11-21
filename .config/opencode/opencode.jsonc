@@ -131,18 +131,6 @@
         "reasoningField": "reasoning_content"
       },
       "models": {
-        "Qwen3.8-Flash-Next UD-IQ1_M": {
-          "name": "Qwen3.8 Flash Next UD-IQ1_M [100k]",
-          "capabilities": {
-            "tools": true,
-            "input": ["text", "image", "video"],
-            "output": ["text"]
-          },
-          "limit": {
-            "context": 100000,
-            "output": 8192
-          }
-        },
         "Qwen3.8-Flash-Next UD-IQ3_XXS": {
           "name": "Qwen3.8 Flash Next UD-IQ3_XXS [100k]",
           "capabilities": {
