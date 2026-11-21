@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Generate H.265 and AV1 directly from each DJI original (10-bit BT.2020/HLG).
+# Generate 10-bit H.265 and AV1, retaining each DJI original's color information.
 # Outputs are relative to the current working directory. No audio is retained.
-# Usage: ./process_dji.sh FILE_OR_FOLDER [FILE_OR_FOLDER...]
+# Usage: process-dji [--delete] [-v h265|av1|both] FILE_OR_FOLDER [FILE_OR_FOLDER...]
 # Folder arguments expand to immediate MP4, JPG and DNG files (not recursive).
 # JPG and DNG files are copied with timestamps preserved.
 # Requirements: ffmpeg with hevc_nvenc, av1_nvenc, scale_cuda, and an
@@ -9,19 +9,31 @@
 
 set -euo pipefail
 
+color_line() {
+    local COLOR="$1"
+    shift
+    if [[ -t 1 ]]; then
+        printf '\033[%sm%s\033[0m\n' "$COLOR" "$*"
+    else
+        printf '%s\n' "$*"
+    fi
+}
+
 # NVENC quality: lower CQ = better quality / larger files (not x265 CRF).
 H265_CQ=20
 H265_PRESET="p5"
 CQ=20
 AV1_PRESET="p5"
 
-if [[ $# -eq 0 ]]; then
-    echo "Usage: $(basename "$0") FILE_OR_FOLDER [FILE_OR_FOLDER...]"
+usage() {
+    echo "Usage: $(basename "$0") [--delete] [-v h265|av1|both] FILE_OR_FOLDER [FILE_OR_FOLDER...]"
     echo ""
     echo "Converts DJI videos to both 10-bit H.265 and AV1 using CUDA/NVENC."
-    echo "Preserves resolution, frame rate, and BT.2020/HLG color; omits audio."
+    echo "Preserves resolution, frame rate, and source color information; omits audio."
     echo "Folder arguments include immediate MP4, JPG and DNG files (not recursive)."
     echo "JPG and DNG files are copied, preserving timestamps; originals stay in place."
+    echo "--delete: move JPG/DNG files and delete videos after all selected encodes succeed."
+    echo "Skipped outputs retain their originals, even with --delete."
     echo ""
     echo "Outputs relative to the current working directory:"
     echo "  ./H265/<original_name>_h265.MP4"
@@ -29,10 +41,60 @@ if [[ $# -eq 0 ]]; then
     echo "  ./JPG/<original_filename>"
     echo "  ./DNG/<original_filename>"
     echo "Existing output files are skipped."
+}
+
+VIDEO_FORMAT=both
+DELETE_ORIGINALS=false
+ARGS=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --delete) DELETE_ORIGINALS=true; shift ;;
+        -v|-v?*)
+            if [[ "$1" == -v ]]; then
+                if [[ $# -lt 2 ]]; then
+                    echo "Option -v requires an argument." >&2
+                    exit 1
+                fi
+                VALUE="$2"
+                shift 2
+            else
+                VALUE="${1#-v}"
+                shift
+            fi
+            case "$VALUE" in
+                h265|av1|both) VIDEO_FORMAT="$VALUE" ;;
+                *) echo "Invalid video format: $VALUE (expected h265, av1 or both)" >&2; exit 1 ;;
+            esac
+            ;;
+        --) shift; ARGS+=("$@"); break ;;
+        -*) echo "Unknown option: $1" >&2; exit 1 ;;
+        *) ARGS+=("$1"); shift ;;
+    esac
+done
+set -- "${ARGS[@]}"
+
+if [[ $# -eq 0 ]]; then
+    usage
     exit 1
 fi
 
-mkdir -p ./H265 ./AV1
+case "$VIDEO_FORMAT" in
+    both) FORMATS=(h265 av1) ;;
+    *) FORMATS=("$VIDEO_FORMAT") ;;
+esac
+for FORMAT in "${FORMATS[@]}"; do
+    mkdir -p "./${FORMAT^^}"
+done
+
+TEMP_DIR=""
+cleanup() {
+    if [[ -n "$TEMP_DIR" ]]; then
+        rm -rf -- "$TEMP_DIR"
+    fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 STATUS=0
 
 shopt -s nullglob
@@ -44,7 +106,7 @@ for ARG in "$@"; do
             [[ -f "$FILE" ]] && FILES+=("$FILE")
         done
         if [[ ${#FILES[@]} -eq 0 ]]; then
-            echo "⚠  No MP4, JPG or DNG files in folder: $ARG"
+            color_line 33 "⚠  No MP4, JPG or DNG files in folder: $ARG"
         fi
         INPUTS+=("${FILES[@]}")
     else
@@ -54,7 +116,7 @@ done
 
 for INPUT in "${INPUTS[@]}"; do
     if [[ ! -f "$INPUT" ]]; then
-        echo "⚠  Skipping (not a file): $INPUT"
+        color_line 33 "⚠  Skipping (not a file): $INPUT"
         STATUS=1
         continue
     fi
@@ -69,18 +131,26 @@ for INPUT in "${INPUTS[@]}"; do
             OUTPUT="${OUTPUT_DIR}/${BASE}"
             mkdir -p "$OUTPUT_DIR"
             if [[ -e "$OUTPUT" ]]; then
-                echo "⚠  Output already exists, skipping: $OUTPUT"
+                color_line 33 "⚠  Output already exists, skipping: $OUTPUT"
+            elif [[ "$DELETE_ORIGINALS" == true ]]; then
+                if mv -n -- "$INPUT" "$OUTPUT" && [[ ! -e "$INPUT" && ! -L "$INPUT" ]]; then
+                    color_line 32 "✔  Moved: $INPUT → $OUTPUT"
+                else
+                    color_line 31 "✘  Move failed or skipped: $INPUT"
+                    STATUS=1
+                fi
             elif cp -n --preserve=timestamps -- "$INPUT" "$OUTPUT"; then
-                echo "✔  Copied: $INPUT → $OUTPUT"
+                color_line 32 "✔  Copied: $INPUT → $OUTPUT"
             else
-                echo "✘  Copy failed: $INPUT"
+                color_line 31 "✘  Copy failed: $INPUT"
                 STATUS=1
             fi
             continue
             ;;
     esac
 
-    for FORMAT in h265 av1; do
+    ALL_CONVERTED=true
+    for FORMAT in "${FORMATS[@]}"; do
         if [[ "$FORMAT" == h265 ]]; then
             OUTPUT="./H265/${NAME}_h265.MP4"
             VIDEO_OPTIONS=(
@@ -97,34 +167,51 @@ for INPUT in "${INPUTS[@]}"; do
         fi
 
         if [[ -e "$OUTPUT" ]]; then
-            echo "⚠  Output already exists, skipping: $OUTPUT"
+            color_line 33 "⚠  Output already exists, skipping: $OUTPUT"
+            ALL_CONVERTED=false
             continue
         fi
 
-        echo "▶  Encoding: $INPUT"
-        echo "   → $OUTPUT"
+        color_line 36 "▶  Encoding: $INPUT"
+        color_line 36 "   → $OUTPUT"
 
-        if ffmpeg -hide_banner -loglevel info -nostdin -n \
+        TEMP_DIR="$(mktemp -d "${OUTPUT%/*}/.process_dji.XXXXXX")"
+        TEMP_OUTPUT="$TEMP_DIR/output.MP4"
+
+        if ffmpeg -hide_banner -loglevel error -stats -nostdin -n \
             -hwaccel cuda -hwaccel_output_format cuda \
             -i "$INPUT" \
             -map 0:v:0 \
             -vf "scale_cuda=format=p010le" \
             "${VIDEO_OPTIONS[@]}" \
-            -color_range tv \
-            -colorspace bt2020nc \
-            -color_trc arib-std-b67 \
-            -color_primaries bt2020 \
             -an -map_metadata 0 -movflags +faststart \
-            "$OUTPUT"; then
-            echo "✔  Done: $OUTPUT"
+            "$TEMP_OUTPUT"; then
+            # Publish atomically without overwriting an output created meanwhile.
+            if ln -- "$TEMP_OUTPUT" "$OUTPUT"; then
+                color_line 32 "✔  Done: $OUTPUT"
+            else
+                color_line 31 "✘  Could not publish output: $OUTPUT"
+                ALL_CONVERTED=false
+                STATUS=1
+            fi
         else
-            echo "✘  Failed: $INPUT ($FORMAT)"
-            echo "   Any partial output must be removed before retrying: $OUTPUT"
+            color_line 31 "✘  Failed: $INPUT ($FORMAT)"
+            ALL_CONVERTED=false
             STATUS=1
         fi
+        cleanup
+        TEMP_DIR=""
 
         echo ""
     done
+    if [[ "$DELETE_ORIGINALS" == true && "$ALL_CONVERTED" == true ]]; then
+        if rm -- "$INPUT"; then
+            color_line 32 "✔  Deleted original: $INPUT"
+        else
+            color_line 31 "✘  Could not delete original: $INPUT"
+            STATUS=1
+        fi
+    fi
 done
 
 exit "$STATUS"
