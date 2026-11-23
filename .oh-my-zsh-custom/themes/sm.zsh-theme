@@ -35,7 +35,7 @@ fi
 
 if [[ "$SSH_CONNECTION" && $(id -u) = 0 ]]; then
    _m_color=black
-elif [[ "$SSH_CONNECTION" ]]; then
+elif [[ -n $SSH_CONNECTION && ${_herdr_local_pane:-0} != 1 ]]; then
   _m_color=red
 else
   _m_color=white
@@ -74,4 +74,3 @@ ZSH_THEME_TERM_TAB_TITLE_IDLE='%m: %~'
 # This is the window title. On Windows, it is also the label used in the
 # task bar button. BTW, %l comes close to ${_tty} but not quite
 ZSH_THEME_TERM_TITLE_IDLE='%m: %~'
-
