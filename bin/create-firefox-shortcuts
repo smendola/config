@@ -331,10 +331,9 @@ def run(args):
         raise ValueError('Specify --profile PATH; could not identify a unique Firefox shortcut profile')
     if not Path(profile).is_dir():
         raise ValueError(f'Firefox profile not found: {profile}')
-    binary = shutil.which('firefox')
-    if not binary:
+    if not shutil.which('firefox'):
         raise ValueError('Firefox executable not found')
-    binary = str(Path(binary).resolve())
+    launcher = home / '.local/bin/focus-firefox-app'
     registry_path = Path(profile) / 'taskbartabs/taskbartabs.json'
     registered = json.loads(registry_path.read_text()).get('taskbarTabs', []) if registry_path.exists() else []
     pending, filenames, used, url_cache = [], [], set(), {}
@@ -379,7 +378,7 @@ def run(args):
                    and r.get('name') == name and r.get('userContextId') == 0]
         if len(matches) == 1:
             identifier = matches[0]['id']
-        command = [binary, '-taskbar-tab', identifier, '-new-window', url,
+        command = [str(launcher), path.stem, '-taskbar-tab', identifier, '-new-window', url,
                    '-profile', profile, '-container', '0']
         text = '\n'.join(['[Desktop Entry]', 'Type=Application', 'Version=1.5',
                           'Name=' + name, 'Icon=' + entry.get('icon', 'firefox'),
