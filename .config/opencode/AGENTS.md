@@ -21,6 +21,8 @@ Under that, append a line like this:
 
 `OC:${HOST}:${USER}:${OPENCODE_SESSION_ID}`
 
+including the backtics so Asana displays it specially like code.
+
 ### Without associated Asana task:
 
 If there is no know Asana task, annotate changed files instead, as follows.
