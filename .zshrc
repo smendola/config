@@ -1,4 +1,3 @@
-
 # Added by Kiro CLI
 case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="${PATH:+$PATH:}$HOME/.local/bin" ;; esac
 
@@ -19,34 +18,65 @@ fi
 
 function hostip() { echo localhost }
 
+# OC:x13-cachy:sal:ses_df5cd72abffeHJOukTa4SjCStL Edited
+# Only a pane on the desktop host should use that desktop's X server.
+_herdr_local_pane=0
+if [[ $HERDR_ENV = 1 ]]; then
+  () {
+    local pid=$PPID parent comm old=$DISPLAY desktop dpy auth line
+    unset DISPLAY
+    _x_status=red
+    [[ ${HOST%%.*} = x13-cachy ]] || return
+    while (( pid > 1 )); do
+      read -r parent comm < <(ps -p "$pid" -o ppid= -o comm=) || return
+      case ${comm:t} in
+        herdr) break ;;
+        sshd|sshd-session|sshd-auth) return ;;
+      esac
+      pid=$parent
+    done
+    (( pid > 1 )) || return
+    _herdr_local_pane=1
+
+    desktop=$(systemctl --user show-environment 2>/dev/null)
+    for line in "${(@f)desktop}"; do
+      case $line in
+        DISPLAY=*) dpy=${line#*=} ;;
+        XAUTHORITY=*) auth=${line#*=} ;;
+      esac
+    done
+    # Never try a forwarded display, even if the desktop environment has one.
+    [[ $dpy =~ '^:[0-9]+(\.[0-9]+)?$' ]] || dpy=:0
+    if DISPLAY=$dpy XAUTHORITY=${auth:-${XAUTHORITY:-$HOME/.Xauthority}} timeout 1s xset q >/dev/null 2>&1; then
+      export DISPLAY=$dpy XAUTHORITY=${auth:-${XAUTHORITY:-$HOME/.Xauthority}}
+      _x_status=green
+      [[ $old = $dpy ]] || print -u2 -- "Local Herdr pane: using desktop DISPLAY=$dpy (was ${old:-unset})."
+    else
+      print -u2 -- "Local Herdr pane: could not open desktop display $dpy; leaving DISPLAY unset."
+    fi
+  }
+elif [[ -n $SSH_CONNECTION || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+  # Keep any explicitly forwarded DISPLAY available, but don't connect on startup.
+  _x_status=yellow
+else
 if [[ ! -z $WSLENV ]]; then
    export DISPLAY=$(hostip):0
-   nc -w1 $(hostip) 6000 && xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+   timeout 1s xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
    if [[ $_x_status = red ]]; then
      echo -e "\033[33mNo X11; falling back to WSLg\033[0m"
      DISPLAY=":0"
-     xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+     timeout 1s xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
    fi
 fi
-
-# X11 TCP port = 6000 + DISPLAY number (e.g. :0 -> 6000, :10.0 -> 6010)
-unset X11_DPY_PORT
-[[ -n "$DISPLAY" && "$DISPLAY" =~ '^[^:]+:([0-9]+)(\.[0-9]+)?$' ]] && X11_DPY_PORT=$((6000 + match[1]))
 
 if [[ -n "$WAYLAND_DISPLAY" ]]; then # WAYLAND_DISPLAY can be a path or just a name like "wayland-0"
   local sock="${WAYLAND_DISPLAY}"
   [[ "${sock}" != /* ]] && sock="${XDG_RUNTIME_DIR}/${sock}"
   [[ -S "$sock" ]] && _x_status=green || _x_status=red
-elif [[ $DISPLAY = ':0' ]]; then
-  # :0 does not necessarily mean port 6000, could be other kind of socket
-  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
-elif [[ $X11_DPY_PORT ]]; then
-  nc -w1 ${DISPLAY/:*/} $X11_DPY_PORT && 
-  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 else
-  echo "RISK OF HANG HERE" && 
-  xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
+  timeout 1s xset q >/dev/null 2>&1 && _x_status=green || _x_status=red
 fi
+fi # non-Herdr, non-SSH shell
 
 # [[ -z $PS18 ]] || print -P "Sourcing file %B%N%b
 # SSH_CONNECTION=%B$SSH_CONNECTION%b
@@ -275,9 +305,10 @@ bindkey '^G' _kiro_translate
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# opencode
-export PATH=/home/dev/.opencode/bin:$PATH
 
 # NVM already loaded above (see "if [[ -d $HOME/.nvm ]]" block)
 
 true
+
+# opencode
+export PATH=/home/sal/.opencode/bin:$PATH

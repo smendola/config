@@ -155,35 +155,22 @@ function 1,000 ()
     sed -e ': start' -e 's/\( \?\)\( \?\)\([0-9]\{1,\}\)\([0-9]\{3\}\)/\1\3,\4/g' -e 't start'
 }
 
+# OC:x13-cachy:sal:ses_df5cd72abffeHJOukTa4SjCStL Edited
 function check_x()
 {
-    local display_number
-    local host
-    local port
-    if [[ -n "$WAYLAND_DISPLAY" ]]; then
+    if [[ -n "$DISPLAY" ]]; then
+      timeout 1s xset q >/dev/null && return 0
+      echo "Cannot open X display: $DISPLAY" >&2
+    elif [[ -n "$WAYLAND_DISPLAY" ]]; then
       # WAYLAND_DISPLAY can be a path or just a name like "wayland-0"
       local sock="${WAYLAND_DISPLAY}"
       [[ "${sock}" != /* ]] && sock="${XDG_RUNTIME_DIR}/${sock}"
-      [[ -S "$sock" ]]
-    elif [ -z "$DISPLAY" ]; then
-      echo "DISPLAY needs to be set"
-      return 1
-    elif [[ $WSLENV && $DISPLAY = :0 ]]; then
-      xset q > /dev/null   
+      [[ -S "$sock" ]] && return 0
+      echo "Wayland socket not found: $sock" >&2
     else
-      display_number=${DISPLAY##*:} # extract display number, e.g. zark:0.1 => 0.1
-      display_number=${display_number%%.*} # strip off decimal part, e.g. 0.1 => 0
-      host=${DISPLAY%%:*}          # extract host part, e.g. zark:0 => zark
-      host=${host:-localhost}      # if host is empty, use localhost
-      port=$((6000 + display_number))
-
-      if nc -w1 $host $port && xset q > /dev/null; then
-        return 0
-      fi
-
-      echo "Problem with display? ($DISPLAY)" 2>&1
+      echo "Neither DISPLAY nor WAYLAND_DISPLAY is set" >&2
     fi
-
+    return 1
 }
 
 function fixtty() {
@@ -505,13 +492,9 @@ wta() {
 
 
 wtr() {
-  if [[ $1 == -f ]]; then
-    rm -rf $2
-    git worktree prune
-  else
-    git worktree remove $1
-  fi
+  git worktree remove --force $1
 }
+
 _wtr() {
   local -a worktrees
   worktrees=(${(f)"$(git worktree list --porcelain | awk '/^worktree /{print $2}' | tail -n +2)"})
