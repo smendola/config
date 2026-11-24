@@ -308,8 +308,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # NVM already loaded above (see "if [[ -d $HOME/.nvm ]]" block)
 
-
-
 true
 
 # opencode
