@@ -111,3 +111,12 @@
     helper = !/usr/bin/gh auth git-credential
 [credential "https://git.heroku.com"]
     helper = !heroku git:credentials
+[url "https://github.com/"]
+    insteadOf = git@github.com:
+    insteadOf = ssh://git@github.com/
+    helper = !heroku git:credentials
+[merge "keep-current"]
+    driver = true
+[credential "https://smendola@github.com"]
+    helper = 
+    helper = !GH_TOKEN=\"$(gh auth token --hostname github.com --user smendola)\" gh auth git-credential
