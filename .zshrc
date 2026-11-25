@@ -26,7 +26,6 @@ if [[ $HERDR_ENV = 1 ]]; then
     local pid=$PPID parent comm old=$DISPLAY desktop dpy auth line
     unset DISPLAY
     _x_status=red
-    [[ ${HOST%%.*} = x13-cachy ]] || return
     while (( pid > 1 )); do
       read -r parent comm < <(ps -p "$pid" -o ppid= -o comm=) || return
       case ${comm:t} in
@@ -47,6 +46,8 @@ if [[ $HERDR_ENV = 1 ]]; then
     done
     # Never try a forwarded display, even if the desktop environment has one.
     [[ $dpy =~ '^:[0-9]+(\.[0-9]+)?$' ]] || dpy=:0
+    local number=${dpy#:}
+    [[ -S /tmp/.X11-unix/X${number%%.*} ]] || return
     if DISPLAY=$dpy XAUTHORITY=${auth:-${XAUTHORITY:-$HOME/.Xauthority}} timeout 1s xset q >/dev/null 2>&1; then
       export DISPLAY=$dpy XAUTHORITY=${auth:-${XAUTHORITY:-$HOME/.Xauthority}}
       _x_status=green
