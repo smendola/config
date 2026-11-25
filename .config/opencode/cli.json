@@ -13,7 +13,7 @@
     "sidebar": "auto",
     "scrollbar": true,
     "thinking": "show",
-    "verbosity": "high",
+    "verbosity": "low",
     "permissions": "autoaccept"
   },
   "animations": true,
