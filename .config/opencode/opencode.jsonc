@@ -156,6 +156,23 @@
         "reasoningField": "reasoning_content"
       },
       "models": {
+        "inkling-2-mini-ud-q4_k_xl": {
+          "name": "Inkling 2 Mini UD Q4_K_XL 👁️‍🗨️ [131k]",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 131072,
+            "output": 8192
+          }
+        },
         "qwen3.6-35b-a3b-ud-q4_k_m": {
           "name": "Qwen3.6 35B/A3B UD Q4_K_M 👁️‍🗨️ [262k]",
           "capabilities": {
@@ -319,14 +336,6 @@
         "type": "remote",
         "url": "https://fs-mcp.labs.onshape.app/mcp"
       }
-    },
-    "solidcraft": {
-      "command": [
-        "/tmp/.mount_solidcNEAcaK/usr/bin/solidcraft-cli",
-        "mcp"
-      ],
-      "enabled": true,
-      "type": "local"
     }
   },
   "plugin": [],
