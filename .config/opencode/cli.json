@@ -14,7 +14,8 @@
     "scrollbar": true,
     "thinking": "show",
     "verbosity": "low",
-    "permissions": "autoaccept"
+    "permissions": "autoaccept",
+    "image_preview": true
   },
   "animations": true,
   "plugins": [
