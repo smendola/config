@@ -31,12 +31,8 @@
     c-p = cherry-pick
     wt = worktree
     ci = commit
-    d = diff HEAD
-    dh = diff HEAD
     dt = difftool
-    dth = difftool HEAD
     dty = difftool -y
-    dtyh = difftool -y HEAD
     comit = commit
     commmit = commit
     
@@ -110,9 +106,6 @@
     name = Always take theirs
     driver = cp %B %A
 [credential "https://github.com"]
-    # Helpers accumulate: the empty entry clears earlier helpers for GitHub HTTPS,
-    # then the next entry adds gh. This does not delete stored credentials.
-    helper =
     helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
     helper = !/usr/bin/gh auth git-credential
@@ -123,4 +116,7 @@
     insteadOf = ssh://git@github.com/
     helper = !heroku git:credentials
 [merge "keep-current"]
-	driver = true
+    driver = true
+[credential "https://smendola@github.com"]
+    helper = 
+    helper = !GH_TOKEN=\"$(gh auth token --hostname github.com --user smendola)\" gh auth git-credential

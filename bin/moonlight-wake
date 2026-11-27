@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# OC:CUDA-LINUX:sal:ses_e18c3337dffexQm6RfPecqe2Pr Created
+# Wake a logged-in KDE Wayland desktop and restart its Sunshine service.
+set -euo pipefail
+
+if [[ $# -ne 1 || -z $1 || $1 == -* ]]; then
+    echo "Usage: $(basename "$0") [user@]hostname" >&2
+    exit 2
+fi
+
+ssh -o ConnectTimeout=10 -- "$1" 'bash -se' <<'REMOTE'
+set -euo pipefail
+
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+command -v kscreen-doctor >/dev/null || {
+    echo "kscreen-doctor is required on the host (KDE Plasma)." >&2
+    exit 1
+}
+
+environment=$(systemctl --user show-environment)
+export WAYLAND_DISPLAY
+WAYLAND_DISPLAY=$(printf '%s\n' "$environment" | sed -n 's/^WAYLAND_DISPLAY=//p')
+if [[ -z $WAYLAND_DISPLAY ]]; then
+    echo "No Wayland desktop found in the user service environment. Log into KDE first." >&2
+    exit 1
+fi
+
+socket=$WAYLAND_DISPLAY
+[[ $socket == /* ]] || socket="$XDG_RUNTIME_DIR/$socket"
+if [[ ! -S $socket ]]; then
+    echo "The desktop's Wayland socket is unavailable: $socket" >&2
+    exit 1
+fi
+
+echo "Waking displays on $(hostname)..."
+kscreen-doctor --dpms on
+echo "Restarting Sunshine..."
+systemctl --user restart sunshine.service
+systemctl --user is-active --quiet sunshine.service
+kscreen-doctor --dpms show
+echo "Sunshine is running. Connect with Moonlight."
+REMOTE

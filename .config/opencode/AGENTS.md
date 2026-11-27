@@ -13,37 +13,36 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 
 ## Self-attribution
 
+When you undertake a substantial coding or configuration effort, that spans many user turns (say > 10) to accomplish the thing
+you will want to record that you worked on those changes, somewhere.
+
 ### With associated Asana task
 When you are working on an Asana task (provided by user), add session-identifying info to the Asana task description
+If there is no know Asana task, first ask the user if there is an Asana task that has not yet been revealed.
 
 Add an H1 named "AI Session(s)" to the description of the asana task (unless a similarly, not necessarily identical, heading is already present).
 Under that, append a line like this:
 
 `OC:${HOST}:${USER}:${OPENCODE_SESSION_ID}`
 
-including the backtics so Asana displays it specially like code.
 
 ### Without associated Asana task:
+If there is no Asana task, annotate changed files instead, as follows.
 
-If there is no know Asana task, annotate changed files instead, as follows.
+If there are multiple files involved, create or append a file at the root of the project like this:
+
+{PROJ_ROOT}/AI_SESSIONS.txt
+
+Into this file append a line like this:
+`OC:${HOST}:${USER}:${OPENCODE_SESSION_ID}` followed by a TERSE summary of the work
+Git add/commit the file along with others pertaining to the work, if asked to commit.
 
 When you create a new file, or make **substantial** edits to a file (not trivial changes), add a comment at top to identify
-the agent session that worked on the file.
+the agent session that worked on the file.  If many files are involved, 
 
-use format:
-`OC:${HOST}:${USER}:${OPENCODE_SESSION_ID}` followed by `Created` or `Edited`
+When working outside the context of a GIT project
 
-e.g.
-
-```
-/* Agent sessions:
-   OC:cuda-linux:sal:ses_e288709b5ffe1RkD4obCbdzsTP Created
-   OC:x13-cachy:dev:ses_e0000000000000000000900009 Edited
-*/
-```
-
-If the file format does not support user-visible comments, but does support user-visible metadata,
-use metadata insetead.
-
-If the file format does not support comments or metadata, alert the user that the above instruction is not
-going to be followed.
+- If the file supprorts comments (that are user-visible) add a comment like the above inside each edited file
+- If the file does not support comments, but has metadata capability, attach that info as metadata
+- If the file format does not support comments or metadata, alert the user that the above instruction is not
+  going to be followed.

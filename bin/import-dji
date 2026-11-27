@@ -1,0 +1,475 @@
+#!/usr/bin/env python3
+"""Recursively organize DJI media; preserve processed originals as *.DELETE."""
+
+from __future__ import annotations
+
+import argparse
+import errno
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from xml.dom import minidom
+from xml.parsers.expat import ExpatError
+
+
+FALLBACK_1900_NAMES = {
+    "DJI_0008 (2).JPG", "DJI_0009 (2).JPG", "DJI_0025.JPG", "DJI_0026.JPG",
+}
+
+
+DISPLAY_ROOTS: tuple[Path, ...] = ()
+
+
+def color_line(color: int, message: str) -> None:
+    if sys.stdout.isatty():
+        prefixes = sorted({str(root) for root in DISPLAY_ROOTS}, key=len, reverse=True)
+        if prefixes:
+            pattern = "|".join(re.escape(prefix) for prefix in prefixes)
+            message = re.sub(
+                rf"(?<![\w/])(?:{pattern})(?=/|\s|$|[;:])",
+                lambda match: f"\033[2m{match.group()}\033[22m",
+                message,
+            )
+        message = f"\033[{color}m{message}\033[0m"
+    print(message, flush=True)
+
+
+def warn(message: str) -> None:
+    color_line(33, f"⚠  {message}")
+
+
+def fail(message: str) -> None:
+    color_line(31, f"✘  {message}")
+
+
+def probe(path: Path) -> dict:
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe", "-v", "error", "-show_entries",
+                "format_tags:stream_tags:stream=codec_type,codec_name,pix_fmt,bits_per_raw_sample",
+                "-of", "json", str(path),
+            ],
+            text=True, capture_output=True, check=True,
+        )
+        return json.loads(result.stdout or "{}")
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        return {}
+
+
+def timestamp(path: Path, data: dict) -> datetime:
+    tags = [data.get("format", {}).get("tags", {})]
+    tags.extend(stream.get("tags", {}) for stream in data.get("streams", []))
+    for tagset in tags:
+        for key in (
+            "creation_time", "com.apple.quicktime.creationdate", "date",
+            "DateTimeOriginal", "DateTime",
+        ):
+            value = tagset.get(key)
+            if not value:
+                continue
+            value = value.strip().replace("Z", "+00:00")
+            for fmt in (None, "%Y:%m:%d %H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+                try:
+                    dt = (
+                        datetime.fromisoformat(value)
+                        if fmt is None else datetime.strptime(value, fmt)
+                    )
+                    return dt.replace(tzinfo=None)
+                except ValueError:
+                    pass
+    match = re.search(r"^DJI_(\d{14})(?:_|\.|$)", path.name, re.I)
+    if match:
+        return datetime.strptime(match.group(1), "%Y%m%d%H%M%S")
+    match = re.search(r"dji_fly_(\d{8})_(\d{6})", path.name, re.I)
+    if match:
+        return datetime.strptime("".join(match.groups()), "%Y%m%d%H%M%S")
+    match = re.search(r"(\d{4}-\d{2}-\d{2})_(\d{2})\.(\d{2})\.(\d{2})", path.name)
+    if match:
+        return datetime.strptime(
+            " ".join((match.group(1), ":".join(match.groups()[1:]))),
+            "%Y-%m-%d %H:%M:%S",
+        )
+    if path.name in FALLBACK_1900_NAMES:
+        return datetime(1900, 1, 1)
+    raise ValueError("no timestamp found")
+
+
+def exists(path: Path) -> bool:
+    # Include dangling symlinks when checking conflicts.
+    return os.path.lexists(path)
+
+
+def encode(src: Path, tmp: Path, data: dict) -> None:
+    ten_bit = any(
+        "10" in stream.get("pix_fmt", "")
+        or stream.get("bits_per_raw_sample") == "10"
+        for stream in data.get("streams", [])
+    )
+    subprocess.run(
+        [
+            "ffmpeg", "-hide_banner", "-loglevel", "error", "-stats",
+            "-nostdin", "-y", "-hwaccel", "cuda",
+            "-hwaccel_output_format", "cuda", "-i", str(src),
+            "-c:v", "hevc_nvenc", "-gpu", "0", "-preset", "medium",
+            "-tune", "hq", "-rc", "vbr", "-cq", "18", "-b:v", "0",
+            "-vf", f"scale_cuda=format={'p010' if ten_bit else 'nv12'}",
+            "-profile:v", "main10" if ten_bit else "main",
+            "-tag:v", "hvc1", "-c:a", "copy", str(tmp),
+        ],
+        check=True,
+    )
+
+
+def sidecar_for(src: Path) -> Path | None:
+    if src.suffix.lower() not in {".jpg", ".jpeg", ".dng"}:
+        return None
+    matches = [
+        path for path in src.parent.iterdir()
+        if path.name[:-4] == src.name and path.suffix.lower() == ".xmp"
+    ]
+    if len(matches) > 1:
+        raise ValueError(f"multiple XMP sidecars for {src}")
+    if matches and (matches[0].is_symlink() or not matches[0].is_file()):
+        raise ValueError(f"sidecar is not a regular file: {matches[0]}")
+    return matches[0] if matches else None
+
+
+def updated_sidecar(src: Path, filename: str) -> bytes:
+    document = minidom.parse(str(src))
+    namespace = "http://ns.adobe.com/xap/1.0/mm/"
+    for element in document.getElementsByTagName("*"):
+        if element.hasAttributeNS(namespace, "DerivedFrom"):
+            attribute = element.getAttributeNodeNS(namespace, "DerivedFrom")
+            attribute.value = filename
+        if element.namespaceURI == namespace and element.localName == "DerivedFrom":
+            # Only rewrite a simple filename value, not structured XMP references.
+            if all(child.nodeType in (child.TEXT_NODE, child.CDATA_SECTION_NODE)
+                   for child in element.childNodes):
+                for child in list(element.childNodes):
+                    element.removeChild(child)
+                element.appendChild(document.createTextNode(filename))
+    return document.toxml(encoding="UTF-8")
+
+
+def process(
+    src: Path, library: Path, dry_run: bool = False,
+    planned: set[Path] | None = None, delete: bool = False,
+    damp_run: bool = False,
+) -> bool:
+    ext = src.suffix.lower()
+    renamed = src.with_name(src.name + ".DELETE")
+    tmp = None
+    side_tmp = None
+    try:
+        if not delete and not damp_run and exists(renamed):
+            warn(f"CONFLICT: {src} -> {renamed}; skipped")
+            return False
+        data = probe(src)
+        video_streams = [
+            stream for stream in data.get("streams", [])
+            if stream.get("codec_type") == "video"
+        ]
+        already_hevc = ext == ".mp4" and bool(video_streams) and all(
+            stream.get("codec_name") == "hevc" for stream in video_streams
+        )
+        needs_encoding = ext == ".mp4" and not already_hevc
+        dt = timestamp(src, data)
+        kind, suffix = {
+            ".mp4": ("H265", ".mp4"),
+            ".jpg": ("JPG", ".jpg"),
+            ".jpeg": ("JPG", ".jpg"),
+            ".dng": ("DNG", ".dng"),
+        }[ext]
+        dst = library / kind / dt.strftime("%Y-%m-%d") / (
+            dt.strftime("%Y-%m-%d_%H_%M_%S") + suffix
+        )
+        if exists(dst) or (planned is not None and dst in planned):
+            warn(f"CONFLICT: {src} -> {dst}; skipped")
+            return False
+        sidecar = sidecar_for(src)
+        side_dst = dst.with_name(dst.name + ".xmp")
+        originals = [(src, renamed)]
+        side_bytes = None
+        if sidecar is not None:
+            side_renamed = sidecar.with_name(sidecar.name + ".DELETE")
+            for candidate in ((side_dst,) if delete or damp_run else (side_dst, side_renamed)):
+                if exists(candidate) or (planned is not None and candidate in planned):
+                    warn(f"CONFLICT: {sidecar} → {candidate}; image and sidecar skipped")
+                    return False
+            side_bytes = updated_sidecar(sidecar, dst.name)
+            originals.append((sidecar, side_renamed))
+        if dry_run:
+            transfer = "move" if delete else "copy"
+            action = "encode to H.265" if needs_encoding else (
+                f"{transfer} unchanged (already H.265)" if already_hevc else transfer
+            )
+            prefix = f"▶  [dry-run] Would {action}: "
+            color_line(36, f"{prefix}{src}")
+            color_line(36, f"{' ' * (len(prefix) - 3)}→  {dst}")
+            if not damp_run:
+                color_line(36, f"   Would delete source after success: {src}" if delete
+                           else f"   Would rename original: {src} → {renamed}")
+            if sidecar is not None:
+                color_line(36, f"   Would copy sidecar: {sidecar} → {side_dst}")
+                color_line(36, f"   Would update XMP DerivedFrom filename to: {dst.name}")
+                if not damp_run:
+                    color_line(36, f"   Would delete source after success: {sidecar}" if delete
+                               else f"   Would rename original: {sidecar} → {side_renamed}")
+            if planned is not None:
+                planned.add(dst)
+                if sidecar is not None:
+                    planned.add(side_dst)
+            return True
+        transfer = "Moving" if delete else "Copying"
+        action = "Encoding" if needs_encoding else (
+            f"{transfer} unchanged (already H.265)" if already_hevc else transfer
+        )
+        prefix = f"▶  {action}: "
+        color_line(36, f"{prefix}{src}")
+        color_line(36, f"{' ' * (len(prefix) - 3)}→  {dst}")
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        fd, name = tempfile.mkstemp(prefix=".processing-", suffix=suffix, dir=dst.parent)
+        os.close(fd)
+        tmp = Path(name)
+        if needs_encoding:
+            encode(src, tmp, data)
+        elif delete:
+            # Stage a same-filesystem move without copying data or removing the
+            # source before the complete image/sidecar pair has been published.
+            tmp.unlink()
+            try:
+                os.link(src, tmp)
+            except OSError as error:
+                if error.errno not in (errno.EXDEV, errno.EPERM, errno.EOPNOTSUPP):
+                    raise
+                shutil.copy2(src, tmp)
+        else:
+            shutil.copy2(src, tmp)
+        if tmp.stat().st_size == 0:
+            raise ValueError("output is empty")
+        outputs = [(tmp, dst)]
+        if sidecar is not None:
+            fd, name = tempfile.mkstemp(prefix=".processing-", suffix=".xmp", dir=dst.parent)
+            os.close(fd)
+            side_tmp = Path(name)
+            side_tmp.write_bytes(side_bytes)
+            shutil.copystat(sidecar, side_tmp)
+            outputs.append((side_tmp, side_dst))
+        if not delete and not damp_run and any(exists(target) for _, target in originals):
+            warn(f"CONFLICT: original .DELETE target appeared during processing; skipped: {src}")
+            return False
+        # Publish each completed file without overwriting; roll back this pair
+        # if either publication fails.
+        published = []
+        try:
+            for temporary, target in outputs:
+                os.link(temporary, target)
+                published.append(target)
+        except FileExistsError:
+            for target in published:
+                target.unlink()
+            warn(f"CONFLICT: output appeared during processing; skipped: {src}")
+            return False
+        except BaseException:
+            for target in published:
+                target.unlink()
+            raise
+        if needs_encoding:
+            color_line(32, f"✔  Done: {dst}")
+        else:
+            color_line(32, f"✔  Saved: {src} → {dst}" if delete
+                       else f"✔  Copied: {src} → {dst}")
+        if sidecar is not None:
+            color_line(32, f"✔  Copied sidecar (updated DerivedFrom): {sidecar} → {side_dst}")
+        if damp_run:
+            color_line(32, f"✔  Sources left in place: {src}")
+            return True
+        if delete:
+            for original, _ in originals:
+                original.unlink()
+                color_line(32, f"✔  Deleted source: {original}")
+            return True
+        # A no-overwrite rename implemented with hard-link/unlink on the source
+        # filesystem. If this fails, keep the completed library copy and original.
+        linked = []
+        try:
+            for original, target in originals:
+                os.link(original, target)
+                linked.append(target)
+        except OSError as error:
+            for target in linked:
+                target.unlink()
+            fail(f"Original rename failed: {src}: {error}; library copy kept at {dst}")
+            return False
+        for original, target in originals:
+            original.unlink()
+            color_line(32, f"✔  Renamed original: {original} → {target}")
+        return True
+    except (OSError, ValueError, ExpatError, subprocess.CalledProcessError) as error:
+        fail(f"Failed: {src}: {error}")
+        return False
+    finally:
+        if tmp is not None:
+            tmp.unlink(missing_ok=True)
+        if side_tmp is not None:
+            side_tmp.unlink(missing_ok=True)
+
+
+def main() -> int:
+    global DISPLAY_ROOTS
+    parser = argparse.ArgumentParser(
+        description="Recursively import DJI videos and photos into a timestamp-organized library.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""\
+What it does:
+  MP4: converts to H.265 using NVIDIA CUDA/NVENC; already-H.265 videos
+       are copied unchanged. Encoding retains detected 10-bit depth and
+       copies audio without re-encoding.
+  JPG/JPEG and DNG: copies images without re-encoding.
+  Matching image.xmp sidecars: copies with the image, renames to match,
+       and updates simple XMP DerivedFrom filename references.
+  After success, appends .DELETE to originals (including sidecars).
+       With -D / --delete, removes sources instead, after all outputs succeed.
+       Unchanged media uses a no-copy move on the same filesystem, or
+       copy-and-delete across filesystems. Sidecars are rewritten separately.
+       With -x / --damp-run, creates outputs but leaves sources in place,
+       without deleting or renaming them (cannot be combined with --delete).
+
+Library layout:
+  LIB_DIR/H265/YYYY-MM-DD/YYYY-MM-DD_HH_MM_SS.mp4
+  LIB_DIR/JPG/YYYY-MM-DD/YYYY-MM-DD_HH_MM_SS.jpg
+  LIB_DIR/DNG/YYYY-MM-DD/YYYY-MM-DD_HH_MM_SS.dng
+
+Dates and conflicts:
+  Uses embedded timestamps first, then recognized DJI/timestamp filenames.
+  Keeps the recorded clock time without timezone conversion.
+  Missing dates cause a skip, except four legacy JPG names use 1900-01-01.
+  Existing destinations cause a warning and skip. Without --delete,
+  existing .DELETE names also cause a skip.
+  Image/sidecar conflicts skip both; existing files are never overwritten.
+
+Scanning:
+  Extensions are case-insensitive. Ignores .LRF, .SRT and .DELETE files.
+  Skips the library directory and does not follow symbolic links.
+  Other files are reported and left alone.
+
+Requirements:
+  Set DJI_LIBRARY or pass --library LIB_DIR (which takes precedence).
+  Requires ffprobe; video conversion also requires ffmpeg with CUDA/NVENC
+  support and a compatible NVIDIA GPU. Dry-run reads metadata but writes
+  no files and previews planned copies, conversions, renames and conflicts.
+
+Examples:
+  import-dji --library /storage/DJI /storage/DJI_TRANSFER
+  DJI_LIBRARY=/storage/DJI import-dji --dry-run /media/card1 /media/card2
+""",
+    )
+    parser.add_argument(
+        "-L", "--library", metavar="LIB_DIR",
+        help="destination library directory (default: DJI_LIBRARY environment variable)",
+    )
+    source_mode = parser.add_mutually_exclusive_group()
+    source_mode.add_argument(
+        "-D", "--delete", action="store_true",
+        help="delete sources after success instead of appending .DELETE; move unchanged media when possible",
+    )
+    source_mode.add_argument(
+        "-x", "--damp-run", action="store_true",
+        help="create outputs but leave sources unchanged: no deletion or renaming",
+    )
+    parser.add_argument(
+        "-n", "--dry-run", action="store_true",
+        help="show planned actions and conflicts without writing or renaming files",
+    )
+    parser.add_argument(
+        "dirs", metavar="SOURCE_DIR", nargs="+", type=Path,
+        help="source directories to scan recursively",
+    )
+    args = parser.parse_args()
+    if args.damp_run and args.dry_run:
+        parser.error("--damp-run (-x) cannot be combined with --dry-run (-n)")
+    library_value = args.library if args.library is not None else os.environ.get("DJI_LIBRARY")
+    if not library_value:
+        parser.error("provide --library LIB_DIR or set DJI_LIBRARY")
+    library = Path(library_value).expanduser().resolve()
+    if library.exists() and not library.is_dir():
+        parser.error(f"library is not a directory: {library}")
+    roots = [path.expanduser().resolve() for path in args.dirs]
+    for root in roots:
+        if not root.is_dir():
+            parser.error(f"not a directory: {root}")
+    if not shutil.which("ffprobe"):
+        parser.error("ffprobe is required but was not found")
+    seen = set()
+    planned: set[Path] = set()
+    completed = skipped = 0
+    scan_errors = []
+    if args.dry_run:
+        color_line(36, "▶  Dry run: no files will be written or renamed.")
+
+    def scan_error(error: OSError) -> None:
+        scan_errors.append(error)
+        fail(f"Scan error: {error}")
+
+    for root in roots:
+        DISPLAY_ROOTS = (root, library)
+        if root == library or library in root.parents:
+            warn(f"Skipping library input: {root}")
+            continue
+        for directory, dirs, files in os.walk(root, onerror=scan_error, followlinks=False):
+            base = Path(directory)
+            dirs[:] = sorted(
+                name for name in dirs
+                if not (base / name).is_symlink()
+                and (base / name).resolve() != library
+            )
+            # Capture companions before processing renames their originals.
+            companions = {
+                name for name in files
+                if name.lower().endswith(".xmp") and name[:-4] in files
+                and Path(name[:-4]).suffix.lower() in {".jpg", ".jpeg", ".dng"}
+            }
+            for name in sorted(files):
+                if name in companions:
+                    continue
+                path = base / name
+                if path in seen:
+                    continue
+                seen.add(path)
+                ext = path.suffix.lower()
+                if ext in {".lrf", ".srt", ".delete"}:
+                    continue
+                if path.is_symlink() or not path.is_file():
+                    warn(f"Unprocessed non-regular file: {path}")
+                    continue
+                if ext not in {".mp4", ".jpg", ".jpeg", ".dng"}:
+                    warn(f"Unrecognized file, left alone: {path}")
+                    continue
+                if process(
+                    path, library, dry_run=args.dry_run,
+                     planned=planned, delete=args.delete, damp_run=args.damp_run,
+                ):
+                    completed += 1
+                else:
+                    skipped += 1
+    label = "Would process" if args.dry_run else "Completed"
+    color_line(
+        33 if skipped or scan_errors else 32,
+        f"{label}: {completed}; skipped/failed: {skipped}; scan errors: {len(scan_errors)}",
+    )
+    return 1 if skipped or scan_errors else 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        warn("Interrupted.")
+        sys.exit(130)

@@ -3,6 +3,5 @@
   "chat.defaultAgent": "main",
   "chat.agentEngine": "v3",
   "chat.enableAutoAgentUpgrade": true,
-  "chat.disableTrustAllConfirmation": true,
-  "chat.sessionDashboard.indexResponses": true
+  "chat.disableTrustAllConfirmation": true
 }
