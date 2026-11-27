@@ -1,0 +1,13 @@
+#!/bin/sh
+# OC:CUDA-LINUX:sal:ses_de14f98b4ffeuD6UEfDjRHy0Dk
+
+if [ "$#" -eq 0 ]; then
+    echo "Usage: prism program [args...]" >&2
+    exit 2
+fi
+
+PRISM_BIN=/home/sal/repos/prism-llama-cpp/build/bin
+export PATH="$PRISM_BIN${PATH:+:$PATH}"
+export LD_LIBRARY_PATH="$PRISM_BIN${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+exec "$@"

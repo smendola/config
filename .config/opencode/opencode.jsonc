@@ -32,38 +32,27 @@
     "llama-server": {
       "name": "llama-server cuda-linux:8080",
       "models": {
+        "bonsai-2.5-27b-think": {
+          "name": "Bonsai 2.5 27B Think 👁️‍🗨️ [260k]",
+          "limit": {
+            "context": 260000,
+            "output": 8192
+          },
+          "attachment": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
         "qwen3.6-35b/a3b-think": {
           "name": "Qwen3.6 35B/A3B Think [260k]",
           "limit": {
             "context": 260000,
-            "output": 8192
-          }
-        },
-        "kimi-vl-a3b-think": {
-          "name": "Kimi Vl A3B Think [131k]",
-          "limit": {
-            "context": 131072,
-            "output": 8192
-          }
-        },
-        "glm4.7-30b-a3b-q3-think": {
-          "name": "Glm4.7 30B A3B Q3 Think [128k]",
-          "limit": {
-            "context": 128000,
-            "output": 8192
-          }
-        },
-        "glm4.7-30b-a3b-q5-think": {
-          "name": "Glm4.7 30B A3B Q5 Think [128k]",
-          "limit": {
-            "context": 128000,
-            "output": 8192
-          }
-        },
-        "glm4.7-30b-a3b-iq4-think": {
-          "name": "Glm4.7 30B A3B Iq4 Think [128k]",
-          "limit": {
-            "context": 128000,
             "output": 8192
           }
         },
